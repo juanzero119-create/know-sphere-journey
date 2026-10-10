@@ -1,5 +1,5 @@
 import { useState, useSyncExternalStore } from 'react';
-import { BookOpen, Bone, Star, Heart, Music, Globe, FlaskConical, Pencil, Trash2, Plus, Check } from 'lucide-react';
+import { BookOpen, Bone, Star, Heart, Music, Globe, FlaskConical, Pencil, ChessKnight, Trash2, Plus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -8,12 +8,12 @@ export const iconChoices = [
   { name: 'Book', icon: BookOpen }, { name: 'Anatomy', icon: Bone },
   { name: 'Star', icon: Star }, { name: 'Heart', icon: Heart },
   { name: 'Music', icon: Music }, { name: 'Globe', icon: Globe },
-  { name: 'Science', icon: FlaskConical }, { name: 'Pencil', icon: Pencil },
+  { name: 'Science', icon: FlaskConical }, { name: 'Pencil', icon: Pencil }, { name: 'Chess', icon: ChessKnight },
 ] as const;
 const destinations = [
   { to: '/studies', label: 'Studies' }, { to: '/words', label: 'Vocabulary' },
   { to: '/anatomy', label: 'Anatomy' }, { to: '/', label: 'Practice' },
-  { to: '/watch', label: 'Watch' }, { to: '/movies', label: 'Movies' },
+  { to: '/watch', label: 'Watch' }, { to: '/movies', label: 'Movies' }, { to: '/chess', label: 'Chess' }, { to: '/ai', label: 'AI models' },
 ] as const;
 type Destination = typeof destinations[number]['to'];
 type IconName = typeof iconChoices[number]['name'];
