@@ -99,6 +99,28 @@ function Notes() {
 
   useEffect(() => { setNotes(loadNotes()); }, []);
 
+  const savedHighlighter = useRef(highlightSavedText);
+  savedHighlighter.current = highlightSavedText;
+  const notesRef = useRef(notes);
+  notesRef.current = notes;
+  useEffect(() => {
+    // Touch selections on saved notes finish with drag handles, so apply once the selection settles.
+    let timer: number | undefined;
+    const onChange = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        const selected = window.getSelection();
+        if (!selected || selected.isCollapsed || !selected.anchorNode) return;
+        const start = selected.anchorNode instanceof Element ? selected.anchorNode : selected.anchorNode.parentElement;
+        const element = start?.closest<HTMLParagraphElement>('[data-note-id]');
+        const note = element && notesRef.current.find(item => item.id === element.dataset.noteId);
+        if (element && note) savedHighlighter.current(element, note);
+      }, 700);
+    };
+    document.addEventListener('selectionchange', onChange);
+    return () => { document.removeEventListener('selectionchange', onChange); window.clearTimeout(timer); };
+  }, []);
+
   const update = (next: Note[]) => {
     setNotes(next);
     saveNotes(next);
@@ -171,7 +193,7 @@ function Notes() {
                   <Button type="button" variant="ghost" size="icon" aria-label={`Delete ${note.title}`} onClick={() => removeNote(note.id)}><Trash2 className="size-4"/></Button>
                 </div>
               </div>
-              {note.body && <p onPointerUp={event => highlightSavedText(event.currentTarget, note)} className="mt-2 select-text whitespace-pre-wrap break-words text-sm text-muted-foreground"><HighlightedNote body={note.body} highlights={note.highlights ?? []}/></p>}
+              {note.body && <p data-note-id={note.id} data-color={color} onPointerUp={event => highlightSavedText(event.currentTarget, note)} className="note-select mt-2 select-text whitespace-pre-wrap break-words text-sm text-muted-foreground"><HighlightedNote body={note.body} highlights={note.highlights ?? []}/></p>}
               <p className="mt-3 text-xs text-muted-foreground">{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </article>
           ))}
