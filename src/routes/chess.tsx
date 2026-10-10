@@ -4,8 +4,6 @@ import type { Square } from 'chess.js';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
-import { ModelManager } from '@/routes/ai';
-import { ChessModelPick } from '@/components/ChessModelPick';
 import { ChessElo } from '@/components/ChessElo';
 import { Pause, Play } from 'lucide-react';
 import { playMove, resetChess, setChessHumanSide, setChessMode, setChessPaused, useChessStore } from '@/lib/chess-store';
