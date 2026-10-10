@@ -89,30 +89,18 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
   </div>;
 });
 
-// Timed thinking indicator: animated dots + a live seconds counter while the
-// AI decides its move.
-function Thinking({ since }: { since: number }) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 100);
-    return () => clearInterval(id);
-  }, []);
-  const secs = Math.max(0, (now - since) / 1000);
-  return <div role="status" aria-label="AI is thinking" className="flex items-center gap-3 rounded-md border border-border bg-card px-3 py-2">
-    <span className="flex gap-1" aria-hidden="true">
-      <span className="thinking-dot size-2 rounded-full bg-primary"/>
-      <span className="thinking-dot size-2 rounded-full bg-primary" style={{ animationDelay: '0.15s' }}/>
-      <span className="thinking-dot size-2 rounded-full bg-primary" style={{ animationDelay: '0.3s' }}/>
-    </span>
-    <span className="text-sm font-semibold">AI is thinking</span>
-    <span className="ml-auto font-mono text-sm tabular-nums text-muted-foreground">{secs.toFixed(1)}s</span>
-  </div>;
+function Thinking() {
+  return <span role="status" aria-label="AI is thinking" className="inline-flex size-4 items-center justify-center">
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="chess-thinking-circle size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 7a9 9 0 0 0-15-2L2 8m0-5v5h5M4 17a9 9 0 0 0 15 2l3-3m0 5v-5h-5" />
+    </svg>
+  </span>;
 }
 
 function ChessPage() {
   const { game, state } = useChessStore();
   const [picked, setPicked] = useState<Square | null>(null);
-  const { clock, mode, humanSide, lastMove, thinking, thinkingSince, aiNote, paused } = state;
+  const { clock, mode, humanSide, lastMove, thinking, aiNote, paused } = state;
   const turn = game.turn();
   const flagged = clock.w <= 0 ? 'w' : clock.b <= 0 ? 'b' : null;
   const over = game.isGameOver() || !!flagged;
@@ -136,7 +124,7 @@ function ChessPage() {
     : game.isCheckmate() ? `Checkmate — ${turn === 'w' ? 'Black' : 'White'} wins`
     : game.isDraw() ? 'Draw' : `${paused ? 'Paused · ' : ''}${turn === 'w' ? 'White' : 'Black'} to move${game.inCheck() ? ' · Check!' : ''}`;
   const history = game.history();
-  const Clock = ({ side }: { side: 'w' | 'b' }) => <div className={'flex items-center justify-between rounded-md px-3 py-2 text-sm ' + (turn === side && !over ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground')}><span className="font-semibold">{side === 'w' ? 'White' : 'Black'}</span><span className="font-mono text-lg tabular-nums">{fmt(clock[side])}</span></div>;
+  const Clock = ({ side }: { side: 'w' | 'b' }) => <div className={'flex items-center justify-between rounded-md px-3 py-2 text-sm ' + (turn === side && !over ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground')}><span className="flex items-center gap-2 font-semibold">{side === 'w' ? 'White' : 'Black'}<span className="inline-flex size-4">{thinking && !over && !paused && turn === side && <Thinking />}</span></span><span className="font-mono text-lg tabular-nums">{fmt(clock[side])}</span></div>;
 
   return <Shell title="Chess">
     <Section number="01" title="Blitz game · 3+2">
@@ -144,11 +132,10 @@ function ChessPage() {
         <Clock side="w" />
         <Board game={game} picked={picked} lastMove={lastMove} interactive={interactive} onTap={tap} />
         <Clock side="b" />
-        {thinking && !over && <Thinking since={thinkingSince} />}
         <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex flex-wrap gap-2">{mode !== '2p' && !over && <><Button size="icon" variant={paused ? 'outline' : 'secondary'} aria-pressed={paused} aria-label="Pause the game" title="Pause" onClick={() => setChessPaused(true)}><Pause /></Button><Button size="icon" variant="outline" aria-pressed={!paused} aria-label="Play the game" title="Play" className={paused ? undefined : 'btn-play-live'} onClick={() => setChessPaused(false)}><Play /></Button></>}<Button variant={mode === 'ai' ? 'secondary' : 'outline'} aria-pressed={mode === 'ai'} onClick={() => setChessMode('ai')}>Vs AI</Button><Button variant={mode === '2p' ? 'secondary' : 'outline'} aria-pressed={mode === '2p'} onClick={() => setChessMode('2p')}>2 players</Button><Button variant={mode === 'aivai' ? 'secondary' : 'outline'} aria-pressed={mode === 'aivai'} onClick={() => setChessMode('aivai')}>AI vs AI</Button><Button variant="outline" onClick={() => resetChess()}>New game</Button></div></div>
         {mode === 'ai' && <div className="flex flex-wrap items-center gap-2"><span className="text-xs text-muted-foreground">You play</span><Button variant={humanSide === 'w' ? 'secondary' : 'outline'} aria-pressed={humanSide === 'w'} onClick={() => setChessHumanSide('w')}>White</Button><Button variant={humanSide === 'b' ? 'secondary' : 'outline'} aria-pressed={humanSide === 'b'} onClick={() => setChessHumanSide('b')}>Black</Button></div>}
-        {mode === 'ai' && <p className="text-xs text-muted-foreground">You play {humanSide === 'w' ? 'White' : 'Black'}. The AI plays {humanSide === 'w' ? 'Black' : 'White'} using the model chosen for its colour below.{thinking ? ' AI is thinking…' : ''}</p>}
-        {mode === 'aivai' && <p className="text-xs text-muted-foreground">Two AIs play each other, each with the model chosen for its colour below — one move at a time, even while you browse other tabs.{thinking ? ' AI is thinking…' : ''} Each move uses AI credits.</p>}
+        {mode === 'ai' && <p className="text-xs text-muted-foreground">You play {humanSide === 'w' ? 'White' : 'Black'}. The AI plays {humanSide === 'w' ? 'Black' : 'White'} using the model chosen for its colour below.</p>}
+        {mode === 'aivai' && <p className="text-xs text-muted-foreground">Two AIs play each other, each with the model chosen for its colour below — one move at a time, even while you browse other tabs. Each move uses AI credits.</p>}
         {aiNote && <p role="alert" className="text-xs text-destructive">{aiNote}</p>}
         <p className="text-xs text-muted-foreground">Full rules: legal moves only, check, checkmate, castling, en passant, promotion. Clock starts after White's first move. The game keeps running if you switch tabs.</p>
         <p className="text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
