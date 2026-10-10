@@ -50,3 +50,9 @@
 - [x] Set the Movies section background to golden yellow RGB(239, 197, 0).
 - [x] Keep dark text and slightly darker gold panels, borders, sidebar, and nav tiles.
 - [x] Verify the Movies and film pages on mobile and desktop.
+
+# Gray bottom bar
+- [x] Make the bottom navigation bar gray on every page, including the golden Movies section.
+- [x] Keep gray icon tiles and light gray labels inside it.
+- [x] Verify the bar on the Movies and home pages on mobile.
+
