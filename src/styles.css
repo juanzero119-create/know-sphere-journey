@@ -100,6 +100,26 @@
 @utility chunky-press {
   &:active { transform: translateY(4px); box-shadow: 0 2px 0 0 var(--ink); }
 }
+
+/* Beveled vertical nav tiles */
+@utility bevel-tile {
+  background: linear-gradient(145deg, var(--bevel-light), var(--bevel-face));
+  box-shadow:
+    -3px -3px 7px var(--bevel-light),
+    3px 3px 7px var(--bevel-dark),
+    inset 1px 1px 1px oklch(1 0 0);
+  transition: box-shadow 0.15s, transform 0.15s, color 0.15s;
+}
+@utility bevel-tile-press {
+  background: var(--bevel-face);
+  box-shadow:
+    inset 2px 2px 5px var(--bevel-dark),
+    inset -2px -2px 5px var(--bevel-light);
+  color: var(--primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .bevel-tile { transition: none; }
+}
 @utility section-label {
   font-size: 0.95rem;
   letter-spacing: 0;
