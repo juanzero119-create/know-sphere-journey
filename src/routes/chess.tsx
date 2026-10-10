@@ -90,9 +90,9 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
 });
 
 function Thinking() {
-  return <span role="status" aria-label="AI is thinking" className="inline-flex size-4 items-center justify-center">
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="chess-thinking-circle size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 7a9 9 0 0 0-15-2L2 8m0-5v5h5M4 17a9 9 0 0 0 15 2l3-3m0 5v-5h-5" />
+  return <span role="status" aria-label="AI is thinking" className="chess-thinking-circle inline-flex size-5 items-center justify-center">
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3.5 9a9 9 0 0 1 15-3L22 9M22 2v7h-7M20.5 15a9 9 0 0 1-15 3L2 15M2 22v-7h7" />
     </svg>
   </span>;
 }
@@ -124,14 +124,17 @@ function ChessPage() {
     : game.isCheckmate() ? `Checkmate — ${turn === 'w' ? 'Black' : 'White'} wins`
     : game.isDraw() ? 'Draw' : `${paused ? 'Paused · ' : ''}${turn === 'w' ? 'White' : 'Black'} to move${game.inCheck() ? ' · Check!' : ''}`;
   const history = game.history();
-  const Clock = ({ side }: { side: 'w' | 'b' }) => <div className={'flex items-center justify-between rounded-md px-3 py-2 text-sm ' + (turn === side && !over ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground')}><span className="flex items-center gap-2 font-semibold">{side === 'w' ? 'White' : 'Black'}<span className="inline-flex size-4">{thinking && !over && !paused && turn === side && <Thinking />}</span></span><span className="font-mono text-lg tabular-nums">{fmt(clock[side])}</span></div>;
+  const renderClock = (side: 'w' | 'b') => <div className={'flex items-center justify-between rounded-md px-3 py-2 text-sm ' + (turn === side && !over ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground')}><span className="font-semibold">{side === 'w' ? 'White' : 'Black'}</span><span className="font-mono text-lg tabular-nums">{fmt(clock[side])}</span></div>;
+  const renderThinking = (side: 'w' | 'b') => <div className="flex h-7 items-center text-muted-foreground">{thinking && !over && !paused && turn === side && <Thinking />}</div>;
 
   return <Shell title="Chess">
     <Section number="01" title="Blitz game · 3+2">
       <div className="mx-auto max-w-2xl space-y-2">
-        <Clock side="w" />
+        {renderClock('w')}
+        {renderThinking('w')}
         <Board game={game} picked={picked} lastMove={lastMove} interactive={interactive} onTap={tap} />
-        <Clock side="b" />
+        {renderClock('b')}
+        {renderThinking('b')}
         <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex flex-wrap gap-2">{mode !== '2p' && !over && <><Button size="icon" variant={paused ? 'outline' : 'secondary'} aria-pressed={paused} aria-label="Pause the game" title="Pause" onClick={() => setChessPaused(true)}><Pause /></Button><Button size="icon" variant="outline" aria-pressed={!paused} aria-label="Play the game" title="Play" className={paused ? undefined : 'btn-play-live'} onClick={() => setChessPaused(false)}><Play /></Button></>}<Button variant={mode === 'ai' ? 'secondary' : 'outline'} aria-pressed={mode === 'ai'} onClick={() => setChessMode('ai')}>Vs AI</Button><Button variant={mode === '2p' ? 'secondary' : 'outline'} aria-pressed={mode === '2p'} onClick={() => setChessMode('2p')}>2 players</Button><Button variant={mode === 'aivai' ? 'secondary' : 'outline'} aria-pressed={mode === 'aivai'} onClick={() => setChessMode('aivai')}>AI vs AI</Button><Button variant="outline" onClick={() => resetChess()}>New game</Button></div></div>
         {mode === 'ai' && <div className="flex flex-wrap items-center gap-2"><span className="text-xs text-muted-foreground">You play</span><Button variant={humanSide === 'w' ? 'secondary' : 'outline'} aria-pressed={humanSide === 'w'} onClick={() => setChessHumanSide('w')}>White</Button><Button variant={humanSide === 'b' ? 'secondary' : 'outline'} aria-pressed={humanSide === 'b'} onClick={() => setChessHumanSide('b')}>Black</Button></div>}
         {mode === 'ai' && <p className="text-xs text-muted-foreground">You play {humanSide === 'w' ? 'White' : 'Black'}. The AI plays {humanSide === 'w' ? 'Black' : 'White'} using the model chosen for its colour below.</p>}

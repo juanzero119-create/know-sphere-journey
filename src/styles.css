@@ -199,14 +199,9 @@ nav [data-status='active'] .nav-tile {
   .btn-play-live { transition: none; }
 }
 
-/* Compact circular thinking indicator beside the active player's name. */
-@keyframes chess-thinking-spin {
-  to { transform: rotate(360deg); }
-}
-.chess-thinking-circle { animation: chess-thinking-spin 1s linear infinite; }
-@media (prefers-reduced-motion: reduce) {
-  .chess-thinking-circle { animation: none; }
-}
+/* The reference shows stationary circular arrows below the player header.
+   Visibility follows thinking state; no continuous spinner is added. */
+.chess-thinking-circle { color: var(--muted-foreground); }
 
 
 
