@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 vi.mock('@/lib/chess-ai.functions', () => ({ getAiMove: vi.fn(() => new Promise(() => {})) }));
-import { ChessModelPick } from '@/components/ChessModelPick';
+import { ChessElo } from '@/components/ChessElo';
 import { ModelManager } from '@/routes/ai';
 import { chooseChessModel, chooseChessModelForBoth, getChessModelFor } from '@/lib/chess-models';
 
@@ -18,7 +18,7 @@ it('keeps an independent model for each colour', () => {
 
 it('renders one model selector per colour, each showing its own choice', () => {
   chooseChessModel('b', 'anthropic/claude-sonnet-5');
-  render(<ChessModelPick />);
+  render(<ChessElo />);
   const white = screen.getByRole('combobox', { name: 'White AI model' });
   const black = screen.getByRole('combobox', { name: 'Black AI model' });
   expect(white).toHaveTextContent('GPT-6 Luna');
