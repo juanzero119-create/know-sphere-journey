@@ -39,7 +39,7 @@ function ChessPage() {
   const [lastMove, setLastMove] = useState<[Square, Square] | null>(null);
   const [clock, setClock] = useState({ w: BLITZ, b: BLITZ });
   const [started, setStarted] = useState(false);
-  const [vsAi, setVsAi] = useState(true);
+  const [mode, setMode] = useState<'ai' | '2p' | 'aivai'>('ai');
   const [thinking, setThinking] = useState(false);
   const [aiNote, setAiNote] = useState('');
   const turn = game.turn();
@@ -57,7 +57,7 @@ function ChessPage() {
   const checkSq = game.inCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === turn)?.square : undefined;
 
   function tap(r: number, c: number) {
-    if (over || thinking || (vsAi && game.turn() === 'b')) return;
+    if (over || thinking || mode === 'aivai' || (mode === 'ai' && game.turn() === 'b')) return;
     const s = sq(r, c);
     const p = game.get(s);
     if (picked && targets.includes(s)) {
@@ -68,7 +68,8 @@ function ChessPage() {
     else setPicked(null);
   }
   useEffect(() => {
-    if (!vsAi || over || turn !== 'b' || thinking) return;
+    const aiTurn = mode === 'aivai' || (mode === 'ai' && turn === 'b');
+    if (!aiTurn || over || thinking) return;
     let cancelled = false;
     const fen = game.fen();
     const model = localStorage.getItem('lexi-ai-model') || 'openai/gpt-6-astra';
@@ -78,12 +79,13 @@ function ChessPage() {
       if ('error' in r && r.error) { setAiNote(r.error); return; }
       if (!('move' in r) || !r.move) return;
       const m = game.move(r.move);
-      setClock(cl => ({ ...cl, b: cl.b + INC }));
+      setStarted(true);
+      setClock(cl => ({ ...cl, [turn]: cl[turn] + INC }));
       setLastMove([m.from, m.to]); setPicked(null); setTick(t => t + 1);
       if (r.fallback) setAiNote('The AI gave an unclear answer, so a random legal move was played.');
     }).catch(() => { if (!cancelled) setAiNote('The AI could not move. Try again.'); }).finally(() => { if (!cancelled) setThinking(false); });
     return () => { cancelled = true; setThinking(false); };
-  }, [vsAi, over, turn, game, lastMove]);
+  }, [mode, over, turn, game, lastMove]);
   function reset() { setAiNote(''); setGame(new Chess()); setPicked(null); setLastMove(null); setClock({ w: BLITZ, b: BLITZ }); setStarted(false); }
 
   const status = flagged ? `${flagged === 'w' ? 'White' : 'Black'} ran out of time — ${flagged === 'w' ? 'Black' : 'White'} wins`
@@ -110,8 +112,9 @@ function ChessPage() {
           }))}
         </div>
         <Clock side="b" />
-        <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex gap-2"><Button variant={vsAi ? 'secondary' : 'outline'} aria-pressed={vsAi} onClick={() => { setVsAi(v => !v); reset(); }}>{vsAi ? 'Vs AI' : '2 players'}</Button><Button variant="outline" onClick={reset}>New game</Button></div></div>
-        {vsAi && <p className="text-xs text-muted-foreground">You play White. The AI plays Black using the model chosen below.{thinking ? ' AI is thinking…' : ''}</p>}
+        <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex flex-wrap gap-2"><Button variant={mode === 'ai' ? 'secondary' : 'outline'} aria-pressed={mode === 'ai'} onClick={() => { setMode('ai'); reset(); }}>Vs AI</Button><Button variant={mode === '2p' ? 'secondary' : 'outline'} aria-pressed={mode === '2p'} onClick={() => { setMode('2p'); reset(); }}>2 players</Button><Button variant={mode === 'aivai' ? 'secondary' : 'outline'} aria-pressed={mode === 'aivai'} onClick={() => { setMode('aivai'); reset(); }}>AI vs AI</Button><Button variant="outline" onClick={reset}>New game</Button></div></div>
+        {mode === 'ai' && <p className="text-xs text-muted-foreground">You play White. The AI plays Black using the model chosen below.{thinking ? ' AI is thinking…' : ''}</p>}
+        {mode === 'aivai' && <p className="text-xs text-muted-foreground">Two AIs play each other with the model chosen below — one move at a time.{thinking ? ' AI is thinking…' : ''} Each move uses AI credits.</p>}
         {aiNote && <p role="alert" className="text-xs text-destructive">{aiNote}</p>}
         <p className="text-xs text-muted-foreground">Full rules: legal moves only, check, checkmate, castling, en passant, promotion. Clock starts after White's first move.</p>
         <p className="text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
