@@ -20,6 +20,6 @@
 - [x] Verify every page on mobile and desktop.
 
 # Studies navigation
-- [ ] Replace separate Vocabulary and Anatomy navigation entries with Studies.
-- [ ] Add a named custom-icon control with icon and destination selection for this visit.
-- [ ] Verify navigation and custom-icon interactions.
+- [x] Replace separate Vocabulary and Anatomy navigation entries with Studies.
+- [x] Add a named custom-icon control with icon and destination selection for this visit.
+- [x] Verify navigation and custom-icon interactions.
