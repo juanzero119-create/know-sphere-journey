@@ -6,6 +6,7 @@ import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { ModelManager } from '@/routes/ai';
 import { ChessElo } from '@/components/ChessElo';
+import { ChessRating } from '@/components/ChessRating';
 import { Pause, Play } from 'lucide-react';
 import { playMove, resetChess, setChessHumanSide, setChessMode, setChessPaused, useChessStore } from '@/lib/chess-store';
 
@@ -130,6 +131,7 @@ function ChessPage() {
         {aiNote && <p role="alert" className="text-xs text-destructive">{aiNote}</p>}
         <p className="text-xs text-muted-foreground">Full rules: legal moves only, check, checkmate, castling, en passant, promotion. Clock starts after White's first move. The game keeps running if you switch tabs.</p>
         <p className="text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
+        {mode === 'ai' && <ChessRating />}
         {mode !== '2p' && <ChessElo />}
       </div>
     </Section>

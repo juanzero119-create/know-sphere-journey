@@ -4,6 +4,7 @@ import { getAiMove } from '@/lib/chess-ai.functions';
 import { getChessModelFor } from '@/lib/chess-models';
 import { DEFAULT_ELO, eloSchema } from '@/lib/chess-elo';
 import { playGameEndSound, playMoveSound } from '@/lib/chess-sounds';
+import { recordRatedGame } from '@/lib/chess-rating';
 
 export type ChessMode = 'ai' | '2p' | 'aivai';
 
@@ -104,6 +105,15 @@ function maybePlayEndSound() {
   if (endSoundPlayed || !isOver()) return;
   endSoundPlayed = true;
   playGameEndSound();
+  if (state.mode === 'ai' && state.started) {
+    const me = state.humanSide;
+    const ai = me === 'w' ? 'b' : 'w';
+    let score: 0 | 0.5 | 1 = 0.5;
+    if (state.clock[me] <= 0) score = 0;
+    else if (state.clock[ai] <= 0) score = 1;
+    else if (game.isCheckmate()) score = game.turn() === me ? 0 : 1;
+    recordRatedGame(state.elo[ai], score);
+  }
 }
 
 function applyMove(from: Square, to: Square, turn: 'w' | 'b') {
