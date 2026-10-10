@@ -4,7 +4,7 @@ import { ArrowLeft, Star } from 'lucide-react';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
-import { movies, runtimeLabel } from '@/lib/movies';
+import { movies, runtimeLabel, type Movie } from '@/lib/movies';
 
 export const Route = createFileRoute('/film/$id')({
  loader:({params})=>{const movie=movies.find(m=>m.id===params.id);if(!movie)throw notFound();return movie;},
@@ -13,7 +13,7 @@ export const Route = createFileRoute('/film/$id')({
  component:FilmPage,
 });
 function FilmPage(){const movie=Route.useLoaderData();return <FilmContent key={movie.id} movie={movie}/>;}
-function FilmContent({movie}:{movie:ReturnType<typeof Route.useLoaderData>}) {
+function FilmContent({movie}:{movie:Movie}) {
  const [rating,setRating]=useState(0);
  return <Shell title="Movies"><Button asChild variant="link" className="px-0"><Link to="/movies"><ArrowLeft/>All movies</Link></Button>
  <div className="grid gap-6 sm:grid-cols-[220px_1fr]"><img src={movie.image} alt={`${movie.title} inspired artwork`} width={512} height={768} className="aspect-[2/3] w-full max-w-56 rounded-lg object-cover"/><div className="self-center"><p className="text-xs text-muted-foreground">{movie.year} · {movie.certificate} · {runtimeLabel(movie.runtime)}</p><h2 className="mt-3 text-3xl font-semibold">{movie.title}</h2><p className="mt-3 text-sm text-muted-foreground">{movie.genres.join(' / ')}</p><p className="mt-5 leading-relaxed">{movie.synopsis}</p><div className="mt-5 flex items-center gap-2"><Star className="size-5 fill-gold text-gold"/><strong>{movie.score.toFixed(1)} / 10</strong><span className="text-xs text-muted-foreground">Sample score</span></div><p className="mt-4 text-xs text-muted-foreground">Film-inspired artwork · Not an official poster</p></div></div>
