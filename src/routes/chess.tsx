@@ -6,7 +6,7 @@ import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { ModelManager } from '@/routes/ai';
 import { ChessElo } from '@/components/ChessElo';
-import { playMove, resetChess, setChessMode, useChessStore } from '@/lib/chess-store';
+import { playMove, resetChess, setChessHumanSide, setChessMode, useChessStore } from '@/lib/chess-store';
 
 export const Route = createFileRoute('/chess')({
   head: () => ({ meta: [
@@ -34,7 +34,7 @@ const fmt = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); retur
 function ChessPage() {
   const { game, state } = useChessStore();
   const [picked, setPicked] = useState<Square | null>(null);
-  const { clock, mode, lastMove, thinking, aiNote } = state;
+  const { clock, mode, humanSide, lastMove, thinking, aiNote } = state;
   const turn = game.turn();
   const flagged = clock.w <= 0 ? 'w' : clock.b <= 0 ? 'b' : null;
   const over = game.isGameOver() || !!flagged;
@@ -43,7 +43,7 @@ function ChessPage() {
   const checkSq = game.inCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === turn)?.square : undefined;
 
   function tap(r: number, c: number) {
-    if (over || thinking || mode === 'aivai' || (mode === 'ai' && turn === 'b')) return;
+    if (over || thinking || mode === 'aivai' || (mode === 'ai' && turn !== humanSide)) return;
     const s = sq(r, c);
     const p = game.get(s);
     if (picked && targets.includes(s)) {

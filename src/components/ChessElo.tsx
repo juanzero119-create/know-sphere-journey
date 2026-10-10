@@ -5,7 +5,8 @@ import { setChessElo, useChessStore } from '@/lib/chess-store';
 
 export function ChessElo() {
   const { state } = useChessStore();
-  const sides: ('w' | 'b')[] = state.mode === 'aivai' ? ['w', 'b'] : ['b'];
+  const aiSide: 'w' | 'b' = state.humanSide === 'w' ? 'b' : 'w';
+  const sides: ('w' | 'b')[] = state.mode === 'aivai' ? ['w', 'b'] : [aiSide];
   return <div className="space-y-5 border-t border-border pt-5">
     <div className="flex flex-wrap items-baseline justify-between gap-2">
       <h3 className="text-sm font-semibold">AI difficulty</h3>
