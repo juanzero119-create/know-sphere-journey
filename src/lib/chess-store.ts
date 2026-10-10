@@ -18,6 +18,7 @@ export interface ChessState {
   thinking: boolean;
   aiNote: string;
   elo: { w: number; b: number };
+  paused: boolean;
 }
 
 const initialState: ChessState = {
@@ -30,6 +31,7 @@ const initialState: ChessState = {
   thinking: false,
   aiNote: '',
   elo: { w: DEFAULT_ELO, b: DEFAULT_ELO },
+  paused: false,
 };
 
 // Module-level game + state: survives route unmounts, so the game (and AI
