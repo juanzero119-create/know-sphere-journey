@@ -11,8 +11,8 @@ describe('Actor editor', () => {
   expect(screen.getByText('DiCaprio')).toBeInTheDocument();
   expect(screen.getAllByText('Kevin').length).toBe(1);
   expect(screen.getByText('Spacey')).toBeInTheDocument();
-  for (const name of ['William Hurt', 'Mark Ruffalo', 'Matt Damon', 'Val Kilmer', 'Nicolas Cage', 'Kevin Costner']) {
-   expect(screen.queryByText(name.split(' ')[0])).not.toBeInTheDocument();
+  for (const lastName of ['Hurt', 'Ruffalo', 'Damon', 'Kilmer', 'Cage', 'Costner']) {
+   expect(screen.queryByText(lastName)).not.toBeInTheDocument();
   }
  });
  it('adds, updates, and removes an actor with independent highlights', () => {
