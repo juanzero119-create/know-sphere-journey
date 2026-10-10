@@ -58,6 +58,11 @@ export function filmsForActor(name: string): Movie[] {
   return (actorIndex.get(name) ?? []).map(f => f.movie);
 }
 
+/** Every film a given actor appears in, with the character they played. */
+export function filmographyForActor(name: string): { movie: Movie; role: string }[] {
+  return actorIndex.get(name) ?? [];
+}
+
 export function searchActors(query: string, limit = 8): ActorHit[] {
   if (!norm(query)) return [];
   const hits: ActorHit[] = [];
