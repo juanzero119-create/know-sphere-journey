@@ -98,3 +98,9 @@
 - [x] Take the "Details" button out from underneath every actor's name.
 - [x] Let the arrow chevron beside the name reveal the bio and the film tiles together.
 - [x] Verify no Details button remains and the tiles still open and close.
+
+# iPhone app
+- [x] Add home-screen install support: app icon, name, dark launch color, full-screen display.
+- [x] Keep the top bar clear of the status bar and the bottom bar clear of the home indicator.
+- [x] Fit every bottom tab on one row on a phone-sized screen.
+- [x] Verify the install files and the phone layout.
