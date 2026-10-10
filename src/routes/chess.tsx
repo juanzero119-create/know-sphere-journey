@@ -33,7 +33,7 @@ const fmt = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); retur
 function ChessPage() {
   const { game, state } = useChessStore();
   const [picked, setPicked] = useState<Square | null>(null);
-  const { clock, started, mode, lastMove, thinking, aiNote } = state;
+  const { clock, mode, lastMove, thinking, aiNote } = state;
   const turn = game.turn();
   const flagged = clock.w <= 0 ? 'w' : clock.b <= 0 ? 'b' : null;
   const over = game.isGameOver() || !!flagged;
