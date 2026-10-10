@@ -5,7 +5,6 @@ import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { ModelManager } from '@/routes/ai';
-import { ChessModelPick } from '@/components/ChessModelPick';
 import { ChessElo } from '@/components/ChessElo';
 import { Pause, Play } from 'lucide-react';
 import { playMove, resetChess, setChessHumanSide, setChessMode, setChessPaused, useChessStore } from '@/lib/chess-store';
@@ -87,10 +86,9 @@ function ChessPage() {
         <p className="text-xs text-muted-foreground">Full rules: legal moves only, check, checkmate, castling, en passant, promotion. Clock starts after White's first move. The game keeps running if you switch tabs.</p>
         <p className="text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
         {mode !== '2p' && <ChessElo />}
-        {mode !== '2p' && <ChessModelPick />}
       </div>
     </Section>
-    <ModelManager pickers={false}/>
+    <ModelManager />
     <Section number="04" title="Move list">
       {history.length === 0 ? <p className="text-sm text-muted-foreground">No moves yet.</p> :
         <ol className="grid grid-cols-[auto_1fr_1fr] gap-x-4 gap-y-1 font-mono text-sm">{Array.from({ length: Math.ceil(history.length / 2) }, (_, i) => <li key={i} className="contents"><span className="text-muted-foreground">{i + 1}.</span><span>{history[i * 2]}</span><span>{history[i * 2 + 1] ?? ''}</span></li>)}</ol>}
