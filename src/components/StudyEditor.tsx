@@ -30,7 +30,7 @@ export function StudyEditor({ open, onOpenChange }: { open: boolean; onOpenChang
   const Icon = iconChoices.find(choice => choice.name === iconName)?.icon ?? BookOpen;
   return <Dialog open={open} onOpenChange={value => { if (!value) reset(); onOpenChange(value); }}>
     <DialogContent className="max-h-[85dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-lg shadow-none">
-      <DialogHeader><DialogTitle>Add a study</DialogTitle><DialogDescription>Custom studies · This visit only</DialogHeader></DialogHeader>
+      <DialogHeader><DialogTitle>Add a study</DialogTitle><DialogDescription>Custom studies · This visit only</DialogDescription></DialogHeader>
       <form className="space-y-5" onSubmit={event => {
         event.preventDefault();
         const trimmed = name.trim();
