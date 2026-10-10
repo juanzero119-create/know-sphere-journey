@@ -135,16 +135,19 @@ function Notes() {
     };
   }, []);
 
+  // Press-and-hold on plain text adds the chosen color; press-and-hold on text that is
+  // already highlighted removes the highlight it touches (undo).
+  const overlapsHighlight = (ranges: NoteHighlight[], start: number, end: number) => ranges.some(range => range.start < end && start < range.end);
   const { drag, begin } = usePressHighlight((id, start, end) => {
     const chosen = colorRef.current;
-    if (id === 'draft') { setHighlights(old => applyHighlight(old, start, end, chosen)); return; }
+    if (id === 'draft') { setHighlights(old => applyHighlight(old, start, end, overlapsHighlight(old, start, end) ? null : chosen)); return; }
     const note = notesRef.current.find(item => item.id === id);
     if (!note) return;
-    const nextHighlights = applyHighlight(note.highlights ?? [], start, end, chosen);
+    const nextHighlights = applyHighlight(note.highlights ?? [], start, end, overlapsHighlight(note.highlights ?? [], start, end) ? null : chosen);
     update(notesRef.current.map(item => item.id === id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
     if (editingId === id && draftBody === note.body) setHighlights(nextHighlights);
   });
-  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, color) : base;
+  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, overlapsHighlight(base, drag.start, drag.end) ? null : color) : base;
 
   const update = (next: Note[]) => {
     setNotes(next);
