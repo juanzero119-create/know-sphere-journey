@@ -39,7 +39,7 @@ function ChessPage() {
   const [lastMove, setLastMove] = useState<[Square, Square] | null>(null);
   const [clock, setClock] = useState({ w: BLITZ, b: BLITZ });
   const [started, setStarted] = useState(false);
-  const [vsAi, setVsAi] = useState(true);
+  const [mode, setMode] = useState<'ai' | '2p' | 'aivai'>('ai');
   const [thinking, setThinking] = useState(false);
   const [aiNote, setAiNote] = useState('');
   const turn = game.turn();
