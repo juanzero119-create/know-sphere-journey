@@ -4,7 +4,8 @@ import { BookOpen, Bone, ArrowRight, Plus } from 'lucide-react';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
-import { StudyEditor, useCustomStudies, studyDestinations, iconChoices } from '@/components/StudyEditor';
+import { StudyEditor, useCustomStudies, studyDestinations } from '@/components/StudyEditor';
+import { iconChoices } from '@/components/NavigationEditor';
 
 export const Route = createFileRoute('/studies')({
   head: () => ({ meta: [
