@@ -83,3 +83,8 @@
 - [x] Turn each movie listed under an actor into a raised, beveled tile with a poster thumbnail.
 - [x] Use the same tiles for actor results in the movies search, with the role shown underneath.
 - [x] Verify the tiles on a film page and in search on the golden Movies theme.
+
+# Film tiles on actor cards
+- [x] Show every film an actor appears in as beveled tiles under their details in the Actors list.
+- [x] Keep the bio above the tiles when an actor's bio is expanded.
+- [x] Verify tiles on seeded actors and on an actor further down the list.
