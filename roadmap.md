@@ -45,3 +45,8 @@
 
 # Remove AI-poster films
 - [x] Remove the six films that use generated artwork from the Movies catalog.
+
+# Movies background color
+- [x] Set the Movies section background to golden yellow RGB(239, 197, 0).
+- [x] Keep dark text and slightly darker gold panels, borders, sidebar, and nav tiles.
+- [x] Verify the Movies and film pages on mobile and desktop.
