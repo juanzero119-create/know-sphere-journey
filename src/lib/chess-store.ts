@@ -79,6 +79,7 @@ function startClock() {
       stopClock();
       return;
     }
+    if (state.paused) return; // clocks freeze while paused
     const turn = game.turn();
     state.clock = { ...state.clock, [turn]: state.clock[turn] - d };
     emit();
