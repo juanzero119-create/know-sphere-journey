@@ -97,7 +97,7 @@ function Thinking({ since }: { since: number }) {
     const id = setInterval(() => tick((n) => n + 1), 100);
     return () => clearInterval(id);
   }, []);
-  return <span role="status" aria-label="AI is thinking" className="inline-flex items-center gap-1.5">
+  return <span role="status" aria-label="AI is thinking" className="inline-flex items-center gap-3">
     <span className="chess-thinking-circle inline-flex size-5 items-center justify-center">
       <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" strokeWidth="4.5">
         <circle className="chess-thinking-track" cx="12" cy="12" r="9" />
