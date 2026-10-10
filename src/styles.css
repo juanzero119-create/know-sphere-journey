@@ -91,10 +91,11 @@
   --chess-last-light: #f5fa53;
   --chess-last-dark: #a7a337;
   --chess-piece-outline: #ffffff;
-  --nav-bar: oklch(0.17 0 0);
-  --nav-bar-foreground: oklch(0.93 0 0);
-  --nav-bar-border: oklch(0.33 0 0);
+  --nav-bar: oklch(0.3 0 0);
+  --nav-bar-foreground: oklch(0.96 0 0);
+  --nav-bar-border: oklch(0.38 0 0);
 }
+
 
 
 /* Movies section: golden yellow background (RGB 239, 197, 0). */
@@ -170,12 +171,13 @@ nav [data-status='active'] .nav-tile {
   background: var(--nav-bar);
   color: var(--nav-bar-foreground);
   border-color: var(--nav-bar-border);
-  --foreground: oklch(0.93 0 0);
-  --muted-foreground: oklch(0.68 0 0);
-  --nav-tile: oklch(0.3 0 0);
-  --nav-tile-active: oklch(0.4 0 0);
-  --nav-tile-press: oklch(0.24 0 0);
+  --foreground: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.82 0 0);
+  --nav-tile: oklch(0.45 0 0);
+  --nav-tile-active: oklch(0.53 0 0);
+  --nav-tile-press: oklch(0.38 0 0);
 }
+
 
 @utility section-label {
   font-size: 0.95rem;
