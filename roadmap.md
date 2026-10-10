@@ -6,4 +6,4 @@
 # Actor interface
 - [x] Add actor entry, optional film and character, and separate name highlight controls.
 - [x] Add live preview and edit/remove controls.
-- [ ] Verify actor interactions and mobile layout.
+- [x] Verify actor interactions and mobile layout.
