@@ -53,6 +53,11 @@ const actorIndex = (() => {
   return map;
 })();
 
+/** Every movie in the catalog a given actor appears in. */
+export function filmsForActor(name: string): Movie[] {
+  return (actorIndex.get(name) ?? []).map(f => f.movie);
+}
+
 export function searchActors(query: string, limit = 8): ActorHit[] {
   if (!norm(query)) return [];
   const hits: ActorHit[] = [];
