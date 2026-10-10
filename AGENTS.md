@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Keep learning content in separate TanStack leaf routes within the shared Shell; this preserves direct navigation to each learning discipline.
+- Store note highlights as validated text ranges alongside plain-text notes and render them as React marks; this preserves existing device-saved notes without storing or injecting HTML.
 - Use Section for numbered content bands and the shared Button for controls; this keeps the expanded learning views consistent.
 
 - Keep the curated film catalog in a browser-safe data module with a Movies leaf and parameterized Film detail leaf; this supports direct links without a live movie API.

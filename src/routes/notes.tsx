@@ -1,11 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { NotebookPen, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Check, Highlighter, NotebookPen, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { HighlightedNote } from '@/components/HighlightedNote';
+import { adjustHighlights, applyHighlight, noteColors, type NoteColor, type NoteHighlight } from '@/lib/note-highlights';
 
 export const Route = createFileRoute('/notes')({
   head: () => ({ meta: [
@@ -19,7 +21,7 @@ export const Route = createFileRoute('/notes')({
   component: Notes,
 });
 
-type Note = { id: string; title: string; body: string; updatedAt: number };
+type Note = { id: string; title: string; body: string; updatedAt: number; highlights?: NoteHighlight[] };
 
 const STORAGE_KEY = 'lexi-notes';
 
@@ -29,7 +31,7 @@ function loadNotes(): Note[] {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as Note[];
-    return Array.isArray(parsed) ? parsed.filter(note => note && typeof note.title === 'string') : [];
+    return Array.isArray(parsed) ? parsed.filter(note => note && typeof note.title === 'string' && typeof note.body === 'string').map(note => ({ ...note, highlights: Array.isArray(note.highlights) ? note.highlights.filter(range => range && Number.isInteger(range.start) && Number.isInteger(range.end) && range.start >= 0 && range.end > range.start && range.end <= note.body.length && noteColors.some(color => color.id === range.color)).sort((a, b) => a.start - b.start) : [] })) : [];
   } catch {
     return [];
   }
@@ -44,6 +46,19 @@ function Notes() {
   const [draftTitle, setDraftTitle] = useState('');
   const [draftBody, setDraftBody] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [highlights, setHighlights] = useState<NoteHighlight[]>([]);
+  const [color, setColor] = useState<NoteColor>('gold');
+  const [selection, setSelection] = useState({ start: 0, end: 0 });
+  const editor = useRef<HTMLTextAreaElement>(null);
+  const captureSelection = () => {
+    const element = editor.current;
+    if (element) setSelection({ start: element.selectionStart, end: element.selectionEnd });
+  };
+  const highlightSelection = (chosen: NoteColor | null) => {
+    setHighlights(old => applyHighlight(old, selection.start, selection.end, chosen));
+    editor.current?.focus();
+    editor.current?.setSelectionRange(selection.start, selection.end);
+  };
 
   useEffect(() => { setNotes(loadNotes()); }, []);
 
@@ -54,39 +69,49 @@ function Notes() {
 
   const saveDraft = () => {
     const title = draftTitle.trim();
-    const body = draftBody.trim();
-    if (!title && !body) return;
+    const body = draftBody;
+    if (!title && !body.trim()) return;
     if (editingId) {
-      update(notes.map(note => note.id === editingId ? { ...note, title, body, updatedAt: Date.now() } : note));
+      update(notes.map(note => note.id === editingId ? { ...note, title: title || 'Untitled note', body, highlights, updatedAt: Date.now() } : note));
     } else {
-      update([{ id: String(Date.now()), title: title || 'Untitled note', body, updatedAt: Date.now() }, ...notes]);
+      update([{ id: String(Date.now()), title: title || 'Untitled note', body, highlights, updatedAt: Date.now() }, ...notes]);
     }
     setDraftTitle('');
     setDraftBody('');
     setEditingId(null);
+    setHighlights([]);
+    setSelection({ start: 0, end: 0 });
   };
 
   const startEdit = (note: Note) => {
     setEditingId(note.id);
     setDraftTitle(note.title === 'Untitled note' ? '' : note.title);
     setDraftBody(note.body);
+    setHighlights(note.highlights ?? []);
+    setSelection({ start: 0, end: 0 });
   };
 
   const removeNote = (id: string) => {
     update(notes.filter(note => note.id !== id));
-    if (editingId === id) { setEditingId(null); setDraftTitle(''); setDraftBody(''); }
+    if (editingId === id) { setEditingId(null); setDraftTitle(''); setDraftBody(''); setHighlights([]); setSelection({ start: 0, end: 0 }); }
   };
 
   return <Shell title="Notes">
     <Section number="01" title="Write a note" subtitle="Saved on this device">
       <div className="rounded-lg border border-border bg-card p-6">
         <Input value={draftTitle} onChange={event => setDraftTitle(event.target.value)} placeholder="Note title" aria-label="Note title" maxLength={80}/>
-        <Textarea value={draftBody} onChange={event => setDraftBody(event.target.value)} placeholder="Write your note…" aria-label="Note text" className="mt-3 min-h-28" maxLength={4000}/>
+        <Textarea ref={editor} value={draftBody} onSelect={captureSelection} onChange={event => { const next = event.target.value; setHighlights(old => adjustHighlights(old, draftBody, next)); setDraftBody(next); }} placeholder="Write your note…" aria-label="Note text" className="mt-3 min-h-28" maxLength={4000}/>
+        <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Note highlighting">
+          {noteColors.map(option => <Button key={option.id} type="button" size="icon" variant="outline" aria-label={`${option.label} highlight color`} title={`${option.label} highlight color`} aria-pressed={color === option.id} onMouseDown={event => event.preventDefault()} onClick={() => setColor(option.id)} className={color === option.id ? 'border-primary' : ''}><span className={`grid size-6 place-items-center rounded-sm ${option.className}`}>{color === option.id && <Check className="size-4"/>}</span></Button>)}
+          <Button type="button" size="icon" variant="outline" aria-label="Highlight selected text" title="Highlight selected text" disabled={selection.start === selection.end} onMouseDown={event => event.preventDefault()} onClick={() => highlightSelection(color)}><Highlighter/></Button>
+          <Button type="button" size="icon" variant="outline" aria-label="Remove selected highlight" title="Remove selected highlight" disabled={selection.start === selection.end} onMouseDown={event => event.preventDefault()} onClick={() => highlightSelection(null)}><X/></Button>
+        </div>
+        {highlights.length > 0 && <div className="mt-4 whitespace-pre-wrap break-words text-sm" aria-label="Highlighted note preview"><HighlightedNote body={draftBody} highlights={highlights}/></div>}
         <div className="mt-4 flex gap-2">
           <Button type="button" onClick={saveDraft} disabled={!draftTitle.trim() && !draftBody.trim()}>
             {editingId ? <Pencil/> : <Plus/>}{editingId ? 'Save changes' : 'Add note'}
           </Button>
-          {editingId && <Button type="button" variant="ghost" onClick={() => { setEditingId(null); setDraftTitle(''); setDraftBody(''); }}>Cancel</Button>}
+           {editingId && <Button type="button" variant="ghost" onClick={() => { setEditingId(null); setDraftTitle(''); setDraftBody(''); setHighlights([]); setSelection({ start: 0, end: 0 }); }}>Cancel</Button>}
         </div>
       </div>
     </Section>
@@ -107,7 +132,7 @@ function Notes() {
                   <Button type="button" variant="ghost" size="icon" aria-label={`Delete ${note.title}`} onClick={() => removeNote(note.id)}><Trash2 className="size-4"/></Button>
                 </div>
               </div>
-              {note.body && <p className="mt-2 whitespace-pre-wrap break-words text-sm text-muted-foreground">{note.body}</p>}
+              {note.body && <p className="mt-2 whitespace-pre-wrap break-words text-sm text-muted-foreground"><HighlightedNote body={note.body} highlights={note.highlights ?? []}/></p>}
               <p className="mt-3 text-xs text-muted-foreground">{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </article>
           ))}
