@@ -1,5 +1,15 @@
 import "@testing-library/jest-dom/vitest";
 
+// jsdom has no ResizeObserver; Radix poppers and the slider need one.
+if (typeof globalThis.ResizeObserver === "undefined") {
+  class ResizeObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  (globalThis as Record<string, unknown>).ResizeObserver = ResizeObserverStub;
+}
+
 Object.defineProperty(window, "scrollTo", {
   writable: true,
   value: () => {},

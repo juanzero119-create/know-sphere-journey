@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { Chess, type Square } from 'chess.js';
 import { getAiMove } from '@/lib/chess-ai.functions';
+import { getChessModelFor } from '@/lib/chess-models';
 import { DEFAULT_ELO, eloSchema } from '@/lib/chess-elo';
 
 export type ChessMode = 'ai' | '2p' | 'aivai';
@@ -121,7 +122,7 @@ async function maybeAiMove() {
   state.aiNote = '';
   emit();
   const fen = game.fen();
-  const model = localStorage.getItem('lexi-ai-model') || 'openai/gpt-6-astra';
+  const model = getChessModelFor(turn);
   try {
     const r = await getAiMove({ data: { fen, model, elo: state.elo[turn] } });
     if (game.fen() !== fen) return; // game was reset while waiting
