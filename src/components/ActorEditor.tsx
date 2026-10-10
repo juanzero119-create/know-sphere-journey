@@ -28,7 +28,7 @@ function ActorName({ actor, preview = false }: { actor: ActorDraft; preview?: bo
  return <span className="flex flex-wrap gap-x-1 gap-y-2 break-words [overflow-wrap:anywhere]">{part(actor.firstName, actor.firstHighlight, 'First name')}{part(actor.lastName, actor.lastHighlight, 'Last name')}</span>;
 }
 export function ActorEditor() {
- const [actors, setActors] = useState<Actor[]>([]);
+ const [actors, setActors] = useState<Actor[]>(seedActors);
  const [draft, setDraft] = useState<ActorDraft>({ ...emptyDraft });
  const [editingId, setEditingId] = useState<number | null>(null);
  const [message, setMessage] = useState('');
