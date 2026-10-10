@@ -26,7 +26,7 @@ const models = [
 const KEY = 'lexi-ai-model';
 
 function AiPage() {
-  const [selected, setSelected] = useState(models[0].id);
+  const [selected, setSelected] = useState('openai/gpt-6-astra');
   useEffect(() => { const saved = localStorage.getItem(KEY); if (saved && models.some(m => m.id === saved)) setSelected(saved); }, []);
   function choose(id: string) { setSelected(id); localStorage.setItem(KEY, id); }
   const current = models.find(m => m.id === selected)!;

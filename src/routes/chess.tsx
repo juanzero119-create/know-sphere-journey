@@ -29,9 +29,9 @@ function ChessPage() {
   function tap(r: number, c: number) {
     if (picked) {
       const [pr, pc] = picked;
-      if (pr !== r || pc !== c) { const next = board.map(row => [...row]); next[r][c] = next[pr][pc]; next[pr][pc] = ''; setBoard(next); }
+      if (pr !== r || pc !== c) { const next = board.map(row => [...row]) as string[][]; next[r]![c] = next[pr]![pc]!; next[pr]![pc] = ''; setBoard(next); }
       setPicked(null);
-    } else if (board[r][c]) setPicked([r, c]);
+    } else if (board[r]?.[c]) setPicked([r, c]);
   }
   return <Shell title="Chess">
     <Section number="01" title="Practice board">
