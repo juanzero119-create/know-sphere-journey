@@ -93,7 +93,8 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
       const { x, y } = latest;
       const focus = offsetAt(t.container, x, y, t.cover) ?? lastFocus ?? t.anchor;
       lastFocus = focus;
-      const [s, e] = snapToWords(t.container.textContent ?? '', Math.min(t.anchor, focus), Math.max(t.anchor, focus));
+      const s = Math.min(t.anchor, focus);
+      const e = Math.max(t.anchor, focus);
       clearNative();
       const prev = dragRef.current;
       if (prev.start === s && prev.end === e && Math.abs(prev.x - x) < 1 && Math.abs(prev.y - y) < 1) return;
