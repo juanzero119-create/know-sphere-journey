@@ -5,7 +5,7 @@ import { useMatchRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { NavigationEditor, useCustomNavigation, iconChoices } from '@/components/NavigationEditor';
 import { useProgress } from '@/lib/progress';
-const tabs = [{ to: '/', label: 'Practice', icon: GraduationCap, detail: 'Lessons & challenges' }, { to: '/studies', label: 'Studies', icon: BookOpen, detail: 'Vocabulary & anatomy' }, { to: '/watch', label: 'Watch', icon: Clapperboard, detail: 'Videos & ratings' }, { to: '/movies', label: 'Movies', icon: Film, detail: 'Films, cast & stories' }, { to: '/chess', label: 'Chess', icon: ChessKnight, detail: 'Board & practice' }] as const;
+const tabs = [{ to: '/', label: 'Practice', icon: GraduationCap, detail: 'Lessons & challenges' }, { to: '/studies', label: 'Studies', icon: BookOpen, detail: 'Vocabulary & anatomy' }, { to: '/watch', label: 'Watch', icon: Clapperboard, detail: 'Videos & ratings' }, { to: '/movies', label: 'Movies', icon: Film, detail: 'Films, cast & stories' }, { to: '/chess', label: 'Chess', icon: ChessKnight, detail: 'Board & practice' }, { to: '/ai', label: 'AI', icon: Bot, detail: 'Models & settings' }] as const;
 const descriptions: Record<string, string> = { Studies: 'Make room for what you want to learn.', Practice: 'A little progress, every day.', Vocabulary: 'Build a vocabulary that stays with you.', Anatomy: 'A closer look at the human body.', Watch: 'Make room for a different perspective.', Movies: 'A closer look at the stories on screen.', Chess: 'Think a few moves ahead.', 'AI models': 'Choose the AI model Lexi should use.' };
 export function Shell({ title, children }: { title: string; children: ReactNode }) {
  const { xp, streak } = useProgress();
