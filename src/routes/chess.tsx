@@ -51,7 +51,8 @@ function ChessPage() {
     <Section number="01" title="Practice board">
       <div role="group" aria-label="Chess practice board" className="mx-auto grid aspect-square w-full max-w-2xl grid-cols-8 overflow-hidden">
         {board.map((row, r) => row.map((p, c) => <Button variant="ghost" key={r + '-' + c} aria-label={`Square ${'hgfedcba'[c]}${r + 1}${p ? ' ' + (p[0] === 'w' ? 'white' : 'black') + ' ' + pieceNames[p.slice(1)] : ''}`} aria-pressed={picked?.[0] === r && picked?.[1] === c} onClick={() => tap(r, c)} className={'chess-square relative h-auto min-w-0 rounded-none p-0 aspect-square ' + ((r + c) % 2 ? 'chess-dark ' : '') + (lastMove.some(([lr, lc]) => lr === r && lc === c) ? 'chess-last' : '')}>
-          {p && <img src={pieceUrl(p)} alt="" draggable={false} className="h-[90%] w-[90%] object-contain"/>}
+          {lastMove[0]?.[0] === r && lastMove[0]?.[1] === c && <span aria-hidden="true" className="chess-square chess-origin absolute inset-0"/>}
+          {p && <img src={pieceUrl(p)} alt="" draggable={false} className="relative h-[90%] w-[90%] object-contain"/>}
           {r === 0 && <span aria-hidden="true" className="absolute right-1 top-0.5 text-xs font-semibold sm:right-2 sm:top-1 sm:text-base">{'hgfedcba'[c]}</span>}
           {c === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
         </Button>))}

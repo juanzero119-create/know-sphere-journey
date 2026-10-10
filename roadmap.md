@@ -30,6 +30,6 @@
 - [x] Verify adding, editing, and removing studies.
 
 # AI tab and chess reference
-- [ ] Add an AI navigation tab and custom model controls.
-- [ ] Match chess squares, pieces, coordinates, orientation, and move highlights to the reference.
-- [ ] Verify both pages and existing tests.
+- [x] Add an AI navigation tab and custom model controls.
+- [x] Match chess squares, pieces, coordinates, orientation, and move highlights to the reference.
+- [x] Verify both pages and existing tests.
