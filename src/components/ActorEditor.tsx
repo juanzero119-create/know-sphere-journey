@@ -37,7 +37,7 @@ export function ActorEditor() {
  function submit(event: FormEvent<HTMLFormElement>) {
   event.preventDefault();
   if (!draft.firstName.trim() || !draft.lastName.trim()) { setMessage('Enter a first and last name.'); return; }
-  const actor = { ...draft, firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), role: draft.role.trim() };
+  const actor = { ...draft, firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), role: draft.role.trim(), bio: draft.bio.trim() };
   if (editingId !== null) { setActors(old => old.map(a => a.id === editingId ? { ...actor, id: editingId } : a)); setMessage('Actor updated.'); }
   else { setActors(old => [...old, { ...actor, id: Date.now() }]); setMessage('Actor added.'); }
   reset();
@@ -48,7 +48,8 @@ export function ActorEditor() {
  <h3 className="text-base font-semibold">{editingId !== null ? 'Edit actor' : 'Add an actor'}</h3>
  <div className="grid gap-4 sm:grid-cols-2"><label className="space-y-2 text-sm font-medium"><span>First name</span><Input required maxLength={80} value={draft.firstName} onChange={e => update('firstName', e.target.value)} placeholder="First name" className="bg-card"/></label><label className="space-y-2 text-sm font-medium"><span>Last name</span><Input required maxLength={80} value={draft.lastName} onChange={e => update('lastName', e.target.value)} placeholder="Last name" className="bg-card"/></label></div>
  <div className="grid gap-4 sm:grid-cols-2"><label className="space-y-2 text-sm font-medium"><span>Film <span className="font-normal text-muted-foreground">(optional)</span></span><select aria-label="Actor film" value={draft.film} onChange={e => update('film', e.target.value)} className="h-9 w-full min-w-0 rounded-md border border-input bg-card px-3 text-sm"><option value="">No film selected</option>{movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}</select></label><label className="space-y-2 text-sm font-medium"><span>Character <span className="font-normal text-muted-foreground">(optional)</span></span><Input maxLength={100} value={draft.role} onChange={e => update('role', e.target.value)} placeholder="Character name" className="bg-card"/></label></div>
- <div className="grid gap-5 sm:grid-cols-2"><HighlightPicker label="First-name highlight" value={draft.firstHighlight} onChange={v => update('firstHighlight', v)}/><HighlightPicker label="Last-name highlight" value={draft.lastHighlight} onChange={v => update('lastHighlight', v)}/></div>
+  <label className="space-y-2 text-sm font-medium"><span>Bio <span className="font-normal text-muted-foreground">(optional)</span></span><textarea aria-label="Actor bio" maxLength={600} rows={3} value={draft.bio} onChange={e => update('bio', e.target.value)} placeholder="A short bio for this actor" className="w-full min-w-0 rounded-md border border-input bg-card px-3 py-2 text-sm"/></label>
+  <div className="grid gap-5 sm:grid-cols-2"><HighlightPicker label="First-name highlight" value={draft.firstHighlight} onChange={v => update('firstHighlight', v)}/><HighlightPicker label="Last-name highlight" value={draft.lastHighlight} onChange={v => update('lastHighlight', v)}/></div>
  <div className="flex gap-3"><Button type="submit">{editingId !== null ? <Check/> : <Plus/>}{editingId !== null ? 'Save changes' : 'Add actor'}</Button>{editingId !== null && <Button type="button" variant="secondary" onClick={reset}>Cancel</Button>}</div>
  <p aria-live="polite" className="min-h-5 text-sm text-muted-foreground">{message}</p>
  </form>
