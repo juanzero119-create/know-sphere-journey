@@ -59,6 +59,30 @@ function Notes() {
     editor.current?.focus();
     editor.current?.setSelectionRange(selection.start, selection.end);
   };
+  const highlightDraggedText = () => {
+    requestAnimationFrame(() => {
+      const element = editor.current;
+      if (!element || element.selectionStart === element.selectionEnd) return;
+      const { selectionStart: start, selectionEnd: end } = element;
+      setSelection({ start, end });
+      setHighlights(old => applyHighlight(old, start, end, color));
+    });
+  };
+  const highlightSavedText = (element: HTMLParagraphElement, note: Note) => {
+    const selected = window.getSelection();
+    if (!selected || selected.isCollapsed || selected.rangeCount === 0) return;
+    const range = selected.getRangeAt(0);
+    if (!element.contains(range.startContainer) || !element.contains(range.endContainer)) return;
+    const prefix = range.cloneRange();
+    prefix.selectNodeContents(element);
+    prefix.setEnd(range.startContainer, range.startOffset);
+    const start = prefix.toString().length;
+    const end = start + range.toString().length;
+    const nextHighlights = applyHighlight(note.highlights ?? [], start, end, color);
+    update(notes.map(item => item.id === note.id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
+    if (editingId === note.id && draftBody === note.body) setHighlights(nextHighlights);
+    selected.removeAllRanges();
+  };
 
   useEffect(() => { setNotes(loadNotes()); }, []);
 
@@ -100,7 +124,7 @@ function Notes() {
     <Section number="01" title="Write a note" subtitle="Saved on this device">
       <div className="rounded-lg border border-border bg-card p-6">
         <Input value={draftTitle} onChange={event => setDraftTitle(event.target.value)} placeholder="Note title" aria-label="Note title" maxLength={80}/>
-        <Textarea ref={editor} value={draftBody} onSelect={captureSelection} onChange={event => { const next = event.target.value; setHighlights(old => adjustHighlights(old, draftBody, next)); setDraftBody(next); }} placeholder="Write your note…" aria-label="Note text" className="mt-3 min-h-28" maxLength={4000}/>
+        <Textarea ref={editor} value={draftBody} onSelect={captureSelection} onPointerUp={highlightDraggedText} onChange={event => { const next = event.target.value; setHighlights(old => adjustHighlights(old, draftBody, next)); setDraftBody(next); }} placeholder="Write your note…" aria-label="Note text" className="mt-3 min-h-28" maxLength={4000}/>
         <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Note highlighting">
           {noteColors.map(option => <Button key={option.id} type="button" size="icon" variant="outline" aria-label={`${option.label} highlight color`} title={`${option.label} highlight color`} aria-pressed={color === option.id} onMouseDown={event => event.preventDefault()} onClick={() => setColor(option.id)} className={color === option.id ? 'border-primary' : ''}><span className={`grid size-6 place-items-center rounded-sm ${option.className}`}>{color === option.id && <Check className="size-4"/>}</span></Button>)}
           <Button type="button" size="icon" variant="outline" aria-label="Highlight selected text" title="Highlight selected text" disabled={selection.start === selection.end} onMouseDown={event => event.preventDefault()} onClick={() => highlightSelection(color)}><Highlighter/></Button>
@@ -132,7 +156,7 @@ function Notes() {
                   <Button type="button" variant="ghost" size="icon" aria-label={`Delete ${note.title}`} onClick={() => removeNote(note.id)}><Trash2 className="size-4"/></Button>
                 </div>
               </div>
-              {note.body && <p className="mt-2 whitespace-pre-wrap break-words text-sm text-muted-foreground"><HighlightedNote body={note.body} highlights={note.highlights ?? []}/></p>}
+              {note.body && <p onPointerUp={event => highlightSavedText(event.currentTarget, note)} className="mt-2 select-text whitespace-pre-wrap break-words text-sm text-muted-foreground"><HighlightedNote body={note.body} highlights={note.highlights ?? []}/></p>}
               <p className="mt-3 text-xs text-muted-foreground">{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </article>
           ))}
