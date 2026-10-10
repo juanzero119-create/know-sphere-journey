@@ -1,43 +1,10 @@
-import { Link } from "@tanstack/react-router";
-import { BookA, Bone, GraduationCap, Clapperboard } from "lucide-react";
-import type { ReactNode } from "react";
-import { useProgress } from "@/lib/progress";
-
-const tabs = [
-  { to: "/words", label: "Words", icon: BookA },
-  { to: "/", label: "Practice", icon: GraduationCap },
-  { to: "/anatomy", label: "Anatomy", icon: Bone },
-  { to: "/watch", label: "Watch", icon: Clapperboard },
-] as const;
-
+import { Link } from '@tanstack/react-router';
+import { BookA, Bone, GraduationCap, Clapperboard, Flame, Sparkles, ArrowUpRight } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useProgress } from '@/lib/progress';
+const tabs = [{ to: '/', label: 'Practice', icon: GraduationCap, detail: 'Lessons & challenges' }, { to: '/words', label: 'Vocabulary', icon: BookA, detail: 'Words & definitions' }, { to: '/anatomy', label: 'Anatomy', icon: Bone, detail: 'Systems & structures' }, { to: '/watch', label: 'Watch', icon: Clapperboard, detail: 'Videos & ratings' }] as const;
+const descriptions: Record<string, string> = { Practice: 'A little progress, every day.', Vocabulary: 'Build a vocabulary that stays with you.', Anatomy: 'A closer look at the human body.', Watch: 'Make room for a different perspective.' };
 export function Shell({ title, children }: { title: string; children: ReactNode }) {
-  const { xp, streak } = useProgress();
-  return (
-    <div className="mx-auto min-h-screen max-w-xl pb-28">
-      <header className="flex items-end justify-between px-5 pt-8 pb-4">
-        <h1 className="font-display text-5xl">{title}</h1>
-        <div className="flex gap-2 text-sm font-semibold">
-          <span className="chunky rounded-full bg-accent px-3 py-1 text-accent-foreground">🔥 {streak}</span>
-          <span className="chunky rounded-full bg-gold px-3 py-1 text-ink">{xp} XP</span>
-        </div>
-      </header>
-      <main className="space-y-6 px-5">{children}</main>
-      <nav className="fixed inset-x-0 bottom-0 border-t-2 bg-muted">
-        <div className="mx-auto grid max-w-xl grid-cols-4 py-3">
-          {tabs.map(({ to, label, icon: Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              activeOptions={{ exact: true }}
-              className="flex flex-col items-center gap-1 text-sm text-muted-foreground"
-              activeProps={{ className: "text-foreground font-semibold" }}
-            >
-              <Icon className="size-6" />
-              {label}
-            </Link>
-          ))}
-        </div>
-      </nav>
-    </div>
-  );
+ const { xp, streak } = useProgress();
+ return <div className="min-h-screen pb-24 md:pb-0"><aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-border bg-sidebar px-5 py-8 text-sidebar-foreground md:flex"><Link to="/" className="mb-12 flex items-center gap-3 text-3xl font-semibold"><span className="grid size-10 place-items-center rounded-lg bg-sidebar-active text-xl">l.</span>lexi<span className="text-primary text-sm">●</span></Link><p className="mb-4 px-3 text-xs text-sidebar-muted">YOUR LEARNING SPACE</p><nav className="space-y-2">{tabs.map(({ to, label, icon: Icon, detail }) => <Link key={to} to={to} activeOptions={{ exact: true }} className="flex items-center gap-3 rounded-md p-3 text-sidebar-muted transition-colors hover:bg-sidebar-active" activeProps={{ className: 'bg-sidebar-active text-sidebar-foreground' }}><Icon className="size-5 shrink-0"/><div className="text-sm font-semibold">{label}<p className="mt-0.5 text-xs font-normal text-sidebar-muted">{detail}</p></div></Link>)}</nav><div className="mt-auto border-t border-sidebar-active pt-5"><p className="text-sm">Stay curious.</p><p className="mt-1 text-xs text-sidebar-muted">One lesson at a time.</p></div></aside><div className="md:ml-60"><header className="flex h-16 items-center justify-between border-b border-border px-5 md:px-10"><Link to="/" className="text-2xl font-semibold md:hidden">lexi.</Link><span className="hidden text-sm text-muted-foreground md:block">Your space to learn <ArrowUpRight className="ml-1 inline size-4"/></span><div className="flex gap-4 text-sm"><span className="flex items-center gap-1.5"><Flame className="size-4 text-accent"/>{streak}<span className="hidden text-muted-foreground sm:inline">day streak</span></span><span className="flex items-center gap-1.5"><Sparkles className="size-4 text-gold"/>{xp} XP</span><span className="grid size-8 place-items-center rounded-full bg-secondary text-xs font-semibold">TG</span></div></header><main className="mx-auto max-w-6xl space-y-8 px-5 py-8 md:px-10 md:py-10"><div><p className="mb-2 text-xs font-semibold text-muted-foreground">LEARN / {title.toUpperCase()}</p><h1 className="text-4xl font-semibold">{title}</h1><p className="mt-2 text-muted-foreground">{descriptions[title]}</p></div>{children}<footer className="border-t border-border pt-5 text-xs text-muted-foreground">LEXI · Keep learning, keep growing.</footer></main></div><nav aria-label="Mobile navigation" className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] md:hidden"><div className="grid grid-cols-4 py-3">{tabs.map(({to,label,icon:Icon}) => <Link key={to} to={to} activeOptions={{exact:true}} className="flex flex-col items-center gap-1 text-xs text-muted-foreground" activeProps={{className:'text-foreground font-semibold'}}><Icon className="size-5"/>{label}</Link>)}</div></nav></div>;
 }
