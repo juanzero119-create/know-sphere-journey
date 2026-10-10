@@ -7,7 +7,7 @@ afterEach(cleanup);
 describe('Actor editor', async () => {
  it('pre-loads the IMDb actor names without the six removed actors', async () => {
   await renderWithRouter(<ActorEditor/>);
-  expect(screen.getAllByRole('article').length).toBe(100);
+  expect(screen.getAllByRole('article').length).toBe(101);
   expect(screen.getByText('Leonardo')).toBeInTheDocument();
   expect(screen.getByText('DiCaprio')).toBeInTheDocument();
   expect(screen.getAllByText('Kevin').length).toBe(1);
@@ -34,7 +34,7 @@ describe('Actor editor', async () => {
   expect(within(screen.getAllByRole('article').at(-1)!).getByText('Annie')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Remove Annie Hathaway' }));
   expect(screen.queryByText('Annie')).not.toBeInTheDocument();
-  expect(screen.getAllByRole('article').length).toBe(100);
+  expect(screen.getAllByRole('article').length).toBe(101);
  });
  it('hides an actor\'s film tiles until Details is clicked', async () => {
   await renderWithRouter(<ActorEditor/>);
@@ -51,6 +51,6 @@ describe('Actor editor', async () => {
   fireEvent.change(screen.getByLabelText('Last name'), { target: { value: 'Smith' } });
   fireEvent.click(screen.getByRole('button', { name: 'Add actor' }));
   expect(screen.getByText('Enter a first and last name.')).toBeInTheDocument();
-  expect(screen.getAllByRole('article').length).toBe(100);
+  expect(screen.getAllByRole('article').length).toBe(101);
  });
 });
