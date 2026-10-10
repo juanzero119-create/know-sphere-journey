@@ -285,6 +285,16 @@ nav [data-status='active'] .nav-tile {
 /* Name highlight chips stay bright, so their text goes dark. */
 .bg-name-gold, .bg-name-blue, .bg-name-rose, .bg-name-green { color: var(--name-on); }
 
+/* Notes: selecting text shows the chosen highlight color instead of the system blue. */
+.note-select { --note-sel: var(--name-gold); }
+.note-select[data-color='blue'] { --note-sel: var(--name-blue); }
+.note-select[data-color='rose'] { --note-sel: var(--name-rose); }
+.note-select[data-color='green'] { --note-sel: var(--name-green); }
+.note-select ::selection, .note-select::selection { background: var(--note-sel); color: var(--name-on); }
+.note-editor-input { color: transparent; caret-color: var(--foreground); -webkit-text-fill-color: transparent; }
+.note-editor-input::placeholder { -webkit-text-fill-color: var(--muted-foreground); }
+.note-editor-input::selection { background: var(--note-sel); -webkit-text-fill-color: transparent; }
+
 .chess-square { background: var(--chess-light); color: var(--chess-dark); }
 .chess-square.chess-dark { background: var(--chess-dark); color: var(--chess-light); }
 .chess-square.chess-last { background: var(--chess-last-light); }
