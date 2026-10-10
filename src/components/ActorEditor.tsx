@@ -52,7 +52,7 @@ export function ActorEditor() {
   else { setActors(old => [...old, { ...actor, id: Date.now() }]); setMessage('Actor added.'); }
   reset();
  }
- return <Section number="01" title="Actors" subtitle="Your cast collection · This visit">
+ return <Section number="02" title="Actors" subtitle="Your cast collection · This visit">
  <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
  <form onSubmit={submit} className="min-w-0 space-y-5">
  <h3 className="text-base font-semibold">{editingId !== null ? 'Edit actor' : 'Add an actor'}</h3>
