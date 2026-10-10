@@ -45,6 +45,8 @@
   --color-name-blue: var(--name-blue);
   --color-name-rose: var(--name-rose);
   --color-name-green: var(--name-green);
+  --color-play: var(--play);
+  --color-play-foreground: var(--play-foreground);
 }
 
 :root {
@@ -86,6 +88,8 @@
   --name-rose: oklch(0.83 0.09 10);
   --name-green: oklch(0.85 0.09 155);
   --name-on: oklch(0.2 0 0);
+  --play: oklch(0.72 0.17 155);
+  --play-foreground: oklch(0.18 0.02 155);
   --chess-light: #ffffff;
   --chess-dark: #121212;
   --chess-last-light: #f5fa53;
@@ -183,6 +187,17 @@ nav [data-status='active'] .nav-tile {
 .bottom-nav a { color: oklch(0.637 0 0); }
 .bottom-nav [data-status='active'] { color: oklch(0.833 0 0); }
 .bottom-nav [data-status='active'] .nav-tile { color: oklch(0.955 0 0); }
+
+/* The Play button turns green while the game is running. */
+.btn-play-live {
+  background: var(--play);
+  color: var(--play-foreground);
+  border-color: var(--play);
+}
+.btn-play-live:hover { background: color-mix(in oklab, var(--play) 88%, black); }
+@media (prefers-reduced-motion: reduce) {
+  .btn-play-live { transition: none; }
+}
 
 
 

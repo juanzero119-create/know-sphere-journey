@@ -61,6 +61,10 @@
 - [x] Pass validated approximate Elo targets to chess AI move instructions.
 - [x] Verify controls, navigation retention, and tests.
 
+# Green play button
+- [x] Show the chess Play button in green while the game is running and plain gray while paused.
+- [x] Verify the color change with Pause and Play on mobile.
+
 
 
 
