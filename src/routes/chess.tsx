@@ -57,7 +57,7 @@ function ChessPage() {
   const checkSq = game.inCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === turn)?.square : undefined;
 
   function tap(r: number, c: number) {
-    if (over || thinking || (vsAi && game.turn() === 'b')) return;
+    if (over || thinking || mode === 'aivai' || (mode === 'ai' && game.turn() === 'b')) return;
     const s = sq(r, c);
     const p = game.get(s);
     if (picked && targets.includes(s)) {
