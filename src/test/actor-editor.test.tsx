@@ -36,6 +36,15 @@ describe('Actor editor', async () => {
   expect(screen.queryByText('Annie')).not.toBeInTheDocument();
   expect(screen.getAllByRole('article').length).toBe(100);
  });
+ it('hides an actor\'s film tiles until Details is clicked', async () => {
+  await renderWithRouter(<ActorEditor/>);
+  const card = screen.getAllByRole('article')[0]!;
+  expect(within(card).queryByRole('link', { name: /The Revenant/ })).not.toBeInTheDocument();
+  fireEvent.click(within(card).getByRole('button', { name: 'Show details for Leonardo DiCaprio' }));
+  expect(within(card).getByRole('link', { name: /The Revenant/ })).toBeInTheDocument();
+  fireEvent.click(within(card).getByRole('button', { name: 'Hide details for Leonardo DiCaprio' }));
+  expect(within(card).queryByRole('link', { name: /The Revenant/ })).not.toBeInTheDocument();
+ });
  it('rejects whitespace-only names', async () => {
   await renderWithRouter(<ActorEditor/>);
   fireEvent.change(screen.getByLabelText('First name'), { target: { value: '  ' } });

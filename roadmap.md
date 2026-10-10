@@ -88,3 +88,8 @@
 - [x] Show every film an actor appears in as beveled tiles under their details in the Actors list.
 - [x] Keep the bio above the tiles when an actor's bio is expanded.
 - [x] Verify tiles on seeded actors and on an actor further down the list.
+
+# Details toggle
+- [x] Hide each actor's film tiles behind a Details button on their card.
+- [x] Keep the bio on the card itself and the tiles revealed only while Details is open.
+- [x] Verify the button shows, hides, and reopens the tiles on the Movies page.
