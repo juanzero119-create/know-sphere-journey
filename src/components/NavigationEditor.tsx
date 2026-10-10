@@ -13,7 +13,7 @@ export const iconChoices = [
 const destinations = [
   { to: '/studies', label: 'Studies' }, { to: '/words', label: 'Vocabulary' },
   { to: '/anatomy', label: 'Anatomy' }, { to: '/', label: 'Practice' },
-  { to: '/watch', label: 'Watch' }, { to: '/movies', label: 'Movies' }, { to: '/chess', label: 'Chess' }, { to: '/ai', label: 'AI models' },
+  { to: '/watch', label: 'Watch' }, { to: '/movies', label: 'Movies' }, { to: '/chess', label: 'Chess' },
 ] as const;
 type Destination = typeof destinations[number]['to'];
 type IconName = typeof iconChoices[number]['name'];

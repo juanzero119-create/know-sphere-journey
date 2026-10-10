@@ -50,10 +50,10 @@ export function ModelManager() {
   }
   const current = models.find(m => m.id === selected) ?? defaultModels[0];
   return <>
-    <Section number="01" title="Current model">
+    <Section number="04" title="Current chess model">
       <div className="flex items-center gap-4 border-y border-border py-5"><span className="grid size-12 shrink-0 place-items-center rounded-2xl nav-tile"><Bot className="size-5"/></span><div className="min-w-0"><p className="break-words font-semibold">{current?.name}</p><p className="text-sm text-muted-foreground">{current?.maker} · Not connected</p></div></div>
     </Section>
-    <Section number="02" title="AI models">
+    <Section number="05" title="Chess AI models">
       <div className="mb-4 flex items-center justify-between gap-3"><p className="text-sm text-muted-foreground">No AI service connected</p><Button variant="outline" onClick={() => setOpen(true)}><Plus/>Add model</Button></div>
       <div className="grid gap-3 sm:grid-cols-2">{models.map(m => <div key={m.id} className="flex min-w-0 items-center gap-2"><Button variant={m.id === selected ? 'secondary' : 'outline'} aria-pressed={m.id === selected} onClick={() => choose(m.id)} className="h-auto min-w-0 flex-1 justify-between whitespace-normal p-4 text-left"><span className="min-w-0"><span className="block break-words font-semibold">{m.name}</span><span className="block text-xs text-muted-foreground">{m.maker}</span><span className="mt-1 block break-all text-xs text-muted-foreground">{m.id}</span></span>{m.id === selected && <Check className="shrink-0"/>}</Button>{!defaultModels.some(item => item.id === m.id) && <Button variant="ghost" size="icon" aria-label={`Remove ${m.name}`} title={`Remove ${m.name}`} onClick={() => remove(m.id)}><Trash2/></Button>}</div>)}</div>
     </Section>
