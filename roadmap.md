@@ -59,7 +59,7 @@
 # Selectable chess Elo
 - [x] Add slider and preset controls for the AI opponent and both AI sides.
 - [x] Pass validated approximate Elo targets to chess AI move instructions.
-- [ ] Verify controls, navigation retention, and tests.
+- [x] Verify controls, navigation retention, and tests.
 
 
 
