@@ -176,3 +176,10 @@ export function setChessElo(side: 'w' | 'b', elo: number) {
   state = { ...state, elo: { ...state.elo, [side]: parsed.data } };
   emit();
 }
+
+export function setChessPaused(paused: boolean) {
+  if (state.paused === paused) return;
+  state = { ...state, paused, version: state.version + 1 };
+  emit();
+  if (!paused) void maybeAiMove(); // resume the AI loop where it stopped
+}
