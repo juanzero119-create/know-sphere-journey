@@ -5,37 +5,33 @@ export type PressDrag = { id: string; start: number; end: number; x: number; y: 
 const HOLD_MS = 350;
 const MOVE_TOLERANCE = 10;
 
-/** Character offset inside `container` under a screen point. `cover` is an element on top that must be ignored. */
-function offsetAt(container: HTMLElement, rawX: number, rawY: number, cover?: HTMLElement | null): number | null {
-  // Keep the finger inside the text box so sliding past an edge sticks to the nearest line instead of jumping.
+/**
+ * Character offset inside `container` under a screen point, measured from the rendered
+ * character boxes (works the same in every direction and ignores user-select locks).
+ */
+function offsetAt(container: HTMLElement, rawX: number, rawY: number, _cover?: HTMLElement | null): number | null {
   const box = container.getBoundingClientRect();
-  const x = Math.min(Math.max(rawX, box.left + 2), box.right - 2);
-  const y = Math.min(Math.max(rawY, box.top + 2), box.bottom - 2);
-  const prevCover = cover?.style.pointerEvents;
-  const prevContainer = container.style.pointerEvents;
-  if (cover) cover.style.pointerEvents = 'none';
-  container.style.pointerEvents = 'auto';
-  let node: Node | null = null;
-  let offset = 0;
-  try {
-    const doc = document as Document & { caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null };
-    if (doc.caretPositionFromPoint) {
-      const pos = doc.caretPositionFromPoint(x, y);
-      if (pos) { node = pos.offsetNode; offset = pos.offset; }
-    } else if (document.caretRangeFromPoint) {
-      const range = document.caretRangeFromPoint(x, y);
-      if (range) { node = range.startContainer; offset = range.startOffset; }
+  const x = Math.min(Math.max(rawX, box.left + 1), box.right - 1);
+  const y = Math.min(Math.max(rawY, box.top + 1), box.bottom - 1);
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  let base = 0;
+  let best: { dy: number; dx: number; offset: number } | null = null;
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const len = node.textContent?.length ?? 0;
+    for (let i = 0; i < len; i++) {
+      range.setStart(node, i);
+      range.setEnd(node, i + 1);
+      const r = range.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue;
+      const dy = y < r.top ? r.top - y : y > r.bottom ? y - r.bottom : 0;
+      const dx = x < r.left ? r.left - x : x > r.right ? x - r.right : 0;
+      const offset = base + (x > r.left + r.width / 2 ? i + 1 : i);
+      if (!best || dy < best.dy || (dy === best.dy && dx < best.dx)) best = { dy, dx, offset };
     }
-  } finally {
-    if (cover) cover.style.pointerEvents = prevCover ?? '';
-    container.style.pointerEvents = prevContainer;
+    base += len;
   }
-  if (!node || !container.contains(node)) return null;
-  if (node === container && offset >= container.childNodes.length) return (container.textContent ?? '').length;
-  const prefix = document.createRange();
-  prefix.selectNodeContents(container);
-  prefix.setEnd(node, offset);
-  return prefix.toString().length;
+  return best ? best.offset : null;
 }
 
 
