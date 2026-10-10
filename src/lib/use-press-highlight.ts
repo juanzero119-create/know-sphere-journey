@@ -38,14 +38,6 @@ function offsetAt(container: HTMLElement, rawX: number, rawY: number, cover?: HT
   return prefix.toString().length;
 }
 
-const isWord = (ch: string | undefined) => !!ch && /[\p{L}\p{N}'’_-]/u.test(ch);
-/** Grow a range so it always covers whole words. */
-function snapToWords(text: string, start: number, end: number): [number, number] {
-  let s = start, e = end;
-  while (s > 0 && isWord(text[s - 1]) && (isWord(text[s]) || s === e)) s--;
-  while (e < text.length && isWord(text[e]) && (isWord(text[e - 1]) || s === e)) e++;
-  return [s, e];
-}
 
 const lockNative = (on: boolean) => {
   document.documentElement.classList.toggle('press-highlighting', on);
@@ -85,8 +77,7 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
         clearNative();
         navigator.vibrate?.(10);
         lockNative(true);
-        const [s, e] = snapToWords(container.textContent ?? '', anchor, anchor);
-        set({ id, start: s, end: e, x, y });
+        set({ id, start: anchor, end: anchor, x, y });
       }, HOLD_MS),
     };
   }, []);
@@ -102,7 +93,8 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
       const { x, y } = latest;
       const focus = offsetAt(t.container, x, y, t.cover) ?? lastFocus ?? t.anchor;
       lastFocus = focus;
-      const [s, e] = snapToWords(t.container.textContent ?? '', Math.min(t.anchor, focus), Math.max(t.anchor, focus));
+      const s = Math.min(t.anchor, focus);
+      const e = Math.max(t.anchor, focus);
       clearNative();
       const prev = dragRef.current;
       if (prev.start === s && prev.end === e && Math.abs(prev.x - x) < 1 && Math.abs(prev.y - y) < 1) return;
