@@ -13,6 +13,7 @@ export interface ChessState {
   clock: { w: number; b: number };
   started: boolean;
   mode: ChessMode;
+  humanSide: 'w' | 'b';
   lastMove: [Square, Square] | null;
   thinking: boolean;
   aiNote: string;
@@ -24,6 +25,7 @@ const initialState: ChessState = {
   clock: { w: BLITZ, b: BLITZ },
   started: false,
   mode: 'ai',
+  humanSide: 'w',
   lastMove: null,
   thinking: false,
   aiNote: '',
@@ -101,7 +103,7 @@ function applyMove(from: Square, to: Square, turn: 'w' | 'b') {
 export function playMove(from: Square, to: Square) {
   if (isOver() || state.thinking) return;
   const turn = game.turn();
-  if (state.mode === 'aivai' || (state.mode === 'ai' && turn === 'b')) return;
+  if (state.mode === 'aivai' || (state.mode === 'ai' && turn !== state.humanSide)) return;
   game.move({ from, to, promotion: 'q' });
   applyMove(from, to, turn);
 }
@@ -109,7 +111,7 @@ export function playMove(from: Square, to: Square) {
 let aiRunning = false;
 async function maybeAiMove() {
   const turn = game.turn();
-  const aiTurn = state.mode === 'aivai' || (state.mode === 'ai' && turn === 'b');
+  const aiTurn = state.mode === 'aivai' || (state.mode === 'ai' && turn !== state.humanSide);
   if (!aiTurn || isOver() || aiRunning) return;
   aiRunning = true;
   state.thinking = true;
