@@ -1,61 +1,74 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { Check, Bot, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Bot, Check, Plus, Trash2 } from 'lucide-react';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ChessModelPick } from '@/components/ChessModelPick';
+import { addChessModel, chooseChessModelForBoth, isDefaultModel, modelById, removeChessModel, useChessModels, type ChessSide } from '@/lib/chess-models';
 
 export const Route = createFileRoute('/ai')({
   head: () => ({ meta: [
     { title: 'AI models — Lexi settings' },
-    { name: 'description', content: 'Choose which AI model Lexi should use for future AI features.' },
+    { name: 'description', content: 'Choose the AI model Lexi uses for each chess colour.' },
     { property: 'og:title', content: 'AI models — Lexi settings' },
-    { property: 'og:description', content: 'Choose which AI model Lexi should use for future AI features.' },
+    { property: 'og:description', content: 'Choose the AI model Lexi uses for each chess colour.' },
     { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary' },
   ] }),
   component: AiPage,
 });
 
-const defaultModels = [
-  { id: 'openai/gpt-6-astra', name: 'GPT-6 Astra', maker: 'OpenAI', note: 'Balanced default — strong reasoning.' },
-  { id: 'openai/gpt-6-luna', name: 'GPT-6 Luna', maker: 'OpenAI', note: 'Fast and light for quick answers.' },
-  { id: 'anthropic/claude-sonnet-5', name: 'Claude Sonnet 5', maker: 'Anthropic', note: 'Thoughtful, clear explanations.' },
-  { id: 'anthropic/claude-haiku-4-5', name: 'Claude Haiku 4.5', maker: 'Anthropic', note: 'Quick and inexpensive.' },
-  { id: 'google/gemini-3-flash', name: 'Gemini 3 Flash', maker: 'Google', note: 'Fast multimodal model.' },
-];
-const KEY = 'lexi-ai-model';
+const sides: ChessSide[] = ['w', 'b'];
 
-export function ModelManager() {
-  const [models, setModels] = useState(defaultModels);
-  const [selected, setSelected] = useState('openai/gpt-6-astra');
+export function ModelManager({ pickers = true }: { pickers?: boolean }) {
+  const { models, selected } = useChessModels();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [maker, setMaker] = useState('');
   const [modelId, setModelId] = useState('');
   const [error, setError] = useState('');
-  useEffect(() => { const saved = localStorage.getItem(KEY); if (saved && defaultModels.some(m => m.id === saved)) setSelected(saved); }, []);
-  function choose(id: string) { setSelected(id); if (defaultModels.some(m => m.id === id)) localStorage.setItem(KEY, id); }
+
   function add(event: React.FormEvent) {
     event.preventDefault();
     if (!name.trim() || !maker.trim() || !modelId.trim()) { setError('Enter a model name, provider, and model ID.'); return; }
-    if (models.some(m => m.id === modelId.trim())) { setError('This model ID is already in your list.'); return; }
-    setModels(items => [...items, { id: modelId.trim(), name: name.trim(), maker: maker.trim(), note: 'Custom model · Not connected' }]);
+    if (!addChessModel({ name, maker, id: modelId })) { setError('This model ID is already in your list.'); return; }
     setOpen(false); setName(''); setMaker(''); setModelId(''); setError('');
   }
-  function remove(id: string) {
-    setModels(items => items.filter(m => m.id !== id));
-    if (selected === id) choose('openai/gpt-6-astra');
-  }
-  const current = models.find(m => m.id === selected) ?? defaultModels[0];
+
   return <>
     <Section number="02" title="Current chess model">
-      <div className="flex items-center gap-4 border-y border-border py-5"><span className="grid size-12 shrink-0 place-items-center rounded-2xl nav-tile"><Bot className="size-5"/></span><div className="min-w-0"><p className="break-words font-semibold">{current?.name}</p><p className="text-sm text-muted-foreground">{current?.maker} · Not connected</p></div></div>
+      <div>{sides.map((side) => {
+        const current = modelById(models, selected[side]);
+        return <div key={side} className="flex items-center gap-4 border-y border-border py-5">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl nav-tile"><Bot className="size-5" /></span>
+          <div className="min-w-0">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">{side === 'w' ? 'White AI' : 'Black AI'}</p>
+            <p className="break-words font-semibold">{current.name}</p>
+            <p className="text-sm text-muted-foreground">{current.maker} · Not connected</p>
+          </div>
+        </div>;
+      })}</div>
+      {pickers && <ChessModelPick />}
     </Section>
     <Section number="03" title="Chess AI models">
       <div className="mb-4 flex items-center justify-between gap-3"><p className="text-sm text-muted-foreground">No AI service connected</p><Button variant="outline" onClick={() => setOpen(true)}><Plus/>Add model</Button></div>
-      <div className="grid gap-3 sm:grid-cols-2">{models.map(m => <div key={m.id} className="flex min-w-0 items-center gap-2"><Button variant={m.id === selected ? 'secondary' : 'outline'} aria-pressed={m.id === selected} onClick={() => choose(m.id)} className="h-auto min-w-0 flex-1 justify-between whitespace-normal p-4 text-left"><span className="min-w-0"><span className="block break-words font-semibold">{m.name}</span><span className="block text-xs text-muted-foreground">{m.maker}</span><span className="mt-1 block break-all text-xs text-muted-foreground">{m.id}</span></span>{m.id === selected && <Check className="shrink-0"/>}</Button>{!defaultModels.some(item => item.id === m.id) && <Button variant="ghost" size="icon" aria-label={`Remove ${m.name}`} title={`Remove ${m.name}`} onClick={() => remove(m.id)}><Trash2/></Button>}</div>)}</div>
+      <div className="grid gap-3 sm:grid-cols-2">{models.map((model) => {
+        const usedBy = sides.filter((side) => selected[side] === model.id);
+        return <div key={model.id} className="flex min-w-0 items-center gap-2">
+          <Button variant={usedBy.length ? 'secondary' : 'outline'} aria-pressed={usedBy.length > 0} aria-label={`${model.name} ${model.maker}`} onClick={() => chooseChessModelForBoth(model.id)} className="h-auto min-w-0 flex-1 justify-between whitespace-normal p-4 text-left">
+            <span className="min-w-0">
+              <span className="block break-words font-semibold">{model.name}</span>
+              <span className="block text-xs text-muted-foreground">{model.maker}</span>
+              <span className="mt-1 block break-all text-xs text-muted-foreground">{model.id}</span>
+              {usedBy.length > 0 && <span className="mt-1 block text-xs text-muted-foreground">Plays {usedBy.map((side) => (side === 'w' ? 'White' : 'Black')).join(' and ')}</span>}
+            </span>
+            {usedBy.length > 0 && <Check className="shrink-0" />}
+          </Button>
+          {!isDefaultModel(model.id) && <Button variant="ghost" size="icon" aria-label={`Remove ${model.name}`} title={`Remove ${model.name}`} onClick={() => removeChessModel(model.id)}><Trash2/></Button>}
+        </div>;
+      })}</div>
     </Section>
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-h-[85dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-lg">
