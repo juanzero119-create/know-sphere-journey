@@ -50,7 +50,7 @@ export const getAiMove = createServerFn({ method: 'POST' })
     return d;
   })
   .handler(async ({ data }) => {
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env['LOVABLE_API_KEY'];
     if (!key) return { error: 'AI is not configured.' };
     let game: Chess;
     try { game = new Chess(data.fen); } catch { return { error: 'Invalid position.' }; }
