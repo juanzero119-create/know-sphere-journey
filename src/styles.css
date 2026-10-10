@@ -95,6 +95,8 @@
   --chess-last-light: #f5fa53;
   --chess-last-dark: #a7a337;
   --chess-piece-outline: #ffffff;
+  --chess-thinking-track: #a58062;
+  --chess-thinking-progress: #efdbb6;
   --nav-bar: oklch(0.297 0 0);
   --nav-bar-foreground: oklch(0.955 0 0);
   --nav-bar-border: oklch(0.36 0 0);
@@ -199,9 +201,19 @@ nav [data-status='active'] .nav-tile {
   .btn-play-live { transition: none; }
 }
 
-/* The reference shows stationary circular arrows below the player header.
-   Visibility follows thinking state; no continuous spinner is added. */
-.chess-thinking-circle { color: var(--muted-foreground); }
+/* Reference countdown ring: the cream arc recedes clockwise from twelve. */
+.chess-thinking-track { stroke: var(--chess-thinking-track); }
+.chess-thinking-progress {
+  stroke: var(--chess-thinking-progress);
+  animation: chess-thinking-countdown 2s linear infinite;
+}
+@keyframes chess-thinking-countdown {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -100; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chess-thinking-progress { animation: none; stroke-dashoffset: 25; }
+}
 
 
 
