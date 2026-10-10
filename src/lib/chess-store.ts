@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { Chess, type Square } from 'chess.js';
 import { getAiMove } from '@/lib/chess-ai.functions';
+import { DEFAULT_ELO, eloSchema } from '@/lib/chess-elo';
 
 export type ChessMode = 'ai' | '2p' | 'aivai';
 
@@ -15,6 +16,7 @@ export interface ChessState {
   lastMove: [Square, Square] | null;
   thinking: boolean;
   aiNote: string;
+  elo: { w: number; b: number };
 }
 
 const initialState: ChessState = {
@@ -25,6 +27,7 @@ const initialState: ChessState = {
   lastMove: null,
   thinking: false,
   aiNote: '',
+  elo: { w: DEFAULT_ELO, b: DEFAULT_ELO },
 };
 
 // Module-level game + state: survives route unmounts, so the game (and AI
@@ -115,7 +118,7 @@ async function maybeAiMove() {
   const fen = game.fen();
   const model = localStorage.getItem('lexi-ai-model') || 'openai/gpt-6-astra';
   try {
-    const r = await getAiMove({ data: { fen, model } });
+    const r = await getAiMove({ data: { fen, model, elo: state.elo[turn] } });
     if (game.fen() !== fen) return; // game was reset while waiting
     if (isOver()) return; // clock ran out or game ended while the AI was thinking
     if ('error' in r && r.error) {
@@ -145,6 +148,7 @@ export function resetChess(mode?: ChessMode) {
     version: state.version + 1,
     mode: mode ?? state.mode,
     clock: { w: BLITZ, b: BLITZ },
+    elo: { ...state.elo },
   };
   listeners.forEach((l) => l());
   void maybeAiMove();
@@ -152,4 +156,11 @@ export function resetChess(mode?: ChessMode) {
 
 export function setChessMode(mode: ChessMode) {
   resetChess(mode);
+}
+
+export function setChessElo(side: 'w' | 'b', elo: number) {
+  const parsed = eloSchema.safeParse(elo);
+  if (!parsed.success) return;
+  state = { ...state, elo: { ...state.elo, [side]: parsed.data } };
+  emit();
 }

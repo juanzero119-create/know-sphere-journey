@@ -5,6 +5,7 @@ import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { ModelManager } from '@/routes/ai';
+import { ChessElo } from '@/components/ChessElo';
 import { playMove, resetChess, setChessMode, useChessStore } from '@/lib/chess-store';
 
 export const Route = createFileRoute('/chess')({
@@ -77,6 +78,7 @@ function ChessPage() {
         </div>
         <Clock side="b" />
         <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex flex-wrap gap-2"><Button variant={mode === 'ai' ? 'secondary' : 'outline'} aria-pressed={mode === 'ai'} onClick={() => setChessMode('ai')}>Vs AI</Button><Button variant={mode === '2p' ? 'secondary' : 'outline'} aria-pressed={mode === '2p'} onClick={() => setChessMode('2p')}>2 players</Button><Button variant={mode === 'aivai' ? 'secondary' : 'outline'} aria-pressed={mode === 'aivai'} onClick={() => setChessMode('aivai')}>AI vs AI</Button><Button variant="outline" onClick={() => resetChess()}>New game</Button></div></div>
+        {mode !== '2p' && <ChessElo />}
         {mode === 'ai' && <p className="text-xs text-muted-foreground">You play White. The AI plays Black using the model chosen below.{thinking ? ' AI is thinking…' : ''}</p>}
         {mode === 'aivai' && <p className="text-xs text-muted-foreground">Two AIs play each other with the model chosen below — one move at a time, even while you browse other tabs.{thinking ? ' AI is thinking…' : ''} Each move uses AI credits.</p>}
         {aiNote && <p role="alert" className="text-xs text-destructive">{aiNote}</p>}
