@@ -89,12 +89,22 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
   </div>;
 });
 
-function Thinking() {
-  return <span role="status" aria-label="AI is thinking" className="chess-thinking-circle inline-flex size-5 items-center justify-center">
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" strokeWidth="4.5">
-      <circle className="chess-thinking-track" cx="12" cy="12" r="9" />
-      <circle className="chess-thinking-progress" cx="12" cy="12" r="9" pathLength="100" strokeDasharray="100" transform="rotate(-90 12 12)" />
-    </svg>
+// Countdown ring plus a live elapsed timer ("1.3s") beside it. Ticks on its
+// own 100ms interval so the rest of the page doesn't re-render each tenth.
+function Thinking({ since }: { since: number }) {
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => tick((n) => n + 1), 100);
+    return () => clearInterval(id);
+  }, []);
+  return <span role="status" aria-label="AI is thinking" className="inline-flex items-center gap-1.5">
+    <span className="chess-thinking-circle inline-flex size-5 items-center justify-center">
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" strokeWidth="4.5">
+        <circle className="chess-thinking-track" cx="12" cy="12" r="9" />
+        <circle className="chess-thinking-progress" cx="12" cy="12" r="9" pathLength="100" strokeDasharray="100" transform="rotate(-90 12 12)" />
+      </svg>
+    </span>
+    <span className="font-mono text-xs tabular-nums">{((Date.now() - since) / 1000).toFixed(1)}s</span>
   </span>;
 }
 
