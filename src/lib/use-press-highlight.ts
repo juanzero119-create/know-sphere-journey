@@ -6,7 +6,11 @@ const HOLD_MS = 350;
 const MOVE_TOLERANCE = 10;
 
 /** Character offset inside `container` under a screen point. `cover` is an element on top that must be ignored. */
-function offsetAt(container: HTMLElement, x: number, y: number, cover?: HTMLElement | null): number | null {
+function offsetAt(container: HTMLElement, rawX: number, rawY: number, cover?: HTMLElement | null): number | null {
+  // Keep the finger inside the text box so sliding past an edge sticks to the nearest line instead of jumping.
+  const box = container.getBoundingClientRect();
+  const x = Math.min(Math.max(rawX, box.left + 2), box.right - 2);
+  const y = Math.min(Math.max(rawY, box.top + 2), box.bottom - 2);
   const prevCover = cover?.style.pointerEvents;
   const prevContainer = container.style.pointerEvents;
   if (cover) cover.style.pointerEvents = 'none';
@@ -27,11 +31,25 @@ function offsetAt(container: HTMLElement, x: number, y: number, cover?: HTMLElem
     container.style.pointerEvents = prevContainer;
   }
   if (!node || !container.contains(node)) return null;
+  if (node === container && offset >= container.childNodes.length) return (container.textContent ?? '').length;
   const prefix = document.createRange();
   prefix.selectNodeContents(container);
   prefix.setEnd(node, offset);
   return prefix.toString().length;
 }
+
+const isWord = (ch: string | undefined) => !!ch && /[\p{L}\p{N}'’_-]/u.test(ch);
+/** Grow a range so it always covers whole words. */
+function snapToWords(text: string, start: number, end: number): [number, number] {
+  let s = start, e = end;
+  while (s > 0 && isWord(text[s - 1]) && (isWord(text[s]) || s === e)) s--;
+  while (e < text.length && isWord(text[e]) && (isWord(text[e - 1]) || s === e)) e++;
+  return [s, e];
+}
+
+const lockNative = (on: boolean) => {
+  document.documentElement.classList.toggle('press-highlighting', on);
+};
 
 /**
  * Press and hold on text to spawn a drag pill; dragging extends a highlight range.
@@ -66,19 +84,35 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
         target.current = { id, container, cover, anchor };
         clearNative();
         navigator.vibrate?.(10);
-        set({ id, start: anchor, end: anchor, x, y });
+        lockNative(true);
+        const [s, e] = snapToWords(container.textContent ?? '', anchor, anchor);
+        set({ id, start: s, end: e, x, y });
       }, HOLD_MS),
     };
   }, []);
 
   useEffect(() => {
-    const move = (x: number, y: number) => {
-      if (pending.current && Math.hypot(x - pending.current.x, y - pending.current.y) > MOVE_TOLERANCE) cancelPending();
+    let frame = 0;
+    let lastFocus: number | null = null;
+    let latest = { x: 0, y: 0 };
+    const apply = () => {
+      frame = 0;
       const t = target.current;
       if (!t || !dragRef.current) return;
-      const focus = offsetAt(t.container, x, y, t.cover) ?? (dragRef.current.end === t.anchor ? dragRef.current.start : dragRef.current.end);
+      const { x, y } = latest;
+      const focus = offsetAt(t.container, x, y, t.cover) ?? lastFocus ?? t.anchor;
+      lastFocus = focus;
+      const [s, e] = snapToWords(t.container.textContent ?? '', Math.min(t.anchor, focus), Math.max(t.anchor, focus));
       clearNative();
-      set({ id: t.id, start: Math.min(t.anchor, focus), end: Math.max(t.anchor, focus), x, y });
+      const prev = dragRef.current;
+      if (prev.start === s && prev.end === e && Math.abs(prev.x - x) < 1 && Math.abs(prev.y - y) < 1) return;
+      set({ id: t.id, start: s, end: e, x, y });
+    };
+    const move = (x: number, y: number) => {
+      if (pending.current && Math.hypot(x - pending.current.x, y - pending.current.y) > MOVE_TOLERANCE) cancelPending();
+      if (!target.current || !dragRef.current) return;
+      latest = { x, y };
+      if (!frame) frame = requestAnimationFrame(apply);
     };
     const onPointerMove = (event: PointerEvent) => move(event.clientX, event.clientY);
     const onTouchMove = (event: TouchEvent) => {
@@ -89,6 +123,9 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
     };
     const end = () => {
       cancelPending();
+      if (frame) { cancelAnimationFrame(frame); frame = 0; if (dragRef.current) apply(); }
+      lastFocus = null;
+      lockNative(false);
       const current = dragRef.current;
       if (current && current.end > current.start) commitRef.current(current.id, current.start, current.end);
       if (current) clearNative();
@@ -100,6 +137,9 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('pointerup', end);
     window.addEventListener('touchend', end);
+    window.addEventListener('touchcancel', end);
+    const blockStart = (event: Event) => { if (dragRef.current) event.preventDefault(); };
+    document.addEventListener('selectstart', blockStart);
     window.addEventListener('pointercancel', () => { if (!dragRef.current) cancelPending(); });
     window.addEventListener('contextmenu', blockMenu);
     return () => {
@@ -107,6 +147,9 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('pointerup', end);
       window.removeEventListener('touchend', end);
+      window.removeEventListener('touchcancel', end);
+      document.removeEventListener('selectstart', blockStart);
+      lockNative(false);
       window.removeEventListener('contextmenu', blockMenu);
       cancelPending();
     };

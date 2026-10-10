@@ -311,3 +311,12 @@ nav [data-status='active'] .nav-tile {
 
 /* Saved notes: press-and-hold spawns the app's drag pill instead of the phone's menu. */
 .note-press { -webkit-touch-callout: none; }
+
+/* While dragging the highlight pill, stop the phone's own selection, magnifier and callout. */
+html.press-highlighting, html.press-highlighting * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  touch-action: none;
+}
+html.press-highlighting textarea { caret-color: transparent; }
