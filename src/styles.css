@@ -166,17 +166,20 @@ nav [data-status='active'] .nav-tile {
   .nav-tile { transition: none; }
 }
 
-/* Bottom navigation bar stays gray everywhere, including the golden Movies theme. */
+/* Bottom navigation bar stays gray everywhere, including the golden Movies theme.
+   The icon squares are the same gray as the bar, so the strip reads as one flat band. */
 .bottom-nav {
   background: var(--nav-bar);
   color: var(--nav-bar-foreground);
   border-color: var(--nav-bar-border);
   --foreground: oklch(0.96 0 0);
   --muted-foreground: oklch(0.82 0 0);
-  --nav-tile: oklch(0.45 0 0);
-  --nav-tile-active: oklch(0.53 0 0);
-  --nav-tile-press: oklch(0.38 0 0);
+  --nav-tile: var(--nav-bar);
+  --nav-tile-active: oklch(0.4 0 0);
+  --nav-tile-press: oklch(0.24 0 0);
 }
+.bottom-nav .nav-tile { box-shadow: none; }
+
 
 
 @utility section-label {
