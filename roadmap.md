@@ -7,3 +7,8 @@
 - [x] Add actor entry, optional film and character, and separate name highlight controls.
 - [x] Add live preview and edit/remove controls.
 - [x] Verify actor interactions and mobile layout.
+
+# Bottom navigation
+- [x] Remove the pressed-in bevel effect from the icon tiles.
+- [x] Use a flat gray tile that turns a slightly darker gray while pressed.
+- [x] Verify resting, active, and pressed tile shades on a mobile-sized preview.
