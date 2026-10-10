@@ -199,14 +199,13 @@ nav [data-status='active'] .nav-tile {
   .btn-play-live { transition: none; }
 }
 
-/* Bouncing dots for the AI thinking indicator. */
-@keyframes thinking-bounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-  30% { transform: translateY(-4px); opacity: 1; }
+/* Compact circular thinking indicator beside the active player's name. */
+@keyframes chess-thinking-spin {
+  to { transform: rotate(360deg); }
 }
-.thinking-dot { animation: thinking-bounce 0.9s ease-in-out infinite; }
+.chess-thinking-circle { animation: chess-thinking-spin 1s linear infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .thinking-dot { animation: none; }
+  .chess-thinking-circle { animation: none; }
 }
 
 
