@@ -18,7 +18,7 @@ function Movies() {
  const featured=movies[0];
  const list=movies.filter(m=>(genre==='All'||m.genres.includes(genre))&&`${m.title} ${m.director} ${m.cast.flat().join(' ')}`.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>sort==='year'?b.year-a.year:sort==='title'?a.title.localeCompare(b.title):b.score-a.score);
  if(!featured)return null;
- return <Shell title="Movies">
+ return <Shell title="Movies" theme="movies">
  <div className="grid gap-6 border-t border-border pt-7 sm:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr]">
  <Link to="/film/$id" params={{id:featured.id}} className="block"><img src={featured.image} alt="Film-inspired artwork of an astronaut on an ocean planet" width={512} height={768} className="aspect-[2/3] w-full max-w-56 rounded-lg object-cover"/></Link>
  <div className="self-center"><p className="flex items-center gap-2 text-xs font-semibold text-muted-foreground"><Film className="size-4"/> SPOTLIGHT / SPACE & TIME</p><h2 className="mt-4 text-3xl font-semibold">Interstellar</h2><p className="mt-2 text-sm text-muted-foreground">2014 · PG-13 · {runtimeLabel(featured.runtime)}</p><div className="mt-4 flex flex-wrap gap-2">{featured.genres.map(g=><span key={g} className="text-xs font-medium border-b border-border pb-1">{g}</span>)}</div><p className="mt-4 max-w-xl leading-relaxed text-muted-foreground">{featured.synopsis}</p><p className="mt-4 text-sm"><span className="text-muted-foreground">Director</span> · {featured.director}</p><Button asChild className="mt-5"><Link to="/film/$id" params={{id:featured.id}}>Explore film <ArrowUpRight/></Link></Button></div></div>
