@@ -297,6 +297,12 @@ nav [data-status='active'] .nav-tile {
 /* Name highlight chips stay bright, so their text goes dark. */
 .bg-name-gold, .bg-name-blue, .bg-name-rose, .bg-name-green { color: var(--name-on); }
 
+/* Highlighted note cards use the same bright-on-dark-text pairing. */
+.note-highlighted { color: var(--name-on); }
+.note-highlighted .note-sub { color: var(--name-on); opacity: 0.68; }
+.note-highlighted .note-icon-btn { color: var(--name-on); }
+.note-highlighted .note-icon-btn:hover { background: oklch(0 0 0 / 0.12); }
+
 .chess-square { background: var(--chess-light); color: var(--chess-dark); }
 .chess-square.chess-dark { background: var(--chess-dark); color: var(--chess-light); }
 .chess-square.chess-last { background: var(--chess-last-light); }
