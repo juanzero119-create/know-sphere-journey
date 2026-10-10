@@ -33,3 +33,8 @@
 - [x] Add an AI navigation tab and custom model controls.
 - [x] Match chess squares, pieces, coordinates, orientation, and move highlights to the reference.
 - [x] Verify both pages and existing tests.
+
+# Actor list trim
+- [x] Remove the last six actors from the pre-loaded list, leaving fifty.
+- [x] Drop their bios and portraits and update the actor tests.
+- [x] Verify the Movies page shows fifty actors on mobile.
