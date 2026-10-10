@@ -14,6 +14,7 @@ import { Route as AiRouteImport } from './routes/ai'
 import { Route as AnatomyRouteImport } from './routes/anatomy'
 import { Route as ChessRouteImport } from './routes/chess'
 import { Route as MoviesRouteImport } from './routes/movies'
+import { Route as NotesRouteImport } from './routes/notes'
 import { Route as StudiesRouteImport } from './routes/studies'
 import { Route as WatchRouteImport } from './routes/watch'
 import { Route as WordsRouteImport } from './routes/words'
@@ -44,6 +45,11 @@ const MoviesRoute = MoviesRouteImport.update({
   path: '/movies',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotesRoute = NotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudiesRoute = StudiesRouteImport.update({
   id: '/studies',
   path: '/studies',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/anatomy': typeof AnatomyRoute
   '/chess': typeof ChessRoute
   '/movies': typeof MoviesRoute
+  '/notes': typeof NotesRoute
   '/studies': typeof StudiesRoute
   '/watch': typeof WatchRoute
   '/words': typeof WordsRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/anatomy': typeof AnatomyRoute
   '/chess': typeof ChessRoute
   '/movies': typeof MoviesRoute
+  '/notes': typeof NotesRoute
   '/studies': typeof StudiesRoute
   '/watch': typeof WatchRoute
   '/words': typeof WordsRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/anatomy': typeof AnatomyRoute
   '/chess': typeof ChessRoute
   '/movies': typeof MoviesRoute
+  '/notes': typeof NotesRoute
   '/studies': typeof StudiesRoute
   '/watch': typeof WatchRoute
   '/words': typeof WordsRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/anatomy'
     | '/chess'
     | '/movies'
+    | '/notes'
     | '/studies'
     | '/watch'
     | '/words'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/anatomy'
     | '/chess'
     | '/movies'
+    | '/notes'
     | '/studies'
     | '/watch'
     | '/words'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/anatomy'
     | '/chess'
     | '/movies'
+    | '/notes'
     | '/studies'
     | '/watch'
     | '/words'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   AnatomyRoute: typeof AnatomyRoute
   ChessRoute: typeof ChessRoute
   MoviesRoute: typeof MoviesRoute
+  NotesRoute: typeof NotesRoute
   StudiesRoute: typeof StudiesRoute
   WatchRoute: typeof WatchRoute
   WordsRoute: typeof WordsRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MoviesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notes': {
+      id: '/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof NotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/studies': {
       id: '/studies'
       path: '/studies'
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnatomyRoute: AnatomyRoute,
   ChessRoute: ChessRoute,
   MoviesRoute: MoviesRoute,
+  NotesRoute: NotesRoute,
   StudiesRoute: StudiesRoute,
   WatchRoute: WatchRoute,
   WordsRoute: WordsRoute,

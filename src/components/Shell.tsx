@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { BookOpen, Plus, GraduationCap, Clapperboard, Film, Flame, Sparkles, ArrowUpRight, ChessKnight, Bot } from 'lucide-react';
+import { BookOpen, Plus, GraduationCap, Clapperboard, Film, Flame, Sparkles, ArrowUpRight, ChessKnight, Bot, NotebookPen } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { useMatchRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
