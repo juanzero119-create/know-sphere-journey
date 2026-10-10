@@ -41,6 +41,10 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-muted: var(--sidebar-muted);
   --color-sidebar-active: var(--sidebar-active);
+  --color-name-gold: var(--name-gold);
+  --color-name-blue: var(--name-blue);
+  --color-name-rose: var(--name-rose);
+  --color-name-green: var(--name-green);
 }
 
 :root {
@@ -73,6 +77,10 @@
   --sidebar-foreground: oklch(0.96 0 0);
   --sidebar-muted: oklch(0.72 0 0);
   --sidebar-active: oklch(0.34 0 0);
+  --name-gold: oklch(0.88 0.12 90);
+  --name-blue: oklch(0.87 0.065 240);
+  --name-rose: oklch(0.87 0.075 10);
+  --name-green: oklch(0.87 0.075 155);
 }
 
 @layer base {
