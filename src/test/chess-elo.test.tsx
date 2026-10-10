@@ -1,9 +1,11 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 vi.mock('@/lib/chess-ai.functions', () => ({ getAiMove: vi.fn(() => new Promise(() => {})) }));
 import { ChessElo } from '@/components/ChessElo';
 import { eloSchema } from '@/lib/chess-elo';
 import { getChessSnapshot, resetChess, setChessElo, setChessMode } from '@/lib/chess-store';
+
+beforeEach(() => vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} }));
 
 afterEach(() => { cleanup(); resetChess('2p'); });
 
