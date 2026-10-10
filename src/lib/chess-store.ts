@@ -19,6 +19,7 @@ export interface ChessState {
   humanSide: 'w' | 'b';
   lastMove: [Square, Square] | null;
   thinking: boolean;
+  thinkingSince: number;
   aiNote: string;
   elo: { w: number; b: number };
   paused: boolean;
@@ -32,6 +33,7 @@ const initialState: ChessState = {
   humanSide: 'w',
   lastMove: null,
   thinking: false,
+  thinkingSince: 0,
   aiNote: '',
   elo: { w: DEFAULT_ELO, b: DEFAULT_ELO },
   paused: false,
@@ -142,6 +144,7 @@ async function maybeAiMove() {
   if (!aiTurn || isOver() || state.paused || aiRunning) return;
   aiRunning = true;
   state.thinking = true;
+  state.thinkingSince = Date.now();
   state.aiNote = '';
   emit();
   const fen = game.fen();
