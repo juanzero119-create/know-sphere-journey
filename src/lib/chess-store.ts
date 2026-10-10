@@ -85,7 +85,10 @@ function startClock() {
     const turn = game.turn();
     state.clock = { ...state.clock, [turn]: state.clock[turn] - d };
     emit();
-    if (state.clock[turn] <= 0) stopClock();
+    if (state.clock[turn] <= 0) {
+      stopClock();
+      maybePlayEndSound();
+    }
   }, 100);
 }
 
@@ -158,6 +161,7 @@ async function maybeAiMove() {
 
 export function resetChess(mode?: ChessMode) {
   stopClock();
+  endSoundPlayed = false;
   game = new Chess();
   state = {
     ...initialState,
