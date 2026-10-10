@@ -15,9 +15,9 @@ export const Route = createFileRoute('/movies')({
  component:Movies,
 });
 function Movies() {
- const [search,setSearch]=useState(''); const [genre,setGenre]=useState('All'); const [sort,setSort]=useState('score');
+ const [search,setSearch]=useState(''); const [genre,setGenre]=useState('All'); const [sort,setSort]=useState('title');
  const featured=movies[0];
- const list=movies.filter(m=>(genre==='All'||m.genres.includes(genre))&&`${m.title} ${m.director} ${m.cast.flat().join(' ')}`.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>sort==='year'?b.year-a.year:sort==='title'?a.title.localeCompare(b.title):b.score-a.score);
+ const list=movies.filter(m=>(genre==='All'||m.genres.includes(genre))&&`${m.title} ${m.director} ${m.cast.flat().join(' ')}`.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>sort==='year'?b.year-a.year:sort==='title'?a.title.localeCompare(b.title):sort==='title-desc'?b.title.localeCompare(a.title):b.score-a.score);
  if(!featured)return null;
  return <Shell title="Movies" theme="movies">
  <div className="grid gap-6 border-t border-border pt-7 sm:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr]">
@@ -26,7 +26,7 @@ function Movies() {
  <FilmSearch/>
  <ActorEditor/>
  <Section number="03" title="Explore the collection" subtitle="Great stories. Remarkable performances.">
- <div className="flex flex-col gap-3 sm:flex-row"><div className="relative flex-1"><Search className="absolute left-3 top-3 size-4 text-muted-foreground"/><Input aria-label="Search movies" placeholder="Search films, directors, or cast…" className="h-10 bg-card pl-10" value={search} onChange={e=>setSearch(e.target.value)}/></div><select aria-label="Sort movies" className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={sort} onChange={e=>setSort(e.target.value)}><option value="score">Sample score</option><option value="year">Newest first</option><option value="title">Title A–Z</option></select></div>
+ <div className="flex flex-col gap-3 sm:flex-row"><div className="relative flex-1"><Search className="absolute left-3 top-3 size-4 text-muted-foreground"/><Input aria-label="Search movies" placeholder="Search films, directors, or cast…" className="h-10 bg-card pl-10" value={search} onChange={e=>setSearch(e.target.value)}/></div><select aria-label="Sort movies" className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={sort} onChange={e=>setSort(e.target.value)}><option value="title">Alphabetical A–Z</option><option value="title-desc">Alphabetical Z–A</option><option value="year">Newest first</option><option value="score">Sample score</option></select></div>
  <div className="flex flex-wrap gap-2" role="group" aria-label="Movie genres">{['All','Drama','Sci-Fi','Action','Animation','Comedy','Thriller','Adventure','Fantasy','Crime'].map(g=><Button key={g} size="sm" variant={genre===g?'default':'secondary'} aria-pressed={genre===g} onClick={()=>setGenre(g)}>{g}</Button>)}</div>
  <p className="text-xs text-muted-foreground">{list.length} films · Sample scores, not live IMDb ratings. Artwork is film-inspired, not official posters.</p>
  <div className="grid grid-cols-2 gap-x-4 gap-y-7 lg:grid-cols-3">{list.map(m=><article key={m.id} className="cv-auto min-w-0" style={{containIntrinsicSize:"auto 420px"}}><Link to="/film/$id" params={{id:m.id}} className="group block"><FilmPoster movie={m} lazy className="transition-opacity group-hover:opacity-90"/><div className="mt-3 flex items-center gap-1.5 text-sm"><Star className="size-4 fill-gold text-gold"/><strong>{m.score.toFixed(1)}</strong><span className="text-xs text-muted-foreground">/ 10</span></div><h3 className="mt-2 text-base font-semibold leading-snug">{m.title}</h3></Link><p className="mt-1 text-xs text-muted-foreground">{m.year} · {runtimeLabel(m.runtime)} · {m.certificate}</p><p className="mt-1 text-xs text-muted-foreground">{m.genres.slice(0,2).join(' / ')}</p><Button asChild variant="link" className="mt-1 h-8 px-0"><Link to="/film/$id" params={{id:m.id}}>Details <ArrowUpRight/></Link></Button></article>)}</div>
