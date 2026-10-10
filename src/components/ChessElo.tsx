@@ -1,12 +1,17 @@
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { eloLabel, eloPresets } from '@/lib/chess-elo';
 import { setChessElo, useChessStore } from '@/lib/chess-store';
-import { chooseChessModel, modelById, useChessModels, type ChessSide } from '@/lib/chess-models';
+import { modelById, useChessModels, type ChessSide } from '@/lib/chess-models';
+import { ChessModelSheet } from '@/components/ChessModelSheet';
 
 export function ChessElo() {
   const { state } = useChessStore();
   const { models, selected } = useChessModels();
+  const [pickerSide, setPickerSide] = useState<ChessSide | null>(null);
   const sides: ChessSide[] = ['w', 'b'];
   return <div className="space-y-5 border-t border-border pt-5">
     <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -34,16 +39,18 @@ export function ChessElo() {
           </Select>
           <div className="space-y-2">
             <span className="block text-sm font-medium">{name} model</span>
-            <Select value={current.id} onValueChange={id => chooseChessModel(side, id)}>
-              <SelectTrigger aria-label={`${name} model`}><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {models.map(model => <SelectItem key={model.id} value={model.id}>{model.name} · {model.maker}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <p className="break-all text-xs text-muted-foreground">{current.maker} · {current.id}</p>
+            <Button variant="outline" aria-label={`${name} model`} onClick={() => setPickerSide(side)}
+              className="h-auto w-full justify-between gap-3 whitespace-normal p-4 text-left">
+              <span className="min-w-0">
+                <span className="block break-words font-semibold">{current.name}</span>
+                <span className="block break-all text-xs text-muted-foreground">{current.maker} · {current.id}</span>
+              </span>
+              <ChevronDown className="shrink-0 text-muted-foreground" />
+            </Button>
           </div>
         </div>;
       })}
     </div>
+    {pickerSide && <ChessModelSheet side={pickerSide} open onOpenChange={value => { if (!value) setPickerSide(null); }} />}
   </div>;
 }
