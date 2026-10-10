@@ -96,6 +96,8 @@
 /* Movies section: golden yellow background (RGB 239, 197, 0). */
 .movies-theme {
   color-scheme: light;
+  background-color: var(--background);
+  color: var(--foreground);
   --background: oklch(0.836 0.171 93.3);
   --foreground: oklch(0.193 0.04 95.2);
   --card: oklch(0.8 0.164 92.3);
