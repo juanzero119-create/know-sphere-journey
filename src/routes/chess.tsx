@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Square } from 'chess.js';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
@@ -46,13 +46,39 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
   const turn = game.turn();
   const targets = picked ? game.moves({ square: picked, verbose: true }).map(m => m.to) : [];
   const checkSq = game.inCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === turn)?.square : undefined;
-  return <div role="group" aria-label="Chess board" className="grid aspect-square w-full grid-cols-8 overflow-hidden">
+
+  // Slide the moved piece from its old square to the new one.
+  const [anim, setAnim] = useState<{ from: Square; to: Square; color: string; type: string } | null>(null);
+  const [animGo, setAnimGo] = useState(false);
+  const prevMove = useRef<typeof lastMove>(null);
+  useEffect(() => {
+    if (lastMove && lastMove !== prevMove.current) {
+      const p = game.get(lastMove[1]);
+      if (p) {
+        setAnim({ from: lastMove[0], to: lastMove[1], color: p.color, type: p.type });
+        setAnimGo(false);
+      }
+    }
+    prevMove.current = lastMove;
+  }, [lastMove, game]);
+  useEffect(() => {
+    if (!anim) return;
+    const raf = requestAnimationFrame(() => requestAnimationFrame(() => setAnimGo(true)));
+    const t = setTimeout(() => setAnim(null), 240);
+    return () => { cancelAnimationFrame(raf); clearTimeout(t); };
+  }, [anim]);
+
+  const rc = (s: Square) => ({ r: Number(s[1]) - 1, c: FILES.indexOf(s[0]) });
+  const a1 = anim ? rc(anim.from) : null;
+  const a2 = anim ? rc(anim.to) : null;
+
+  return <div role="group" aria-label="Chess board" className="relative grid aspect-square w-full grid-cols-8 overflow-hidden">
     {Array.from({ length: 8 }, (_, r) => Array.from({ length: 8 }, (_, c) => {
       const s = sq(r, c); const p = game.get(s); const isTarget = targets.includes(s);
       return <Button variant="ghost" key={s} aria-label={`Square ${s}${p ? ' ' + (p.color === 'w' ? 'white' : 'black') + ' ' + pieceNames[p.type] : ''}`} aria-pressed={picked === s} onClick={() => interactive && onTap(r, c)} className={'chess-square relative h-auto min-w-0 rounded-none p-0 aspect-square ' + ((r + c) % 2 ? 'chess-dark ' : '') + (lastMove?.includes(s) || picked === s ? 'chess-last' : '')}>
         {lastMove?.[0] === s && <span aria-hidden="true" className="chess-square chess-origin absolute inset-0"/>}
         {checkSq === s && <span aria-hidden="true" className="absolute inset-0 bg-destructive/60"/>}
-        {p && <img src={pieceUrl(p.color, p.type)} alt="" draggable={false} className="relative h-[90%] w-[90%] object-contain"/>}
+        {p && anim?.to !== s && <img src={pieceUrl(p.color, p.type)} alt="" draggable={false} className="relative h-[90%] w-[90%] object-contain"/>}
         {isTarget && (p ? <span aria-hidden="true" className="absolute inset-[4%] rounded-full border-4 border-ink/30"/> : <span aria-hidden="true" className="absolute size-1/3 rounded-full bg-ink/25"/>)}
         {r === 0 && <span aria-hidden="true" className="absolute right-1 top-0.5 text-xs font-semibold sm:right-2 sm:top-1 sm:text-base">{FILES[c]}</span>}
         {c === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
