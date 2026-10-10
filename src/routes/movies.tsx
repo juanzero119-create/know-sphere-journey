@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { movies, runtimeLabel } from '@/lib/movies';
 import { ActorEditor } from '@/components/ActorEditor';
+import { FilmSearch } from '@/components/FilmSearch';
 
 export const Route = createFileRoute('/movies')({
  head:()=>({meta:[{title:'Movies — Film collection & cast | Lexi'},{name:'description',content:'Explore a curated movie collection, discover stories and cast, and browse films by genre.'},{property:'og:title',content:'Movies — Film collection & cast | Lexi'},{property:'og:description',content:'Discover cinema, from memorable stories to the people behind them.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),
@@ -22,6 +23,7 @@ function Movies() {
  <div className="grid gap-6 border-t border-border pt-7 sm:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr]">
  <Link to="/film/$id" params={{id:featured.id}} className="block"><img src={featured.image} alt="Film-inspired artwork of an astronaut on an ocean planet" width={512} height={768} className="aspect-[2/3] w-full max-w-56 rounded-lg object-cover"/></Link>
  <div className="self-center"><p className="flex items-center gap-2 text-xs font-semibold text-muted-foreground"><Film className="size-4"/> SPOTLIGHT / SPACE & TIME</p><h2 className="mt-4 text-3xl font-semibold">Interstellar</h2><p className="mt-2 text-sm text-muted-foreground">2014 · PG-13 · {runtimeLabel(featured.runtime)}</p><div className="mt-4 flex flex-wrap gap-2">{featured.genres.map(g=><span key={g} className="text-xs font-medium border-b border-border pb-1">{g}</span>)}</div><p className="mt-4 max-w-xl leading-relaxed text-muted-foreground">{featured.synopsis}</p><p className="mt-4 text-sm"><span className="text-muted-foreground">Director</span> · {featured.director}</p><Button asChild className="mt-5"><Link to="/film/$id" params={{id:featured.id}}>Explore film <ArrowUpRight/></Link></Button></div></div>
+ <FilmSearch/>
  <ActorEditor/>
  <Section number="02" title="Explore the collection" subtitle="Great stories. Remarkable performances.">
  <div className="flex flex-col gap-3 sm:flex-row"><div className="relative flex-1"><Search className="absolute left-3 top-3 size-4 text-muted-foreground"/><Input aria-label="Search movies" placeholder="Search films, directors, or cast…" className="h-10 bg-card pl-10" value={search} onChange={e=>setSearch(e.target.value)}/></div><select aria-label="Sort movies" className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={sort} onChange={e=>setSort(e.target.value)}><option value="score">Sample score</option><option value="year">Newest first</option><option value="title">Title A–Z</option></select></div>
