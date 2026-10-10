@@ -91,9 +91,9 @@
   --chess-last-light: #f5fa53;
   --chess-last-dark: #a7a337;
   --chess-piece-outline: #ffffff;
-  --nav-bar: oklch(0.3 0 0);
-  --nav-bar-foreground: oklch(0.96 0 0);
-  --nav-bar-border: oklch(0.38 0 0);
+  --nav-bar: oklch(0.297 0 0);
+  --nav-bar-foreground: oklch(0.955 0 0);
+  --nav-bar-border: oklch(0.36 0 0);
 }
 
 
@@ -167,21 +167,22 @@ nav [data-status='active'] .nav-tile {
 }
 
 /* Bottom navigation bar stays gray everywhere, including the golden Movies theme.
-   Every icon square is the same gray as the bar; the current tab is shown by a
-   brighter icon and label instead of a different tile color. */
+   The bar is dark gray, the icon squares a lighter gray, and the current tab's
+   square a shade lighter still. Icons sit brighter than their labels. */
 .bottom-nav {
   background: var(--nav-bar);
   color: var(--nav-bar-foreground);
   border-color: var(--nav-bar-border);
-  --foreground: oklch(0.98 0 0);
-  --muted-foreground: oklch(0.7 0 0);
-  --nav-tile: var(--nav-bar);
-  --nav-tile-active: var(--nav-bar);
-  --nav-tile-press: oklch(0.24 0 0);
+  --foreground: oklch(0.955 0 0);
+  --muted-foreground: oklch(0.637 0 0);
+  --nav-tile: oklch(0.45 0 0);
+  --nav-tile-active: oklch(0.528 0 0);
+  --nav-tile-press: oklch(0.356 0 0);
 }
-.bottom-nav .nav-tile { box-shadow: none; }
-.bottom-nav a { color: var(--muted-foreground); }
-.bottom-nav [data-status='active'] { color: var(--foreground); }
+.bottom-nav .nav-tile { box-shadow: none; color: oklch(0.8 0 0); }
+.bottom-nav a { color: oklch(0.637 0 0); }
+.bottom-nav [data-status='active'] { color: oklch(0.833 0 0); }
+.bottom-nav [data-status='active'] .nav-tile { color: oklch(0.955 0 0); }
 
 
 
