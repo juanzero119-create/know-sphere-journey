@@ -3,6 +3,7 @@ import { Chess, type Square } from 'chess.js';
 import { getAiMove } from '@/lib/chess-ai.functions';
 import { getChessModelFor } from '@/lib/chess-models';
 import { DEFAULT_ELO, eloSchema } from '@/lib/chess-elo';
+import { playGameEndSound, playMoveSound } from '@/lib/chess-sounds';
 
 export type ChessMode = 'ai' | '2p' | 'aivai';
 
@@ -84,7 +85,10 @@ function startClock() {
     const turn = game.turn();
     state.clock = { ...state.clock, [turn]: state.clock[turn] - d };
     emit();
-    if (state.clock[turn] <= 0) stopClock();
+    if (state.clock[turn] <= 0) {
+      stopClock();
+      maybePlayEndSound();
+    }
   }, 100);
 }
 
@@ -95,10 +99,19 @@ function stopClock() {
   }
 }
 
+let endSoundPlayed = false;
+function maybePlayEndSound() {
+  if (endSoundPlayed || !isOver()) return;
+  endSoundPlayed = true;
+  playGameEndSound();
+}
+
 function applyMove(from: Square, to: Square, turn: 'w' | 'b') {
   state.clock = { ...state.clock, [turn]: state.clock[turn] + (state.started ? INC : 0) };
   state.started = true;
   state.lastMove = [from, to];
+  playMoveSound();
+  maybePlayEndSound();
   startClock();
   emit();
   void maybeAiMove();
@@ -148,6 +161,7 @@ async function maybeAiMove() {
 
 export function resetChess(mode?: ChessMode) {
   stopClock();
+  endSoundPlayed = false;
   game = new Chess();
   state = {
     ...initialState,
