@@ -38,9 +38,8 @@ function ActorName({ actor, preview = false }: { actor: ActorDraft; preview?: bo
  const part = (name: string, color: Highlight, fallback: string) => <span className={`rounded-sm px-1 py-0.5 ${highlights.find(h => h.id === color)?.className ?? ''}`}>{name || (preview ? fallback : '')}</span>;
  return <span className="flex flex-wrap gap-x-1 gap-y-2 break-words [overflow-wrap:anywhere]">{part(actor.firstName, actor.firstHighlight, 'First name')}{part(actor.lastName, actor.lastHighlight, 'Last name')}</span>;
 }
-/** Beveled tiles for every film this actor appears in, shown under their details. */
-function ActorFilms({ name }: { name: string }) {
- const films = filmographyForActor(name);
+/** Beveled tiles for every film this actor appears in, revealed by the Details button. */
+function ActorFilms({ name, films }: { name: string; films: ReturnType<typeof filmographyForActor> }) {
  if (films.length === 0) return null;
  return <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={`Films featuring ${name}`}>{films.map(f => <FilmChip key={f.movie.id} movie={f.movie} note={f.role}/>)}</div>;
 }
@@ -48,7 +47,8 @@ export function ActorEditor() {
  const [actors, setActors] = useState<Actor[]>(seedActors);
  const [draft, setDraft] = useState<ActorDraft>({ ...emptyDraft });
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [openId, setOpenId] = useState<number | null>(null);
+   const [openId, setOpenId] = useState<number | null>(null);
+   const [detailsId, setDetailsId] = useState<number | null>(null);
  const [message, setMessage] = useState('');
  const update = <K extends keyof ActorDraft>(key: K, value: ActorDraft[K]) => setDraft(old => ({ ...old, [key]: value }));
  function reset() { setDraft({ ...emptyDraft }); setEditingId(null); }
