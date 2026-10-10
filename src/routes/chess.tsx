@@ -68,7 +68,8 @@ function ChessPage() {
     else setPicked(null);
   }
   useEffect(() => {
-    if (!vsAi || over || turn !== 'b' || thinking) return;
+    const aiTurn = mode === 'aivai' || (mode === 'ai' && turn === 'b');
+    if (!aiTurn || over || thinking) return;
     let cancelled = false;
     const fen = game.fen();
     const model = localStorage.getItem('lexi-ai-model') || 'openai/gpt-6-astra';
@@ -78,12 +79,13 @@ function ChessPage() {
       if ('error' in r && r.error) { setAiNote(r.error); return; }
       if (!('move' in r) || !r.move) return;
       const m = game.move(r.move);
-      setClock(cl => ({ ...cl, b: cl.b + INC }));
+      setStarted(true);
+      setClock(cl => ({ ...cl, [turn]: cl[turn] + INC }));
       setLastMove([m.from, m.to]); setPicked(null); setTick(t => t + 1);
       if (r.fallback) setAiNote('The AI gave an unclear answer, so a random legal move was played.');
     }).catch(() => { if (!cancelled) setAiNote('The AI could not move. Try again.'); }).finally(() => { if (!cancelled) setThinking(false); });
     return () => { cancelled = true; setThinking(false); };
-  }, [vsAi, over, turn, game, lastMove]);
+  }, [mode, over, turn, game, lastMove]);
   function reset() { setAiNote(''); setGame(new Chess()); setPicked(null); setLastMove(null); setClock({ w: BLITZ, b: BLITZ }); setStarted(false); }
 
   const status = flagged ? `${flagged === 'w' ? 'White' : 'Black'} ran out of time — ${flagged === 'w' ? 'Black' : 'White'} wins`
