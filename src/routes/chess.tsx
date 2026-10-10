@@ -68,7 +68,7 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
     return () => { cancelAnimationFrame(raf); clearTimeout(t); };
   }, [anim]);
 
-  const rc = (s: Square) => ({ r: Number(s[1]) - 1, c: FILES.indexOf(s[0]) });
+  const rc = (s: Square) => ({ r: Number(s[1]!) - 1, c: FILES.indexOf(s[0]!) });
   const a1 = anim ? rc(anim.from) : null;
   const a2 = anim ? rc(anim.to) : null;
 
