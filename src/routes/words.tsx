@@ -22,7 +22,7 @@ function Words() {
   const [i, setI] = useState(0);
   const [flip, setFlip] = useState(false);
   const [quiz, setQuiz] = useState(false);
-  const w = words[i];
+  const w = words[i]!;
   return (
     <Shell title="Words">
       <button onClick={() => setFlip(!flip)} className="chunky flex min-h-72 w-full flex-col items-center justify-center rounded-3xl bg-cream p-8 text-center text-ink">

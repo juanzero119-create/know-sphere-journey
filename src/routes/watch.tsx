@@ -20,7 +20,7 @@ export const Route = createFileRoute("/watch")({
 });
 
 function Watch() {
-  const [cur, setCur] = useState<Video>(videos[0]);
+  const [cur, setCur] = useState<Video>(videos[0]!);
   const [topic, setTopic] = useState<string>("All");
   const { ratings, rate } = useProgress();
   const list = videos.filter((v) => topic === "All" || v.topic === topic);

@@ -23,7 +23,7 @@ export function Quiz({ mode, onClose }: { mode: Mode; onClose: () => void }) {
 
   useEffect(() => { if (done) addXp(score * 10); }, [done]); // eslint-disable-line
 
-  const q = qs[i];
+  const q = qs[i]!;
   const choose = (o: string) => {
     if (picked) return;
     setPicked(o);
