@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 
 export const studyDestinations = [
   { to: '/words', label: 'Vocabulary' }, { to: '/anatomy', label: 'Anatomy' },
-  { to: '/', label: 'Practice' }, { to: '/watch', label: 'Watch' }, { to: '/movies', label: 'Movies' },
+  { to: '/', label: 'Practice' }, { to: '/watch', label: 'Watch' }, { to: '/movies', label: 'Movies' }, { to: '/chess', label: 'Chess' },
 ] as const;
 type Destination = typeof studyDestinations[number]['to'];
 type IconName = typeof iconChoices[number]['name'];
