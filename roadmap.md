@@ -69,6 +69,11 @@
 - [x] Place the chess AI model chooser directly beneath the Elo difficulty selectors.
 - [x] Renumber the Chess page sections and verify the order on mobile.
 
+# Per-side AI model selectors
+- [x] Add a model selector for each colour directly underneath both Elo sliders.
+- [x] Let White AI and Black AI run different models, remembered separately.
+- [x] Verify the order, the choice, and that it survives a reload on mobile.
+
 
 
 
