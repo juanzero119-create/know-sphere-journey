@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Section } from '@/components/Section';
@@ -13,12 +13,12 @@ const highlights = [
  { id: 'green', label: 'Green', className: 'bg-name-green', swatch: 'bg-name-green' },
 ] as const;
 type Highlight = (typeof highlights)[number]['id'];
-type ActorDraft = { firstName: string; lastName: string; role: string; film: string; firstHighlight: Highlight; lastHighlight: Highlight };
+type ActorDraft = { firstName: string; lastName: string; role: string; film: string; bio: string; firstHighlight: Highlight; lastHighlight: Highlight };
 type Actor = ActorDraft & { id: number };
-const emptyDraft: ActorDraft = { firstName: '', lastName: '', role: '', film: '', firstHighlight: 'gold', lastHighlight: 'blue' };
+const emptyDraft: ActorDraft = { firstName: '', lastName: '', role: '', film: '', bio: '', firstHighlight: 'gold', lastHighlight: 'blue' };
 // "The 50 Most Talented Male Actors By Screen Achievement" (imdb.com/list/ls000759379)
 const imdbNames = ['Leonardo DiCaprio','Jeff Bridges','Daniel Day-Lewis','Anthony Hopkins','Al Pacino','Philip Seymour Hoffman','Denzel Washington','Robert De Niro','Jack Nicholson','Javier Bardem','Tom Hanks','Christian Bale','Ben Kingsley','Edward Norton','Tom Hardy','George Clooney','Michael Caine','Robert Downey Jr.','Ralph Fiennes','Ryan Gosling','Sam Rockwell','Tom Wilkinson','Forest Whitaker','Kevin Spacey','Brad Pitt','Christopher Plummer','Robert Duvall','Joaquin Phoenix','Gary Oldman','Samuel L. Jackson','Benicio Del Toro','Jamie Foxx','Liam Neeson','Mark Wahlberg','Gene Hackman','Tim Roth','Sean Penn','Morgan Freeman','Tommy Lee Jones','Clint Eastwood','Ian McKellen','Don Cheadle','Colin Farrell','Johnny Depp','Ray Winstone','Stephen Rea','William H. Macy','Adrien Brody','Michael Gambon','Brendan Gleeson','William Hurt','Mark Ruffalo','Matt Damon','Val Kilmer','Nicolas Cage','Kevin Costner'];
-const seedActors: Actor[] = imdbNames.map((name, i) => { const parts = name.split(' '); const lastName = parts.pop() ?? ''; return { id: i + 1, firstName: parts.join(' '), lastName, role: '', film: '', firstHighlight: 'gold', lastHighlight: 'blue' }; });
+const seedActors: Actor[] = imdbNames.map((name, i) => { const parts = name.split(' '); const lastName = parts.pop() ?? ''; return { id: i + 1, firstName: parts.join(' '), lastName, role: '', film: '', bio: '', firstHighlight: 'gold', lastHighlight: 'blue' }; });
 
 function HighlightPicker({ label, value, onChange }: { label: string; value: Highlight; onChange: (value: Highlight) => void }) {
  return <fieldset><legend className="mb-2 text-sm font-medium">{label}</legend><div className="flex gap-2">{highlights.map(h => <Button key={h.id} type="button" variant="outline" size="icon" title={`${label}: ${h.label}`} aria-label={`${label}: ${h.label}`} aria-pressed={value === h.id} onClick={() => onChange(h.id)} className={`border-2 hover:bg-muted ${value === h.id ? 'border-primary' : 'border-border'}`}><span className={`grid size-6 place-items-center rounded-sm text-foreground ${h.swatch}`}>{value === h.id ? <Check className="size-4"/> : h.id === 'none' ? <X className="size-3"/> : null}</span></Button>)}</div></fieldset>;
@@ -30,14 +30,15 @@ function ActorName({ actor, preview = false }: { actor: ActorDraft; preview?: bo
 export function ActorEditor() {
  const [actors, setActors] = useState<Actor[]>(seedActors);
  const [draft, setDraft] = useState<ActorDraft>({ ...emptyDraft });
- const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [openId, setOpenId] = useState<number | null>(null);
  const [message, setMessage] = useState('');
  const update = <K extends keyof ActorDraft>(key: K, value: ActorDraft[K]) => setDraft(old => ({ ...old, [key]: value }));
  function reset() { setDraft({ ...emptyDraft }); setEditingId(null); }
  function submit(event: FormEvent<HTMLFormElement>) {
   event.preventDefault();
   if (!draft.firstName.trim() || !draft.lastName.trim()) { setMessage('Enter a first and last name.'); return; }
-  const actor = { ...draft, firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), role: draft.role.trim() };
+  const actor = { ...draft, firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), role: draft.role.trim(), bio: draft.bio.trim() };
   if (editingId !== null) { setActors(old => old.map(a => a.id === editingId ? { ...actor, id: editingId } : a)); setMessage('Actor updated.'); }
   else { setActors(old => [...old, { ...actor, id: Date.now() }]); setMessage('Actor added.'); }
   reset();
@@ -48,12 +49,13 @@ export function ActorEditor() {
  <h3 className="text-base font-semibold">{editingId !== null ? 'Edit actor' : 'Add an actor'}</h3>
  <div className="grid gap-4 sm:grid-cols-2"><label className="space-y-2 text-sm font-medium"><span>First name</span><Input required maxLength={80} value={draft.firstName} onChange={e => update('firstName', e.target.value)} placeholder="First name" className="bg-card"/></label><label className="space-y-2 text-sm font-medium"><span>Last name</span><Input required maxLength={80} value={draft.lastName} onChange={e => update('lastName', e.target.value)} placeholder="Last name" className="bg-card"/></label></div>
  <div className="grid gap-4 sm:grid-cols-2"><label className="space-y-2 text-sm font-medium"><span>Film <span className="font-normal text-muted-foreground">(optional)</span></span><select aria-label="Actor film" value={draft.film} onChange={e => update('film', e.target.value)} className="h-9 w-full min-w-0 rounded-md border border-input bg-card px-3 text-sm"><option value="">No film selected</option>{movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}</select></label><label className="space-y-2 text-sm font-medium"><span>Character <span className="font-normal text-muted-foreground">(optional)</span></span><Input maxLength={100} value={draft.role} onChange={e => update('role', e.target.value)} placeholder="Character name" className="bg-card"/></label></div>
- <div className="grid gap-5 sm:grid-cols-2"><HighlightPicker label="First-name highlight" value={draft.firstHighlight} onChange={v => update('firstHighlight', v)}/><HighlightPicker label="Last-name highlight" value={draft.lastHighlight} onChange={v => update('lastHighlight', v)}/></div>
+  <label className="space-y-2 text-sm font-medium"><span>Bio <span className="font-normal text-muted-foreground">(optional)</span></span><textarea aria-label="Actor bio" maxLength={600} rows={3} value={draft.bio} onChange={e => update('bio', e.target.value)} placeholder="A short bio for this actor" className="w-full min-w-0 rounded-md border border-input bg-card px-3 py-2 text-sm"/></label>
+  <div className="grid gap-5 sm:grid-cols-2"><HighlightPicker label="First-name highlight" value={draft.firstHighlight} onChange={v => update('firstHighlight', v)}/><HighlightPicker label="Last-name highlight" value={draft.lastHighlight} onChange={v => update('lastHighlight', v)}/></div>
  <div className="flex gap-3"><Button type="submit">{editingId !== null ? <Check/> : <Plus/>}{editingId !== null ? 'Save changes' : 'Add actor'}</Button>{editingId !== null && <Button type="button" variant="secondary" onClick={reset}>Cancel</Button>}</div>
  <p aria-live="polite" className="min-h-5 text-sm text-muted-foreground">{message}</p>
  </form>
  <div className="min-w-0 border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0"><p className="text-xs font-semibold text-muted-foreground">NAME PREVIEW</p><div className="mt-5 min-h-20 text-2xl font-semibold"><ActorName actor={draft} preview/></div><p className="mt-3 text-sm text-muted-foreground">{draft.role || 'Character'}{draft.film && ` · ${movies.find(m => m.id === draft.film)?.title}`}</p></div>
  </div>
- <div className="border-t border-border pt-5"><h3 className="mb-4 text-sm font-semibold">Added actors <span className="ml-1 text-muted-foreground">({actors.length})</span></h3>{actors.length === 0 ? <p className="py-4 text-sm text-muted-foreground">No actors added yet.</p> : <div className="divide-y divide-border">{actors.map(a => <article key={a.id} className="flex items-start justify-between gap-3 py-4"><div className="min-w-0"><h4 className="text-lg font-semibold"><ActorName actor={a}/></h4>{(a.role || a.film) && <p className="mt-2 text-sm text-muted-foreground">{[a.role, movies.find(m => m.id === a.film)?.title].filter(Boolean).join(' · ')}</p>}</div><div className="flex shrink-0 gap-1"><Button type="button" size="icon" variant="ghost" aria-label={`Edit ${a.firstName} ${a.lastName}`} title="Edit actor" onClick={() => { setDraft({ ...a }); setEditingId(a.id); setMessage(''); }}><Pencil/></Button><Button type="button" size="icon" variant="ghost" aria-label={`Remove ${a.firstName} ${a.lastName}`} title="Remove actor" onClick={() => {setActors(old => old.filter(actor => actor.id !== a.id)); if (editingId === a.id) reset(); setMessage('Actor removed.');}}><Trash2/></Button></div></article>)}</div>}</div>
+ <div className="border-t border-border pt-5"><h3 className="mb-4 text-sm font-semibold">Added actors <span className="ml-1 text-muted-foreground">({actors.length})</span></h3>{actors.length === 0 ? <p className="py-4 text-sm text-muted-foreground">No actors added yet.</p> : <div className="divide-y divide-border">{actors.map(a => <article key={a.id} className="flex items-start justify-between gap-3 py-4"><div className="min-w-0"><h4 className="text-lg font-semibold"><ActorName actor={a}/></h4>{(a.role || a.film) && <p className="mt-2 text-sm text-muted-foreground">{[a.role, movies.find(m => m.id === a.film)?.title].filter(Boolean).join(' · ')}</p>}{openId === a.id && <p className="mt-2 text-sm text-muted-foreground">{a.bio || 'No bio yet — edit this actor to add one.'}</p>}</div><div className="flex shrink-0 gap-1"><Button type="button" size="icon" variant="ghost" aria-label={openId === a.id ? `Hide bio for ${a.firstName} ${a.lastName}` : `Show bio for ${a.firstName} ${a.lastName}`} title={openId === a.id ? 'Hide bio' : 'Show bio'} aria-expanded={openId === a.id} onClick={() => setOpenId(old => old === a.id ? null : a.id)}>{openId === a.id ? <ChevronLeft/> : <ChevronRight/>}</Button><Button type="button" size="icon" variant="ghost" aria-label={`Edit ${a.firstName} ${a.lastName}`} title="Edit actor" onClick={() => { setDraft({ ...a }); setEditingId(a.id); setMessage(''); }}><Pencil/></Button><Button type="button" size="icon" variant="ghost" aria-label={`Remove ${a.firstName} ${a.lastName}`} title="Remove actor" onClick={() => {setActors(old => old.filter(actor => actor.id !== a.id)); if (editingId === a.id) reset(); setMessage('Actor removed.');}}><Trash2/></Button></div></article>)}</div>}</div>
  </Section>;
 }
