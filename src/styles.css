@@ -308,3 +308,6 @@ nav [data-status='active'] .nav-tile {
 .chess-square img { filter: drop-shadow(0 0 1px var(--chess-piece-outline)); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+
+/* Saved notes: press-and-hold spawns the app's drag pill instead of the phone's menu. */
+.note-press { -webkit-touch-callout: none; }
