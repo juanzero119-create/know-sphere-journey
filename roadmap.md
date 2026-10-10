@@ -38,3 +38,10 @@
 - [x] Remove the last six actors from the pre-loaded list, leaving fifty.
 - [x] Drop their bios and portraits and update the actor tests.
 - [x] Verify the Movies page shows fifty actors on mobile.
+
+# Fifty more actors
+- [ ] Add fifty more popular actors with bios and portraits.
+- [ ] Update actor tests and verify the Movies page.
+
+# Remove AI-poster films
+- [ ] Remove the six films that use generated artwork from the Movies catalog.
