@@ -34,14 +34,14 @@ it('allows independent White and Black Elo targets in AI vs AI', () => {
   expect(screen.getByRole('slider', { name: 'Black AI Elo' })).toHaveAttribute('aria-valuenow', '2000');
 });
 
-it('shows the White AI difficulty when you play Black in Vs AI', () => {
+it('shows both AI difficulties when you play Black in Vs AI', () => {
   setChessMode('ai');
   setChessHumanSide('b');
   setChessElo('w', 1400);
   expect(getChessSnapshot().humanSide).toBe('b');
   render(<ChessElo />);
   expect(screen.getByRole('slider', { name: 'White AI Elo' })).toHaveAttribute('aria-valuenow', '1400');
-  expect(screen.queryByRole('slider', { name: 'Black AI Elo' })).not.toBeInTheDocument();
+  expect(screen.getByRole('slider', { name: 'Black AI Elo' })).toBeInTheDocument();
   fireEvent.keyDown(screen.getByRole('slider', { name: 'White AI Elo' }), { key: 'ArrowLeft' });
   expect(getChessSnapshot().elo.w).toBe(1300);
 });
