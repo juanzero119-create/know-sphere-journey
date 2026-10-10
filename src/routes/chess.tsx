@@ -84,6 +84,7 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
         {c === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
       </Button>;
     }))}
+    {anim && a1 && a2 && <img src={pieceUrl(anim.color, anim.type)} alt="" aria-hidden="true" draggable={false} className="pointer-events-none absolute z-10 object-contain transition-transform duration-200 ease-out" style={{ left: `${a1.c * 12.5}%`, top: `${a1.r * 12.5}%`, width: '12.5%', height: '12.5%', padding: '0.4%', transform: animGo ? `translate(${(a2.c - a1.c) * 100}%, ${(a2.r - a1.r) * 100}%)` : 'none' }} />}
   </div>;
 });
 
