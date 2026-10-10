@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep learning content in separate TanStack leaf routes within the shared Shell; this preserves direct navigation to each learning discipline.
+- Use Section for numbered content bands and the shared Button for controls; this keeps the expanded learning views consistent.
