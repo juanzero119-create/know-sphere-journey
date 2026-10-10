@@ -1,66 +1,103 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Chess, type Square } from 'chess.js';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 
 export const Route = createFileRoute('/chess')({
   head: () => ({ meta: [
-    { title: 'Chess — Lexi practice board' },
-    { name: 'description', content: 'Move pieces on a practice chess board and learn how each piece moves.' },
-    { property: 'og:title', content: 'Chess — Lexi practice board' },
-    { property: 'og:description', content: 'Move pieces on a practice chess board and learn how each piece moves.' },
+    { title: 'Chess — Lexi blitz board' },
+    { name: 'description', content: 'Play a full-rules blitz chess game with clocks, legal moves and a move list.' },
+    { property: 'og:title', content: 'Chess — Lexi blitz board' },
+    { property: 'og:description', content: 'Play a full-rules blitz chess game with clocks, legal moves and a move list.' },
     { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary' },
   ] }),
   component: ChessPage,
 });
 
-const back = ['R', 'N', 'B', 'K', 'Q', 'B', 'N', 'R'];
-const start = () => [back.map(p => 'w' + p), Array.from({ length: 8 }, (_, c) => c === 3 ? '' : 'wP'), Array(8).fill(''), Array.from({ length: 8 }, (_, c) => c === 3 ? 'wP' : ''), Array(8).fill(''), Array(8).fill(''), Array(8).fill('bP'), back.map(p => 'b' + p)] as string[][];
+const FILES = 'hgfedcba';
+const BLITZ = 3 * 60 * 1000;
+const INC = 2000;
 const pieces = [
-  ['King', '♔', 'One square in any direction.'], ['Queen', '♕', 'Any distance in a straight line or diagonal.'],
+  ['King', '♔', 'One square in any direction. Castle by moving it two squares toward a rook.'], ['Queen', '♕', 'Any distance in a straight line or diagonal.'],
   ['Rook', '♖', 'Any distance along a row or column.'], ['Bishop', '♗', 'Any distance along a diagonal.'],
-  ['Knight', '♘', 'An L-shape: two squares one way, one square sideways. It can jump.'], ['Pawn', '♙', 'Forward one square (two on its first move); captures diagonally.'],
+  ['Knight', '♘', 'An L-shape: two squares one way, one square sideways. It can jump.'], ['Pawn', '♙', 'Forward one (two on its first move); captures diagonally; en passant; promotes to a queen.'],
 ];
-const pieceNames: Record<string, string> = { K: 'king', Q: 'queen', R: 'rook', B: 'bishop', N: 'knight', P: 'pawn' };
+const pieceNames: Record<string, string> = { k: 'king', q: 'queen', r: 'rook', b: 'bishop', n: 'knight', p: 'pawn' };
 const assetFiles = import.meta.glob<{ url: string }>('../assets/chess/*.asset.json', { eager: true, import: 'default' });
-function pieceUrl(piece: string) { return assetFiles[`../assets/chess/${piece}.asset.json`]?.url; }
+function pieceUrl(color: string, type: string) { return assetFiles[`../assets/chess/${color}${type.toUpperCase()}.asset.json`]?.url; }
+const sq = (r: number, c: number) => `${FILES[c]}${r + 1}` as Square;
+const fmt = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
 function ChessPage() {
-  const [board, setBoard] = useState(start);
-  const [picked, setPicked] = useState<[number, number] | null>(null);
-  const [lastMove, setLastMove] = useState<[number, number][]>([]);
+  const [game, setGame] = useState(() => new Chess());
+  const [, setTick] = useState(0);
+  const [picked, setPicked] = useState<Square | null>(null);
+  const [lastMove, setLastMove] = useState<[Square, Square] | null>(null);
+  const [clock, setClock] = useState({ w: BLITZ, b: BLITZ });
+  const [started, setStarted] = useState(false);
+  const turn = game.turn();
+  const flagged = clock.w <= 0 ? 'w' : clock.b <= 0 ? 'b' : null;
+  const over = game.isGameOver() || !!flagged;
+
+  useEffect(() => {
+    if (!started || over) return;
+    let prev = Date.now();
+    const id = setInterval(() => { const now = Date.now(); const d = now - prev; prev = now; setClock(c => ({ ...c, [turn]: c[turn] - d })); }, 100);
+    return () => clearInterval(id);
+  }, [started, over, turn]);
+
+  const targets = useMemo(() => picked ? game.moves({ square: picked, verbose: true }).map(m => m.to) : [], [picked, game, lastMove]);
+  const checkSq = game.inCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === turn)?.square : undefined;
+
   function tap(r: number, c: number) {
-    if (picked) {
-      const [pr, pc] = picked;
-      const piece = board[pr]?.[pc];
-      if (piece && (pr !== r || pc !== c)) {
-        const next = board.map(row => [...row]);
-        const target = next[r];
-        const source = next[pr];
-        if (!target || !source) return;
-        target[c] = piece;
-        source[pc] = '';
-        setBoard(next);
-        setLastMove([[pr, pc], [r, c]]);
-      }
-      setPicked(null);
-    } else if (board[r]?.[c]) setPicked([r, c]);
+    if (over) return;
+    const s = sq(r, c);
+    const p = game.get(s);
+    if (picked && targets.includes(s)) {
+      game.move({ from: picked, to: s, promotion: 'q' });
+      setClock(cl => ({ ...cl, [turn]: cl[turn] + (started ? INC : 0) }));
+      setStarted(true); setLastMove([picked, s]); setPicked(null); setTick(t => t + 1);
+    } else if (p && p.color === turn) setPicked(s === picked ? null : s);
+    else setPicked(null);
   }
+  function reset() { setGame(new Chess()); setPicked(null); setLastMove(null); setClock({ w: BLITZ, b: BLITZ }); setStarted(false); }
+
+  const status = flagged ? `${flagged === 'w' ? 'White' : 'Black'} ran out of time — ${flagged === 'w' ? 'Black' : 'White'} wins`
+    : game.isCheckmate() ? `Checkmate — ${turn === 'w' ? 'Black' : 'White'} wins`
+    : game.isDraw() ? 'Draw' : `${turn === 'w' ? 'White' : 'Black'} to move${game.inCheck() ? ' · Check!' : ''}`;
+  const history = game.history();
+  const Clock = ({ side }: { side: 'w' | 'b' }) => <div className={'flex items-center justify-between rounded-md px-3 py-2 text-sm ' + (turn === side && !over ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground')}><span className="font-semibold">{side === 'w' ? 'White' : 'Black'}</span><span className="font-mono text-lg tabular-nums">{fmt(clock[side])}</span></div>;
+
   return <Shell title="Chess">
-    <Section number="01" title="Practice board">
-      <div role="group" aria-label="Chess practice board" className="mx-auto grid aspect-square w-full max-w-2xl grid-cols-8 overflow-hidden">
-        {board.map((row, r) => row.map((p, c) => <Button variant="ghost" key={r + '-' + c} aria-label={`Square ${'hgfedcba'[c]}${r + 1}${p ? ' ' + (p[0] === 'w' ? 'white' : 'black') + ' ' + pieceNames[p.slice(1)] : ''}`} aria-pressed={picked?.[0] === r && picked?.[1] === c} onClick={() => tap(r, c)} className={'chess-square relative h-auto min-w-0 rounded-none p-0 aspect-square ' + ((r + c) % 2 ? 'chess-dark ' : '') + (lastMove.some(([lr, lc]) => lr === r && lc === c) ? 'chess-last' : '')}>
-          {lastMove[0]?.[0] === r && lastMove[0]?.[1] === c && <span aria-hidden="true" className="chess-square chess-origin absolute inset-0"/>}
-          {p && <img src={pieceUrl(p)} alt="" draggable={false} className="relative h-[90%] w-[90%] object-contain"/>}
-          {r === 0 && <span aria-hidden="true" className="absolute right-1 top-0.5 text-xs font-semibold sm:right-2 sm:top-1 sm:text-base">{'hgfedcba'[c]}</span>}
-          {c === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
-        </Button>))}
+    <Section number="01" title="Blitz game · 3+2">
+      <div className="mx-auto max-w-2xl space-y-2">
+        <Clock side="w" />
+        <div role="group" aria-label="Chess board" className="grid aspect-square w-full grid-cols-8 overflow-hidden">
+          {Array.from({ length: 8 }, (_, r) => Array.from({ length: 8 }, (_, c) => {
+            const s = sq(r, c); const p = game.get(s); const isTarget = targets.includes(s);
+            return <Button variant="ghost" key={s} aria-label={`Square ${s}${p ? ' ' + (p.color === 'w' ? 'white' : 'black') + ' ' + pieceNames[p.type] : ''}`} aria-pressed={picked === s} onClick={() => tap(r, c)} className={'chess-square relative h-auto min-w-0 rounded-none p-0 aspect-square ' + ((r + c) % 2 ? 'chess-dark ' : '') + (lastMove?.includes(s) || picked === s ? 'chess-last' : '')}>
+              {lastMove?.[0] === s && <span aria-hidden="true" className="chess-square chess-origin absolute inset-0"/>}
+              {checkSq === s && <span aria-hidden="true" className="absolute inset-0 bg-destructive/60"/>}
+              {p && <img src={pieceUrl(p.color, p.type)} alt="" draggable={false} className="relative h-[90%] w-[90%] object-contain"/>}
+              {isTarget && (p ? <span aria-hidden="true" className="absolute inset-[4%] rounded-full border-4 border-ink/30"/> : <span aria-hidden="true" className="absolute size-1/3 rounded-full bg-ink/25"/>)}
+              {r === 0 && <span aria-hidden="true" className="absolute right-1 top-0.5 text-xs font-semibold sm:right-2 sm:top-1 sm:text-base">{FILES[c]}</span>}
+              {c === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
+            </Button>;
+          }))}
+        </div>
+        <Clock side="b" />
+        <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><Button variant="outline" onClick={reset}>New game</Button></div>
+        <p className="text-xs text-muted-foreground">Full rules: legal moves only, check, checkmate, castling, en passant, promotion. Clock starts after White's first move.</p>
+        <p className="text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
       </div>
-      <div className="mt-4 flex items-center justify-between gap-3"><span className="text-xs text-muted-foreground">Free practice · White at top</span><Button variant="outline" onClick={() => { setBoard(start()); setPicked(null); setLastMove([]); }}>Reset board</Button></div>
-      <p className="mt-3 text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
     </Section>
-    <Section number="02" title="How the pieces move">
+    <Section number="02" title="Move list">
+      {history.length === 0 ? <p className="text-sm text-muted-foreground">No moves yet.</p> :
+        <ol className="grid grid-cols-[auto_1fr_1fr] gap-x-4 gap-y-1 font-mono text-sm">{Array.from({ length: Math.ceil(history.length / 2) }, (_, i) => <li key={i} className="contents"><span className="text-muted-foreground">{i + 1}.</span><span>{history[i * 2]}</span><span>{history[i * 2 + 1] ?? ''}</span></li>)}</ol>}
+    </Section>
+    <Section number="03" title="How the pieces move">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{pieces.map(([n, s, d]) => <div key={n} className="flex gap-3 rounded-lg border border-border bg-card p-4"><span className="text-3xl">{s}</span><div><p className="font-semibold">{n}</p><p className="text-sm text-muted-foreground">{d}</p></div></div>)}</div>
     </Section>
   </Shell>;
