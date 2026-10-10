@@ -89,12 +89,22 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
   </div>;
 });
 
-function Thinking() {
-  return <span role="status" aria-label="AI is thinking" className="chess-thinking-circle inline-flex size-5 items-center justify-center">
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" strokeWidth="4.5">
-      <circle className="chess-thinking-track" cx="12" cy="12" r="9" />
-      <circle className="chess-thinking-progress" cx="12" cy="12" r="9" pathLength="100" strokeDasharray="100" transform="rotate(-90 12 12)" />
-    </svg>
+// Countdown ring plus a live elapsed timer ("1.3s") beside it. Ticks on its
+// own 100ms interval so the rest of the page doesn't re-render each tenth.
+function Thinking({ since }: { since: number }) {
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => tick((n) => n + 1), 100);
+    return () => clearInterval(id);
+  }, []);
+  return <span role="status" aria-label="AI is thinking" className="inline-flex items-center gap-1.5">
+    <span className="chess-thinking-circle inline-flex size-5 items-center justify-center">
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" strokeWidth="4.5">
+        <circle className="chess-thinking-track" cx="12" cy="12" r="9" />
+        <circle className="chess-thinking-progress" cx="12" cy="12" r="9" pathLength="100" strokeDasharray="100" transform="rotate(-90 12 12)" />
+      </svg>
+    </span>
+    <span className="font-mono text-xs tabular-nums">{((Date.now() - since) / 1000).toFixed(1)}s</span>
   </span>;
 }
 
@@ -125,7 +135,7 @@ function ChessPage() {
     : game.isCheckmate() ? `Checkmate — ${turn === 'w' ? 'Black' : 'White'} wins`
     : game.isDraw() ? 'Draw' : `${paused ? 'Paused · ' : ''}${turn === 'w' ? 'White' : 'Black'} to move${game.inCheck() ? ' · Check!' : ''}`;
   const history = game.history();
-  const renderClock = (side: 'w' | 'b') => <div className={'flex items-center justify-between rounded-md px-3 py-2 text-sm ' + (turn === side && !over ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground')}><span className="flex items-center gap-2 font-semibold">{side === 'w' ? 'White' : 'Black'}<span className="inline-flex size-5">{thinking && !over && !paused && turn === side && <Thinking />}</span></span><span className="font-mono text-lg tabular-nums">{fmt(clock[side])}</span></div>;
+  const renderClock = (side: 'w' | 'b') => <div className={'flex items-center justify-between rounded-md px-3 py-2 text-sm ' + (turn === side && !over ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground')}><span className="flex items-center gap-2 font-semibold">{side === 'w' ? 'White' : 'Black'}<span className="inline-flex items-center">{thinking && !over && !paused && turn === side && <Thinking since={state.thinkingSince} />}</span></span><span className="font-mono text-lg tabular-nums">{fmt(clock[side])}</span></div>;
 
   return <Shell title="Chess">
     <Section number="01" title="Blitz game · 3+2">
