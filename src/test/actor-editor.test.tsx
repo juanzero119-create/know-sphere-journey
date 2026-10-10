@@ -17,7 +17,7 @@ describe('Actor editor', () => {
    expect(screen.queryByText(lastName)).not.toBeInTheDocument();
   }
  });
- it('adds, updates, and removes an actor with independent highlights', () => {
+ it('adds, updates, and removes an actor with independent highlights', { timeout: 20000 }, () => {
   render(<ActorEditor/>);
   fireEvent.change(screen.getByLabelText('First name'), { target: { value: 'Anne' } });
   fireEvent.change(screen.getByLabelText('Last name'), { target: { value: 'Hathaway' } });

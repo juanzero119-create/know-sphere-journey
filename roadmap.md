@@ -65,6 +65,10 @@
 - [x] Show the chess Play button in green while the game is running and plain gray while paused.
 - [x] Verify the color change with Pause and Play on mobile.
 
+# Model picker under Elo
+- [x] Place the chess AI model chooser directly beneath the Elo difficulty selectors.
+- [x] Renumber the Chess page sections and verify the order on mobile.
+
 
 
 
