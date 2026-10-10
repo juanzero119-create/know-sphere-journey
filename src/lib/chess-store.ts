@@ -149,6 +149,7 @@ export function resetChess(mode?: ChessMode) {
     ...initialState,
     version: state.version + 1,
     mode: mode ?? state.mode,
+    humanSide: state.humanSide,
     clock: { w: BLITZ, b: BLITZ },
     elo: { ...state.elo },
   };
@@ -158,6 +159,12 @@ export function resetChess(mode?: ChessMode) {
 
 export function setChessMode(mode: ChessMode) {
   resetChess(mode);
+}
+
+export function setChessHumanSide(side: 'w' | 'b') {
+  if (state.humanSide === side) return;
+  state = { ...state, humanSide: side, version: state.version + 1 };
+  resetChess();
 }
 
 export function setChessElo(side: 'w' | 'b', elo: number) {
