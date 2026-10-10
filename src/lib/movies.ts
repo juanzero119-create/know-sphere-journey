@@ -3,9 +3,10 @@ import inception from '@/assets/movie-inception.jpg';
 import spiritedAway from '@/assets/movie-spirited-away.jpg';
 import grandBudapest from '@/assets/movie-grand-budapest.jpg';
 import shawshank from '@/assets/movie-shawshank.jpg';
+import { actorFilms } from './actor-films';
 import darkKnight from '@/assets/movie-dark-knight.jpg';
 
-export const movies = [
+export const movies: {id:string;title:string;year:number;runtime:number;certificate:string;genres:string[];director:string;image:string;score:number;synopsis:string;cast:[string,string][];themes:string[];language:string}[] = [
  { id:'interstellar', title:'Interstellar', year:2014, runtime:169, certificate:'PG-13', genres:['Sci-Fi','Adventure','Drama'], director:'Christopher Nolan', image:interstellar, score:8.7, synopsis:'A team of explorers travels beyond this galaxy to discover whether mankind has a future among the stars.', cast:[['Matthew McConaughey','Cooper'],['Anne Hathaway','Brand'],['Jessica Chastain','Murph']], themes:['Space exploration','Time & relativity','Family'], language:'English' },
  { id:'inception', title:'Inception', year:2010, runtime:148, certificate:'PG-13', genres:['Sci-Fi','Thriller','Action'], director:'Christopher Nolan', image:inception, score:8.8, synopsis:'A thief who steals secrets from the subconscious is offered a chance at redemption: plant an idea in someone else’s mind.', cast:[['Leonardo DiCaprio','Cobb'],['Joseph Gordon-Levitt','Arthur'],['Elliot Page','Ariadne']], themes:['Dreams','Memory','Reality'], language:'English' },
  { id:'spirited-away', title:'Spirited Away', year:2001, runtime:125, certificate:'PG', genres:['Animation','Fantasy','Adventure'], director:'Hayao Miyazaki', image:spiritedAway, score:8.6, synopsis:'A young girl enters a world of spirits and must find the courage to save her parents and return home.', cast:[['Rumi Hiiragi','Chihiro (voice)'],['Miyu Irino','Haku (voice)'],['Mari Natsuki','Yubaba / Zeniba (voice)']], themes:['Growing up','Identity','Japanese folklore'], language:'Japanese' },
@@ -13,5 +14,6 @@ export const movies = [
  { id:'shawshank', title:'The Shawshank Redemption', year:1994, runtime:142, certificate:'R', genres:['Drama'], director:'Frank Darabont', image:shawshank, score:9.3, synopsis:'Two imprisoned men form a lasting friendship, finding hope and dignity through years of hardship.', cast:[['Tim Robbins','Andy Dufresne'],['Morgan Freeman','Ellis Boyd “Red” Redding'],['Bob Gunton','Warden Norton']], themes:['Hope','Friendship','Freedom'], language:'English' },
  { id:'dark-knight', title:'The Dark Knight', year:2008, runtime:152, certificate:'PG-13', genres:['Action','Crime','Drama'], director:'Christopher Nolan', image:darkKnight, score:9.0, synopsis:'Batman faces a criminal mastermind whose campaign of chaos challenges the line between heroism and vigilantism.', cast:[['Christian Bale','Bruce Wayne / Batman'],['Heath Ledger','The Joker'],['Aaron Eckhart','Harvey Dent']], themes:['Justice','Moral choices','Chaos'], language:'English' },
 ];
+movies.push(...actorFilms);
 export type Movie = (typeof movies)[number];
 export function runtimeLabel(minutes:number) { return `${Math.floor(minutes/60)}h ${minutes%60}m`; }
