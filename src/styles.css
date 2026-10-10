@@ -209,7 +209,7 @@ nav [data-status='active'] .nav-tile {
 }
 @keyframes chess-thinking-countdown {
   from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: -100; }
 }
 @media (prefers-reduced-motion: reduce) {
   .chess-thinking-progress { animation: none; stroke-dashoffset: 25; }
