@@ -44,10 +44,10 @@ export function Quiz({ mode, onClose }: { mode: Mode; onClose: () => void }) {
           {mode.seconds && <span className="font-semibold">⏱ {time}s</span>}
         </div>
         {done ? (
-          <div className="chunky mt-10 rounded-lg bg-primary p-8 text-center text-primary-foreground">
+          <div className="chunky mt-10 rounded-lg bg-card p-8 text-center">
             <p className="font-display text-5xl">{score}/{qs.length}</p>
             <p className="mt-2 text-lg">{mode.name} complete · +{score * 10} XP</p>
-            <Button onClick={onClose} className="chunky chunky-press mt-6 rounded-full bg-cream px-6 py-3 font-semibold text-ink">Continue</Button>
+            <Button onClick={onClose} className="chunky chunky-press mt-6 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground">Continue</Button>
           </div>
         ) : (
           <>
@@ -55,7 +55,7 @@ export function Quiz({ mode, onClose }: { mode: Mode; onClose: () => void }) {
             <h2 className="mt-2 mb-8 text-2xl font-bold">{q?.prompt}</h2>
             <div className="space-y-3">
               {q?.options.map((o) => {
-                const state = picked && (o === q.answer ? "bg-success text-ink" : o === picked ? "bg-accent text-ink" : "bg-card");
+                const state = picked && (o === q.answer ? "bg-success text-ink" : o === picked ? "bg-accent text-ink" : "bg-secondary text-secondary-foreground");
                 return (
                   <Button variant="ghost" key={o} onClick={() => choose(o)} className={`chunky chunky-press h-auto min-h-14 w-full justify-start whitespace-normal rounded-lg p-4 text-left text-lg font-semibold ${state || "bg-card"}`}>
                     {o}
