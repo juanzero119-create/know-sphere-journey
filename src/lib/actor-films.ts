@@ -1,4 +1,3 @@
-import posters from './film-posters.json';
 
 type Row = [id: string, title: string, year: number, runtime: number, cert: string, genres: string, director: string, score: number, synopsis: string, cast: [string, string][]];
 
@@ -56,6 +55,6 @@ const rows: Row[] = [
 
 export const actorFilms = rows.map(([id, title, year, runtime, certificate, genres, director, score, synopsis, cast]) => ({
   id, title, year, runtime, certificate, genres: genres.split('/'), director,
-  image: (posters as Record<string, string>)[title] ?? '', score, synopsis, cast,
+  image: '', score, synopsis, cast,
   themes: genres.split('/'), language: 'English',
 }));
