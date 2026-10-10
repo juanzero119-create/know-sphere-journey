@@ -23,3 +23,8 @@
 - [x] Replace separate Vocabulary and Anatomy navigation entries with Studies.
 - [x] Add a named custom-icon control with icon and destination selection for this visit.
 - [x] Verify navigation and custom-icon interactions.
+
+# Add studies
+- [x] Add a plus control beneath the study cards to add more studies.
+- [x] Let custom studies choose a name, icon, and destination for this visit.
+- [x] Verify adding, editing, and removing studies.

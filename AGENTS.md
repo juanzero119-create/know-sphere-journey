@@ -16,3 +16,4 @@
 - Keep the actor-entry interface in its own presentation component with independently tokenized name highlights and visit-only state; this isolates custom cast entries from the curated catalog without adding backend behavior.
 - Group discipline links on the Studies leaf while preserving their direct routes; this consolidates navigation without removing learning content.
 - Keep custom navigation shortcuts in a browser-only, visit-scoped shared store with a fixed empty SSR snapshot; this preserves shortcuts across page navigation without adding persistence or server behavior.
+- Keep custom studies added from the Studies page in the same browser-only, visit-scoped store pattern; this isolates them from the built-in discipline cards.
