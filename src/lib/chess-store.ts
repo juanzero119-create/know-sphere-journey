@@ -89,7 +89,7 @@ function startClock() {
       stopClock();
       maybePlayEndSound();
     }
-  }, 100);
+  }, 250);
 }
 
 function stopClock() {
