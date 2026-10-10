@@ -16,7 +16,7 @@ export function FilmChip({ movie, current = false, note }: { movie: Movie; curre
       className={current ? 'film-chip film-chip-active' : 'film-chip'}
     >
       {movie.image
-        ? <img src={movie.image} alt="" loading="lazy" className="film-chip-art" />
+        ? <img src={movie.image} alt="" loading="lazy" decoding="async" className="film-chip-art" />
         : <span aria-hidden className="film-chip-art bg-secondary" />}
       <span className="film-chip-label">
         {movie.title}

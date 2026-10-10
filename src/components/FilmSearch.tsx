@@ -40,7 +40,7 @@ export function FilmSearch() {
                 <ul className="divide-y divide-border rounded-lg border border-border bg-card">
                   {actors.map(a => (
                     <li key={a.name} className="flex gap-3 p-3">
-                      {pics[a.name] ? <img src={pics[a.name]} alt={a.name} loading="lazy" className="size-12 shrink-0 rounded-full object-cover" /> : <div className="grid size-12 shrink-0 place-items-center rounded-full bg-secondary text-sm font-semibold">{a.name.split(' ').map(w => w[0]).join('').slice(0, 2)}</div>}
+                      {pics[a.name] ? <img src={pics[a.name]} alt={a.name} loading="lazy" decoding="async" className="size-12 shrink-0 rounded-full object-cover" /> : <div className="grid size-12 shrink-0 place-items-center rounded-full bg-secondary text-sm font-semibold">{a.name.split(' ').map(w => w[0]).join('').slice(0, 2)}</div>}
                       <div className="min-w-0">
                         <p className="font-semibold">{a.name}</p>
                         <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
@@ -61,7 +61,7 @@ export function FilmSearch() {
                   {films.map(({ movie: m, reason }) => (
                     <li key={m.id}>
                       <Link to="/film/$id" params={{ id: m.id }} className="flex gap-3 p-3">
-                        {m.image ? <img src={m.image} alt={`${m.title} poster`} loading="lazy" className="h-16 w-11 shrink-0 rounded object-cover" /> : <div className="h-16 w-11 shrink-0 rounded bg-secondary" />}
+                        {m.image ? <img src={m.image} alt={`${m.title} poster`} loading="lazy" decoding="async" className="h-16 w-11 shrink-0 rounded object-cover" /> : <div className="h-16 w-11 shrink-0 rounded bg-secondary" />}
                         <div className="min-w-0">
                           <p className="font-semibold leading-snug">{m.title} <span className="font-normal text-muted-foreground">({m.year})</span></p>
                           <p className="mt-0.5 flex items-center gap-1 text-xs"><Star className="size-3 fill-gold text-gold" />{m.score.toFixed(1)} · {m.director}</p>
