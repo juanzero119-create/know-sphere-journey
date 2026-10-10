@@ -99,6 +99,8 @@ function Notes() {
 
   useEffect(() => { setNotes(loadNotes()); }, []);
 
+  const captureRef = useRef(captureSelection);
+  captureRef.current = captureSelection;
   const savedHighlighter = useRef(highlightSavedText);
   savedHighlighter.current = highlightSavedText;
   const notesRef = useRef(notes);
@@ -113,12 +115,23 @@ function Notes() {
         if (!selected || selected.isCollapsed || !selected.anchorNode) return;
         const start = selected.anchorNode instanceof Element ? selected.anchorNode : selected.anchorNode.parentElement;
         const element = start?.closest<HTMLParagraphElement>('[data-note-id]');
-        const note = element && notesRef.current.find(item => item.id === element.dataset.noteId);
+        const note = element && notesRef.current.find(item => item.id === element.dataset['noteId']);
         if (element && note) savedHighlighter.current(element, note);
       }, 700);
     };
+    const onEditorSelect = () => { if (document.activeElement === editor.current) captureRef.current(); };
     document.addEventListener('selectionchange', onChange);
-    return () => { document.removeEventListener('selectionchange', onChange); window.clearTimeout(timer); };
+    document.addEventListener('selectionchange', onEditorSelect);
+    const box = editor.current;
+    box?.addEventListener('select', onEditorSelect);
+    box?.addEventListener('selectionchange', onEditorSelect);
+    return () => {
+      document.removeEventListener('selectionchange', onChange);
+      document.removeEventListener('selectionchange', onEditorSelect);
+      box?.removeEventListener('select', onEditorSelect);
+      box?.removeEventListener('selectionchange', onEditorSelect);
+      window.clearTimeout(timer);
+    };
   }, []);
 
   const update = (next: Note[]) => {
