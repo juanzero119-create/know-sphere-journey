@@ -17,3 +17,5 @@
 - Group discipline links on the Studies leaf while preserving their direct routes; this consolidates navigation without removing learning content.
 - Keep custom navigation shortcuts in a browser-only, visit-scoped shared store with a fixed empty SSR snapshot; this preserves shortcuts across page navigation without adding persistence or server behavior.
 - Keep custom studies added from the Studies page in the same browser-only, visit-scoped store pattern; this isolates them from the built-in discipline cards.
+- Keep added AI model entries as visit-only interface settings, without implying a live provider connection; this separates model management from future AI execution.
+- Use licensed Cburnett chess piece assets with semantic board tokens; this keeps pieces readable on both square colors.

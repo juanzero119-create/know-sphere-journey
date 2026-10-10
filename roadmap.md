@@ -28,3 +28,8 @@
 - [x] Add a plus control beneath the study cards to add more studies.
 - [x] Let custom studies choose a name, icon, and destination for this visit.
 - [x] Verify adding, editing, and removing studies.
+
+# AI tab and chess reference
+- [ ] Add an AI navigation tab and custom model controls.
+- [ ] Match chess squares, pieces, coordinates, orientation, and move highlights to the reference.
+- [ ] Verify both pages and existing tests.
