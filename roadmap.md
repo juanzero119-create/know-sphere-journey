@@ -77,4 +77,4 @@
 
 
 
-- [ ] Add a live thinking timer (0.0s count-up) next to the AI's countdown ring on the left of the clock row.
+- [x] Add a live thinking timer (0.0s count-up) next to the AI's countdown ring on the left of the clock row.
