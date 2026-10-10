@@ -93,3 +93,8 @@
 - [x] Hide each actor's film tiles behind a Details button on their card.
 - [x] Keep the bio on the card itself and the tiles revealed only while Details is open.
 - [x] Verify the button shows, hides, and reopens the tiles on the Movies page.
+
+# Remove the Details button
+- [x] Take the "Details" button out from underneath every actor's name.
+- [x] Let the arrow chevron beside the name reveal the bio and the film tiles together.
+- [x] Verify no Details button remains and the tiles still open and close.
