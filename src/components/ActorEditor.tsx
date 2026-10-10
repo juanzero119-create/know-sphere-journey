@@ -50,7 +50,7 @@ export function ActorEditor() {
  const [openId, setOpenId] = useState<number | null>(null);
  const [message, setMessage] = useState('');
  const [sortDir, setSortDir] = useState<'az' | 'za'>('az');
- const sortedActors = [...actors].sort((a, b) => { const an = `${a.lastName} ${a.firstName}`.toLowerCase(); const bn = `${b.lastName} ${b.firstName}`.toLowerCase(); return sortDir === 'az' ? an.localeCompare(bn) : bn.localeCompare(an); });
+ const sortedActors = [...actors].sort((a, b) => { const an = `${a.firstName} ${a.lastName}`.toLowerCase(); const bn = `${b.firstName} ${b.lastName}`.toLowerCase(); return sortDir === 'az' ? an.localeCompare(bn) : bn.localeCompare(an); });
  const update = <K extends keyof ActorDraft>(key: K, value: ActorDraft[K]) => setDraft(old => ({ ...old, [key]: value }));
  function reset() { setDraft({ ...emptyDraft }); setEditingId(null); }
  function submit(event: FormEvent<HTMLFormElement>) {
