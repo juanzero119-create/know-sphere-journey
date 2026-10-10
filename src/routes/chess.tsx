@@ -6,7 +6,7 @@ import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { ModelManager } from '@/routes/ai';
 import { ChessElo } from '@/components/ChessElo';
-import { playMove, resetChess, setChessHumanSide, setChessMode, useChessStore } from '@/lib/chess-store';
+import { playMove, resetChess, setChessHumanSide, setChessMode, setChessPaused, useChessStore } from '@/lib/chess-store';
 
 export const Route = createFileRoute('/chess')({
   head: () => ({ meta: [
