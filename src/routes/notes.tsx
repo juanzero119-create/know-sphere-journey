@@ -46,6 +46,10 @@ function Notes() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [draftTitle, setDraftTitle] = useState('');
   const [draftBody, setDraftBody] = useState('');
+  // Typing into the server-rendered boxes before the app wakes up gets wiped when
+  // React takes over, so keep them disabled until the page is live.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [highlights, setHighlights] = useState<NoteHighlight[]>([]);
   const [color, setColor] = useState<NoteColor>('gold');
