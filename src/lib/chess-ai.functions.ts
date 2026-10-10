@@ -1,10 +1,13 @@
 import { createServerFn } from '@tanstack/react-start';
 import { Chess } from 'chess.js';
+import { z } from 'zod';
+import { DEFAULT_ELO, eloSchema } from '@/lib/chess-elo';
 
 const BASE = 'https://ai.gateway.lovable.dev/v1';
 
 async function readSse(res: Response, pick: (data: any) => string | undefined) {
-  const reader = res.body!.getReader();
+  if (!res.body) throw new Error('Empty AI response');
+  const reader = res.body.getReader();
   const dec = new TextDecoder();
   let buf = '', text = '';
   for (;;) {
@@ -45,10 +48,11 @@ async function ask(model: string, prompt: string, key: string) {
 }
 
 export const getAiMove = createServerFn({ method: 'POST' })
-  .inputValidator((d: { fen: string; model: string }) => {
-    if (typeof d?.fen !== 'string' || typeof d?.model !== 'string' || d.model.length > 160) throw new Error('Invalid input');
-    return d;
-  })
+  .inputValidator((d: { fen: string; model: string; elo?: number }) => z.object({
+    fen: z.string().trim().min(1).max(120),
+    model: z.string().trim().min(1).max(160).regex(/^[a-zA-Z0-9._:/-]+$/),
+    elo: eloSchema.default(DEFAULT_ELO),
+  }).parse(d))
   .handler(async ({ data }) => {
     const key = process.env['LOVABLE_API_KEY'];
     if (!key) return { error: 'AI is not configured.' };
@@ -75,7 +79,8 @@ export const getAiMove = createServerFn({ method: 'POST' })
       'General technique: develop pieces early, castle to safety, control the center, connect rooks, keep the king safe, and never hang pieces — before moving, check what your opponent threatens.',
     ].map((t, i) => `${i + 1}. ${t}`).join('\n');
     const prompt = `You are a strong chess engine playing ${game.turn() === 'w' ? 'White' : 'Black'}. Position (FEN): ${data.fen}\nLegal moves (SAN): ${legal.join(' ')}\n\nUse these tactics and techniques when choosing your move:\n${tactics}\n\nLook for winning tactics first (checks, captures, threats), then improve your position. Pick the best move. Reply with ONLY one move from the list, nothing else.`;
-    const out = await ask(data.model, prompt, key);
+    const difficulty = `Play at an approximate ${data.elo} Elo difficulty target, not maximum strength. This is a simulated difficulty, not a certified rating. At 400–700 use basic one-move plans and miss complex tactics; at 800–1100 notice obvious captures and checks but miss combinations; at 1200–1500 develop sensibly and consider short tactics; at 1600–1900 consider tactical replies and positional plans; at 2000–2400 calculate forcing variations carefully and apply advanced technique. Use the techniques above only as appropriate to this target. Always choose a legal move. Reply with ONLY one SAN move.`;
+    const out = await ask(data.model, `${prompt}\n\n${difficulty}`, key);
     if ('error' in out) return { error: out.error };
     const tokens = (out.text ?? '').replace(/[.,!*`"]/g, ' ').split(/\s+/).filter(Boolean);
     const move = [...tokens].reverse().find(t => legal.includes(t)) ?? legal.find(m => out.text?.includes(m));

@@ -56,6 +56,11 @@
 - [x] Make the bar dark gray RGB(45, 45, 45), the icon squares lighter gray RGB(85, 85, 85), and the current tab's square RGB(107, 107, 107); icons brighter than labels.
 - [x] Verify the bar on the Movies and home pages on mobile.
 
+# Selectable chess Elo
+- [x] Add slider and preset controls for the AI opponent and both AI sides.
+- [x] Pass validated approximate Elo targets to chess AI move instructions.
+- [x] Verify controls, navigation retention, and tests.
+
 
 
 
