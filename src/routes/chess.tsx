@@ -112,8 +112,9 @@ function ChessPage() {
           }))}
         </div>
         <Clock side="b" />
-        <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex gap-2"><Button variant={vsAi ? 'secondary' : 'outline'} aria-pressed={vsAi} onClick={() => { setVsAi(v => !v); reset(); }}>{vsAi ? 'Vs AI' : '2 players'}</Button><Button variant="outline" onClick={reset}>New game</Button></div></div>
-        {vsAi && <p className="text-xs text-muted-foreground">You play White. The AI plays Black using the model chosen below.{thinking ? ' AI is thinking…' : ''}</p>}
+        <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex flex-wrap gap-2"><Button variant={mode === 'ai' ? 'secondary' : 'outline'} aria-pressed={mode === 'ai'} onClick={() => { setMode('ai'); reset(); }}>Vs AI</Button><Button variant={mode === '2p' ? 'secondary' : 'outline'} aria-pressed={mode === '2p'} onClick={() => { setMode('2p'); reset(); }}>2 players</Button><Button variant={mode === 'aivai' ? 'secondary' : 'outline'} aria-pressed={mode === 'aivai'} onClick={() => { setMode('aivai'); reset(); }}>AI vs AI</Button><Button variant="outline" onClick={reset}>New game</Button></div></div>
+        {mode === 'ai' && <p className="text-xs text-muted-foreground">You play White. The AI plays Black using the model chosen below.{thinking ? ' AI is thinking…' : ''}</p>}
+        {mode === 'aivai' && <p className="text-xs text-muted-foreground">Two AIs play each other with the model chosen below — one move at a time.{thinking ? ' AI is thinking…' : ''} Each move uses AI credits.</p>}
         {aiNote && <p role="alert" className="text-xs text-destructive">{aiNote}</p>}
         <p className="text-xs text-muted-foreground">Full rules: legal moves only, check, checkmate, castling, en passant, promotion. Clock starts after White's first move.</p>
         <p className="text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
