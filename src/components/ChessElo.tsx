@@ -39,7 +39,7 @@ export function ChessElo() {
           </Select>
           <div className="space-y-2">
             <span className="block text-sm font-medium">{name} model</span>
-            <Button variant="outline" aria-label={`${name} model`} onClick={() => setPickerSide(side)}
+            <Button variant={pickerSide === side ? 'secondary' : 'outline'} aria-label={`${name} model`} aria-expanded={pickerSide === side} onClick={() => setPickerSide(current => (current === side ? null : side))}
               className="h-auto w-full justify-between gap-3 whitespace-normal p-4 text-left">
               <span className="min-w-0">
                 <span className="block break-words font-semibold">{current.name}</span>
@@ -47,10 +47,10 @@ export function ChessElo() {
               </span>
               <ChevronDown className="shrink-0 text-muted-foreground" />
             </Button>
+            <ChessModelSheet side={side} open={pickerSide === side} onOpenChange={value => { if (!value) setPickerSide(null); }} />
           </div>
         </div>;
       })}
     </div>
-    {pickerSide && <ChessModelSheet side={pickerSide} open onOpenChange={value => { if (!value) setPickerSide(null); }} />}
   </div>;
 }
