@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 vi.mock('@/lib/chess-ai.functions', () => ({ getAiMove: vi.fn(() => new Promise(() => {})) }));
 import { ChessElo } from '@/components/ChessElo';
 import { eloSchema } from '@/lib/chess-elo';
-import { getChessSnapshot, resetChess, setChessElo, setChessMode } from '@/lib/chess-store';
+import { getChessSnapshot, resetChess, setChessElo, setChessHumanSide, setChessMode } from '@/lib/chess-store';
 
 beforeEach(() => vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} }));
 
@@ -32,4 +32,16 @@ it('allows independent White and Black Elo targets in AI vs AI', () => {
   render(<ChessElo />);
   expect(screen.getByRole('slider', { name: 'White AI Elo' })).toHaveAttribute('aria-valuenow', '800');
   expect(screen.getByRole('slider', { name: 'Black AI Elo' })).toHaveAttribute('aria-valuenow', '2000');
+});
+
+it('shows the White AI difficulty when you play Black in Vs AI', () => {
+  setChessMode('ai');
+  setChessHumanSide('b');
+  setChessElo('w', 1400);
+  expect(getChessSnapshot().humanSide).toBe('b');
+  render(<ChessElo />);
+  expect(screen.getByRole('slider', { name: 'White AI Elo' })).toHaveAttribute('aria-valuenow', '1400');
+  expect(screen.queryByRole('slider', { name: 'Black AI Elo' })).not.toBeInTheDocument();
+  fireEvent.keyDown(screen.getByRole('slider', { name: 'White AI Elo' }), { key: 'ArrowLeft' });
+  expect(getChessSnapshot().elo.w).toBe(1300);
 });
