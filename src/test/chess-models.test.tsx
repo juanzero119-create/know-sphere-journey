@@ -29,7 +29,7 @@ it('renders one model selector per colour, each showing its own choice', () => {
 
 it('assigns a model to both colours from the model list', () => {
   chooseChessModelForBoth('openai/gpt-6-astra');
-  render(<ModelManager pickers={false} />);
+  render(<ModelManager />);
   const card = screen.getByRole('button', { name: 'GPT-6 Luna OpenAI' });
   expect(card).toHaveAttribute('aria-pressed', 'false');
   fireEvent.click(card);
