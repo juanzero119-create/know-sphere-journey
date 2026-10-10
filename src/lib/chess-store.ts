@@ -18,6 +18,7 @@ export interface ChessState {
   thinking: boolean;
   aiNote: string;
   elo: { w: number; b: number };
+  paused: boolean;
 }
 
 const initialState: ChessState = {
@@ -30,6 +31,7 @@ const initialState: ChessState = {
   thinking: false,
   aiNote: '',
   elo: { w: DEFAULT_ELO, b: DEFAULT_ELO },
+  paused: false,
 };
 
 // Module-level game + state: survives route unmounts, so the game (and AI
@@ -77,6 +79,7 @@ function startClock() {
       stopClock();
       return;
     }
+    if (state.paused) return; // clocks freeze while paused
     const turn = game.turn();
     state.clock = { ...state.clock, [turn]: state.clock[turn] - d };
     emit();
@@ -112,7 +115,7 @@ let aiRunning = false;
 async function maybeAiMove() {
   const turn = game.turn();
   const aiTurn = state.mode === 'aivai' || (state.mode === 'ai' && turn !== state.humanSide);
-  if (!aiTurn || isOver() || aiRunning) return;
+  if (!aiTurn || isOver() || state.paused || aiRunning) return;
   aiRunning = true;
   state.thinking = true;
   state.aiNote = '';
@@ -122,7 +125,7 @@ async function maybeAiMove() {
   try {
     const r = await getAiMove({ data: { fen, model, elo: state.elo[turn] } });
     if (game.fen() !== fen) return; // game was reset while waiting
-    if (isOver()) return; // clock ran out or game ended while the AI was thinking
+    if (isOver() || state.paused) return; // clock ran out, game ended, or the user paused while the AI was thinking
     if ('error' in r && r.error) {
       state.aiNote = r.error;
       return;
@@ -172,4 +175,11 @@ export function setChessElo(side: 'w' | 'b', elo: number) {
   if (!parsed.success) return;
   state = { ...state, elo: { ...state.elo, [side]: parsed.data } };
   emit();
+}
+
+export function setChessPaused(paused: boolean) {
+  if (state.paused === paused) return;
+  state = { ...state, paused, version: state.version + 1 };
+  emit();
+  if (!paused) void maybeAiMove(); // resume the AI loop where it stopped
 }
