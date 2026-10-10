@@ -18,3 +18,8 @@
 - [x] Keep bottom nav tiles flat gray, turning slightly darker while pressed.
 - [x] Retune quiz panels, name highlights, and the anatomy illustration for dark.
 - [x] Verify every page on mobile and desktop.
+
+# Studies navigation
+- [x] Replace separate Vocabulary and Anatomy navigation entries with Studies.
+- [x] Add a named custom-icon control with icon and destination selection for this visit.
+- [x] Verify navigation and custom-icon interactions.
