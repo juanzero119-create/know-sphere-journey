@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import type { Square } from 'chess.js';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
@@ -32,6 +32,35 @@ function pieceUrl(color: string, type: string) { return assetFiles[`../assets/ch
 const sq = (r: number, c: number) => `${FILES[c]}${r + 1}` as Square;
 const fmt = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
+interface BoardProps {
+  game: ReturnType<typeof useChessStore>['game'];
+  picked: Square | null;
+  lastMove: [Square, Square] | null;
+  interactive: boolean;
+  onTap: (r: number, c: number) => void;
+}
+
+// Memoized so clock ticks (which bump state but not these props) don't
+// re-render the 64 squares — the board only repaints on real moves.
+const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }: BoardProps) {
+  const turn = game.turn();
+  const targets = picked ? game.moves({ square: picked, verbose: true }).map(m => m.to) : [];
+  const checkSq = game.inCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === turn)?.square : undefined;
+  return <div role="group" aria-label="Chess board" className="grid aspect-square w-full grid-cols-8 overflow-hidden">
+    {Array.from({ length: 8 }, (_, r) => Array.from({ length: 8 }, (_, c) => {
+      const s = sq(r, c); const p = game.get(s); const isTarget = targets.includes(s);
+      return <Button variant="ghost" key={s} aria-label={`Square ${s}${p ? ' ' + (p.color === 'w' ? 'white' : 'black') + ' ' + pieceNames[p.type] : ''}`} aria-pressed={picked === s} onClick={() => interactive && onTap(r, c)} className={'chess-square relative h-auto min-w-0 rounded-none p-0 aspect-square ' + ((r + c) % 2 ? 'chess-dark ' : '') + (lastMove?.includes(s) || picked === s ? 'chess-last' : '')}>
+        {lastMove?.[0] === s && <span aria-hidden="true" className="chess-square chess-origin absolute inset-0"/>}
+        {checkSq === s && <span aria-hidden="true" className="absolute inset-0 bg-destructive/60"/>}
+        {p && <img src={pieceUrl(p.color, p.type)} alt="" draggable={false} className="relative h-[90%] w-[90%] object-contain"/>}
+        {isTarget && (p ? <span aria-hidden="true" className="absolute inset-[4%] rounded-full border-4 border-ink/30"/> : <span aria-hidden="true" className="absolute size-1/3 rounded-full bg-ink/25"/>)}
+        {r === 0 && <span aria-hidden="true" className="absolute right-1 top-0.5 text-xs font-semibold sm:right-2 sm:top-1 sm:text-base">{FILES[c]}</span>}
+        {c === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
+      </Button>;
+    }))}
+  </div>;
+});
+
 function ChessPage() {
   const { game, state } = useChessStore();
   const [picked, setPicked] = useState<Square | null>(null);
@@ -40,10 +69,9 @@ function ChessPage() {
   const flagged = clock.w <= 0 ? 'w' : clock.b <= 0 ? 'b' : null;
   const over = game.isGameOver() || !!flagged;
 
-  const targets = useMemo(() => picked ? game.moves({ square: picked, verbose: true }).map(m => m.to) : [], [picked, game, state.version]);
-  const checkSq = game.inCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === turn)?.square : undefined;
+  const targets = useMemo(() => picked ? game.moves({ square: picked, verbose: true }).map(m => m.to) : [], [picked, game, lastMove]);
 
-  function tap(r: number, c: number) {
+  const tap = useCallback((r: number, c: number) => {
     if (over || thinking || paused || mode === 'aivai' || (mode === 'ai' && turn !== humanSide)) return;
     const s = sq(r, c);
     const p = game.get(s);
@@ -52,7 +80,9 @@ function ChessPage() {
       setPicked(null);
     } else if (p && p.color === turn) setPicked(s === picked ? null : s);
     else setPicked(null);
-  }
+  }, [over, thinking, paused, mode, turn, humanSide, picked, targets, game]);
+
+  const interactive = !over && !thinking && !paused && mode !== 'aivai' && !(mode === 'ai' && turn !== humanSide);
 
   const status = flagged ? `${flagged === 'w' ? 'White' : 'Black'} ran out of time — ${flagged === 'w' ? 'Black' : 'White'} wins`
     : game.isCheckmate() ? `Checkmate — ${turn === 'w' ? 'Black' : 'White'} wins`
@@ -64,19 +94,7 @@ function ChessPage() {
     <Section number="01" title="Blitz game · 3+2">
       <div className="mx-auto max-w-2xl space-y-2">
         <Clock side="w" />
-        <div role="group" aria-label="Chess board" className="grid aspect-square w-full grid-cols-8 overflow-hidden">
-          {Array.from({ length: 8 }, (_, r) => Array.from({ length: 8 }, (_, c) => {
-            const s = sq(r, c); const p = game.get(s); const isTarget = targets.includes(s);
-            return <Button variant="ghost" key={s} aria-label={`Square ${s}${p ? ' ' + (p.color === 'w' ? 'white' : 'black') + ' ' + pieceNames[p.type] : ''}`} aria-pressed={picked === s} onClick={() => tap(r, c)} className={'chess-square relative h-auto min-w-0 rounded-none p-0 aspect-square ' + ((r + c) % 2 ? 'chess-dark ' : '') + (lastMove?.includes(s) || picked === s ? 'chess-last' : '')}>
-              {lastMove?.[0] === s && <span aria-hidden="true" className="chess-square chess-origin absolute inset-0"/>}
-              {checkSq === s && <span aria-hidden="true" className="absolute inset-0 bg-destructive/60"/>}
-              {p && <img src={pieceUrl(p.color, p.type)} alt="" draggable={false} className="relative h-[90%] w-[90%] object-contain"/>}
-              {isTarget && (p ? <span aria-hidden="true" className="absolute inset-[4%] rounded-full border-4 border-ink/30"/> : <span aria-hidden="true" className="absolute size-1/3 rounded-full bg-ink/25"/>)}
-              {r === 0 && <span aria-hidden="true" className="absolute right-1 top-0.5 text-xs font-semibold sm:right-2 sm:top-1 sm:text-base">{FILES[c]}</span>}
-              {c === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
-            </Button>;
-          }))}
-        </div>
+        <Board game={game} picked={picked} lastMove={lastMove} interactive={interactive} onTap={tap} />
         <Clock side="b" />
         <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex flex-wrap gap-2">{mode !== '2p' && !over && <><Button size="icon" variant={paused ? 'outline' : 'secondary'} aria-pressed={paused} aria-label="Pause the game" title="Pause" onClick={() => setChessPaused(true)}><Pause /></Button><Button size="icon" variant="outline" aria-pressed={!paused} aria-label="Play the game" title="Play" className={paused ? undefined : 'btn-play-live'} onClick={() => setChessPaused(false)}><Play /></Button></>}<Button variant={mode === 'ai' ? 'secondary' : 'outline'} aria-pressed={mode === 'ai'} onClick={() => setChessMode('ai')}>Vs AI</Button><Button variant={mode === '2p' ? 'secondary' : 'outline'} aria-pressed={mode === '2p'} onClick={() => setChessMode('2p')}>2 players</Button><Button variant={mode === 'aivai' ? 'secondary' : 'outline'} aria-pressed={mode === 'aivai'} onClick={() => setChessMode('aivai')}>AI vs AI</Button><Button variant="outline" onClick={() => resetChess()}>New game</Button></div></div>
         {mode === 'ai' && <div className="flex flex-wrap items-center gap-2"><span className="text-xs text-muted-foreground">You play</span><Button variant={humanSide === 'w' ? 'secondary' : 'outline'} aria-pressed={humanSide === 'w'} onClick={() => setChessHumanSide('w')}>White</Button><Button variant={humanSide === 'b' ? 'secondary' : 'outline'} aria-pressed={humanSide === 'b'} onClick={() => setChessHumanSide('b')}>Black</Button></div>}
