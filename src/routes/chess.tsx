@@ -85,7 +85,6 @@ function ChessPage() {
         <p className="text-xs text-muted-foreground">Full rules: legal moves only, check, checkmate, castling, en passant, promotion. Clock starts after White's first move. The game keeps running if you switch tabs.</p>
         <p className="text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
         {mode !== '2p' && <ChessElo />}
-        {mode !== '2p' && <ChessModelPick />}
       </div>
     </Section>
     <ModelManager pickers={false}/>
