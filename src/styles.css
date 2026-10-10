@@ -45,6 +45,12 @@
   --color-name-blue: var(--name-blue);
   --color-name-rose: var(--name-rose);
   --color-name-green: var(--name-green);
+  --color-note-yellow: var(--note-yellow);
+  --color-note-green: var(--note-green);
+  --color-note-blue: var(--note-blue);
+  --color-note-pink: var(--note-pink);
+  --color-note-purple: var(--note-purple);
+  --color-note-orange: var(--note-orange);
   --color-play: var(--play);
   --color-play-foreground: var(--play-foreground);
 }
@@ -87,6 +93,12 @@
   --name-blue: oklch(0.83 0.08 240);
   --name-rose: oklch(0.83 0.09 10);
   --name-green: oklch(0.85 0.09 155);
+  --note-yellow: oklch(0.88 0.14 95);
+  --note-green: oklch(0.85 0.11 150);
+  --note-blue: oklch(0.84 0.09 240);
+  --note-pink: oklch(0.85 0.09 350);
+  --note-purple: oklch(0.82 0.09 300);
+  --note-orange: oklch(0.85 0.12 65);
   --name-on: oklch(0.2 0 0);
   --chip: oklch(0.34 0 0);
   --chip-foreground: oklch(0.93 0 0);
@@ -284,6 +296,12 @@ nav [data-status='active'] .nav-tile {
 
 /* Name highlight chips stay bright, so their text goes dark. */
 .bg-name-gold, .bg-name-blue, .bg-name-rose, .bg-name-green { color: var(--name-on); }
+
+/* Highlighted note cards use the same bright-on-dark-text pairing. */
+.note-highlighted { color: var(--name-on); }
+.note-highlighted .note-sub { color: var(--name-on); opacity: 0.68; }
+.note-highlighted .note-icon-btn { color: var(--name-on); }
+.note-highlighted .note-icon-btn:hover { background: oklch(0 0 0 / 0.12); }
 
 .chess-square { background: var(--chess-light); color: var(--chess-dark); }
 .chess-square.chess-dark { background: var(--chess-dark); color: var(--chess-light); }
