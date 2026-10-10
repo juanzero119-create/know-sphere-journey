@@ -167,18 +167,20 @@ nav [data-status='active'] .nav-tile {
 }
 
 /* Bottom navigation bar stays gray everywhere, including the golden Movies theme.
-   The icon squares are the same gray as the bar, so the strip reads as one flat band. */
+   Every icon square is the same gray as the bar; the current tab is shown by a
+   brighter icon and label instead of a different tile color. */
 .bottom-nav {
   background: var(--nav-bar);
   color: var(--nav-bar-foreground);
   border-color: var(--nav-bar-border);
-  --foreground: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.82 0 0);
+  --foreground: oklch(0.98 0 0);
+  --muted-foreground: oklch(0.7 0 0);
   --nav-tile: var(--nav-bar);
-  --nav-tile-active: oklch(0.4 0 0);
+  --nav-tile-active: var(--nav-bar);
   --nav-tile-press: oklch(0.24 0 0);
 }
 .bottom-nav .nav-tile { box-shadow: none; }
+
 
 
 
