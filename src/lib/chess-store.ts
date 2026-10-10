@@ -115,7 +115,7 @@ let aiRunning = false;
 async function maybeAiMove() {
   const turn = game.turn();
   const aiTurn = state.mode === 'aivai' || (state.mode === 'ai' && turn !== state.humanSide);
-  if (!aiTurn || isOver() || aiRunning) return;
+  if (!aiTurn || isOver() || state.paused || aiRunning) return;
   aiRunning = true;
   state.thinking = true;
   state.aiNote = '';
