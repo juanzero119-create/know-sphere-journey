@@ -100,6 +100,11 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var k="lexi-boot-reload",re=/Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i;function r(m){try{if(!re.test(m||"")||sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1");location.reload();}catch(e){}}addEventListener("error",function(e){r(e.message||(e.target&&e.target.src?"Importing a module script failed":""))},true);addEventListener("unhandledrejection",function(e){r(String(e.reason&&e.reason.message||e.reason))});addEventListener("vite:preloadError",function(e){e.preventDefault();r("Importing a module script failed")});setTimeout(function(){try{sessionStorage.removeItem(k)}catch(e){}},10000);})();`,
+          }}
+        />
         <HeadContent />
       </head>
       <body>
