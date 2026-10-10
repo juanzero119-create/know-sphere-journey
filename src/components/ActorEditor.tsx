@@ -18,7 +18,14 @@ type Actor = ActorDraft & { id: number };
 const emptyDraft: ActorDraft = { firstName: '', lastName: '', role: '', film: '', bio: '', firstHighlight: 'gold', lastHighlight: 'blue' };
 // "The 50 Most Talented Male Actors By Screen Achievement" (imdb.com/list/ls000759379)
 import imdbBios from '@/lib/actor-bios.json';
+import imdbPortraits from '@/lib/actor-portraits.json';
 const bios = imdbBios as Record<string, string>;
+const portraits = imdbPortraits as Record<string, string>;
+function ActorPortrait({ firstName, lastName }: { firstName: string; lastName: string }) {
+ const url = portraits[`${firstName} ${lastName}`];
+ if (url) return <img src={url} alt={`Portrait of ${firstName} ${lastName}`} loading="lazy" className="size-14 shrink-0 rounded-xl border border-border object-cover"/>;
+ return <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-xl border border-border bg-secondary text-sm font-semibold text-secondary-foreground">{firstName.charAt(0)}{lastName.charAt(0)}</span>;
+}
 const imdbNames = ['Leonardo DiCaprio','Jeff Bridges','Daniel Day-Lewis','Anthony Hopkins','Al Pacino','Philip Seymour Hoffman','Denzel Washington','Robert De Niro','Jack Nicholson','Javier Bardem','Tom Hanks','Christian Bale','Ben Kingsley','Edward Norton','Tom Hardy','George Clooney','Michael Caine','Robert Downey Jr.','Ralph Fiennes','Ryan Gosling','Sam Rockwell','Tom Wilkinson','Forest Whitaker','Kevin Spacey','Brad Pitt','Christopher Plummer','Robert Duvall','Joaquin Phoenix','Gary Oldman','Samuel L. Jackson','Benicio Del Toro','Jamie Foxx','Liam Neeson','Mark Wahlberg','Gene Hackman','Tim Roth','Sean Penn','Morgan Freeman','Tommy Lee Jones','Clint Eastwood','Ian McKellen','Don Cheadle','Colin Farrell','Johnny Depp','Ray Winstone','Stephen Rea','William H. Macy','Adrien Brody','Michael Gambon','Brendan Gleeson','William Hurt','Mark Ruffalo','Matt Damon','Val Kilmer','Nicolas Cage','Kevin Costner'];
 const seedActors: Actor[] = imdbNames.map((name, i) => { const parts = name.split(' '); const lastName = parts.pop() ?? ''; return { id: i + 1, firstName: parts.join(' '), lastName, role: '', film: '', bio: bios[name] ?? '', firstHighlight: 'gold', lastHighlight: 'blue' }; });
 
