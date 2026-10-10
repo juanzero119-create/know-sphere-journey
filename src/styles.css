@@ -327,3 +327,7 @@ html.press-highlighting textarea { caret-color: transparent; }
 /* Home-screen launch: no rubber-band reveal behind the page, no blue tap flash. */
 html { overscroll-behavior-y: none; background: var(--background); }
 body { -webkit-tap-highlight-color: transparent; }
+
+/* Performance: skip rendering off-screen cards in long lists */
+.cv-auto { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+html { -webkit-tap-highlight-color: transparent; }
