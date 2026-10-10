@@ -89,10 +89,30 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
   </div>;
 });
 
+// Timed thinking indicator: animated dots + a live seconds counter while the
+// AI decides its move.
+function Thinking({ since }: { since: number }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 100);
+    return () => clearInterval(id);
+  }, []);
+  const secs = Math.max(0, (now - since) / 1000);
+  return <div role="status" aria-label="AI is thinking" className="flex items-center gap-3 rounded-md border border-border bg-card px-3 py-2">
+    <span className="flex gap-1" aria-hidden="true">
+      <span className="thinking-dot size-2 rounded-full bg-primary"/>
+      <span className="thinking-dot size-2 rounded-full bg-primary" style={{ animationDelay: '0.15s' }}/>
+      <span className="thinking-dot size-2 rounded-full bg-primary" style={{ animationDelay: '0.3s' }}/>
+    </span>
+    <span className="text-sm font-semibold">AI is thinking</span>
+    <span className="ml-auto font-mono text-sm tabular-nums text-muted-foreground">{secs.toFixed(1)}s</span>
+  </div>;
+}
+
 function ChessPage() {
   const { game, state } = useChessStore();
   const [picked, setPicked] = useState<Square | null>(null);
-  const { clock, mode, humanSide, lastMove, thinking, aiNote, paused } = state;
+  const { clock, mode, humanSide, lastMove, thinking, thinkingSince, aiNote, paused } = state;
   const turn = game.turn();
   const flagged = clock.w <= 0 ? 'w' : clock.b <= 0 ? 'b' : null;
   const over = game.isGameOver() || !!flagged;
