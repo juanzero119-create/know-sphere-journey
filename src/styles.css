@@ -331,3 +331,13 @@ body { -webkit-tap-highlight-color: transparent; }
 /* Performance: skip rendering off-screen cards in long lists */
 .cv-auto { content-visibility: auto; contain-intrinsic-size: auto 120px; }
 html { -webkit-tap-highlight-color: transparent; }
+
+/* Native-app feel on iPhone */
+html, body { overscroll-behavior-y: none; -webkit-text-size-adjust: 100%; }
+a, button, [role="button"], label, summary { touch-action: manipulation; -webkit-touch-callout: none; }
+nav a, nav button, button { -webkit-user-select: none; user-select: none; }
+button:active, nav a:active { transition: transform 80ms ease; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 160ms; animation-timing-function: ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
