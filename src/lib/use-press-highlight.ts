@@ -43,7 +43,7 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
   const commitRef = useRef(onCommit);
   commitRef.current = onCommit;
   const pending = useRef<{ timer: number; x: number; y: number } | null>(null);
-  const target = useRef<{ id: string; container: HTMLElement; cover?: HTMLElement | null; anchor: number } | null>(null);
+  const target = useRef<{ id: string; container: HTMLElement; cover?: HTMLElement | null | undefined; anchor: number } | null>(null);
 
   const set = (next: PressDrag | null) => { dragRef.current = next; setDrag(next); };
   const cancelPending = () => { if (pending.current) window.clearTimeout(pending.current.timer); pending.current = null; };
