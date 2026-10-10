@@ -4,6 +4,7 @@ import { Search, X, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Section } from '@/components/Section';
+import { FilmChip } from '@/components/FilmChip';
 import { searchActors, searchMovies } from '@/lib/film-search';
 import portraits from '@/lib/actor-portraits.json';
 
@@ -43,7 +44,7 @@ export function FilmSearch() {
                       <div className="min-w-0">
                         <p className="font-semibold">{a.name}</p>
                         <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
-                          {a.films.map(f => <Link key={f.movie.id} to="/film/$id" params={{ id: f.movie.id }} className="text-xs text-muted-foreground underline underline-offset-4">{f.movie.title} ({f.movie.year}) · {f.role}</Link>)}
+                          {a.films.map(f => <FilmChip key={f.movie.id} movie={f.movie} note={f.role} />)}
                         </div>
                       </div>
                     </li>
