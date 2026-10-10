@@ -46,6 +46,10 @@ function Notes() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [draftTitle, setDraftTitle] = useState('');
   const [draftBody, setDraftBody] = useState('');
+  // Typing into the server-rendered boxes before the app wakes up gets wiped when
+  // React takes over, so keep them disabled until the page is live.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [highlights, setHighlights] = useState<NoteHighlight[]>([]);
   const [color, setColor] = useState<NoteColor>('gold');
@@ -188,10 +192,10 @@ function Notes() {
     {drag && <div aria-hidden="true" className={`pointer-events-none fixed z-50 grid h-7 w-12 -translate-x-1/2 -translate-y-full place-items-center rounded-full shadow-lg ring-2 ring-background ${pillColor}`} style={{ left: drag.x, top: drag.y - 14 }}><Highlighter className="size-4"/></div>}
     <Section number="01" title="Write a note" subtitle="Saved on this device">
       <div className="rounded-lg border border-border bg-card p-6">
-        <Input value={draftTitle} onChange={event => setDraftTitle(event.target.value)} placeholder="Note title" aria-label="Note title" maxLength={80}/>
+        <Input value={draftTitle} onChange={event => setDraftTitle(event.target.value)} placeholder="Note title" aria-label="Note title" maxLength={80} disabled={!ready}/>
         <div className="note-select relative mt-3" data-color={color} onPointerDown={event => begin(event, 'draft', backdrop.current, editor.current)}>
           <div ref={backdrop} aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words rounded-md border border-transparent px-3 py-2 text-base text-foreground md:text-sm"><HighlightedNote body={draftBody} highlights={withDrag('draft', highlights)}/>{'\n'}</div>
-          <Textarea ref={editor} value={draftBody} onSelect={captureSelection} onPointerUp={highlightDraggedText} onTouchEnd={highlightDraggedText} onScroll={event => { if (backdrop.current) backdrop.current.scrollTop = event.currentTarget.scrollTop; }} onChange={event => { const next = event.target.value; setHighlights(old => adjustHighlights(old, draftBody, next)); setDraftBody(next); }} placeholder="Write your note…" aria-label="Note text" className="note-editor-input relative min-h-28 break-words" maxLength={4000}/>
+          <Textarea ref={editor} value={draftBody} onSelect={captureSelection} onPointerUp={highlightDraggedText} onTouchEnd={highlightDraggedText} onScroll={event => { if (backdrop.current) backdrop.current.scrollTop = event.currentTarget.scrollTop; }} onChange={event => { const next = event.target.value; setHighlights(old => adjustHighlights(old, draftBody, next)); setDraftBody(next); }} placeholder="Write your note…" aria-label="Note text" className="note-editor-input relative min-h-28 break-words" maxLength={4000} disabled={!ready}/>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Note highlighting">
           {noteColors.map(option => <Button key={option.id} type="button" size="icon" variant="outline" aria-label={`${option.label} highlight color`} title={`${option.label} highlight color`} aria-pressed={color === option.id} onMouseDown={event => event.preventDefault()} onClick={() => setColor(option.id)} className={color === option.id ? 'border-primary' : ''}><span className={`grid size-6 place-items-center rounded-sm ${option.className}`}>{color === option.id && <Check className="size-4"/>}</span></Button>)}
