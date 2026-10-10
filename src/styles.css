@@ -120,6 +120,13 @@
     inset -2px -2px 5px var(--bevel-light);
   color: var(--primary);
 }
+nav [data-status='active'] .bevel-tile {
+  background: var(--bevel-face);
+  box-shadow:
+    inset 2px 2px 5px var(--bevel-dark),
+    inset -2px -2px 5px var(--bevel-light);
+  color: var(--primary);
+}
 @media (prefers-reduced-motion: reduce) {
   .bevel-tile { transition: none; }
 }
