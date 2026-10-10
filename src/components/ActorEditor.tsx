@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Check, ChevronLeft, ChevronRight, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { ArrowDownAZ, ArrowUpAZ, Check, ChevronLeft, ChevronRight, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Section } from '@/components/Section';
@@ -47,8 +47,10 @@ export function ActorEditor() {
  const [actors, setActors] = useState<Actor[]>(seedActors);
  const [draft, setDraft] = useState<ActorDraft>({ ...emptyDraft });
   const [editingId, setEditingId] = useState<number | null>(null);
-   const [openId, setOpenId] = useState<number | null>(null);
+ const [openId, setOpenId] = useState<number | null>(null);
  const [message, setMessage] = useState('');
+ const [sortDir, setSortDir] = useState<'az' | 'za'>('az');
+ const sortedActors = [...actors].sort((a, b) => { const an = `${a.lastName} ${a.firstName}`.toLowerCase(); const bn = `${b.lastName} ${b.firstName}`.toLowerCase(); return sortDir === 'az' ? an.localeCompare(bn) : bn.localeCompare(an); });
  const update = <K extends keyof ActorDraft>(key: K, value: ActorDraft[K]) => setDraft(old => ({ ...old, [key]: value }));
  function reset() { setDraft({ ...emptyDraft }); setEditingId(null); }
  function submit(event: FormEvent<HTMLFormElement>) {
