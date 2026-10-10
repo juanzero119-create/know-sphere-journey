@@ -19,11 +19,22 @@ it('keeps an independent model for each colour', () => {
 it('renders one model selector per colour, each showing its own choice', () => {
   chooseChessModel('b', 'anthropic/claude-sonnet-5');
   render(<ChessElo />);
-  const white = screen.getByRole('combobox', { name: 'White AI model' });
-  const black = screen.getByRole('combobox', { name: 'Black AI model' });
+  const white = screen.getByRole('button', { name: 'White AI model' });
+  const black = screen.getByRole('button', { name: 'Black AI model' });
   expect(white).toHaveTextContent('GPT-6 Luna');
   expect(black).toHaveTextContent('Claude Sonnet 5');
   expect(screen.getByText(/claude-sonnet-5/)).toBeInTheDocument();
+  cleanup();
+});
+
+it('opens the card list and picks a model for the opened colour only', () => {
+  chooseChessModelForBoth('openai/gpt-6-astra');
+  render(<ChessElo />);
+  fireEvent.click(screen.getByRole('button', { name: 'White AI model' }));
+  const card = screen.getByRole('button', { name: 'GPT-6 Luna OpenAI' });
+  fireEvent.click(card);
+  expect(getChessModelFor('w')).toBe('openai/gpt-6-luna');
+  expect(getChessModelFor('b')).toBe('openai/gpt-6-astra');
   cleanup();
 });
 
