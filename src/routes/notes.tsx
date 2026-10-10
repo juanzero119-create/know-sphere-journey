@@ -124,13 +124,15 @@ function Notes() {
     <Section number="01" title="Write a note" subtitle="Saved on this device">
       <div className="rounded-lg border border-border bg-card p-6">
         <Input value={draftTitle} onChange={event => setDraftTitle(event.target.value)} placeholder="Note title" aria-label="Note title" maxLength={80}/>
-        <Textarea ref={editor} value={draftBody} onSelect={captureSelection} onPointerUp={highlightDraggedText} onChange={event => { const next = event.target.value; setHighlights(old => adjustHighlights(old, draftBody, next)); setDraftBody(next); }} placeholder="Write your note…" aria-label="Note text" className="mt-3 min-h-28" maxLength={4000}/>
+        <div className="note-select relative mt-3" data-color={color}>
+          <div ref={backdrop} aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words rounded-md border border-transparent px-3 py-2 text-base text-foreground md:text-sm"><HighlightedNote body={draftBody} highlights={highlights}/>{'\n'}</div>
+          <Textarea ref={editor} value={draftBody} onSelect={captureSelection} onPointerUp={highlightDraggedText} onTouchEnd={highlightDraggedText} onScroll={event => { if (backdrop.current) backdrop.current.scrollTop = event.currentTarget.scrollTop; }} onChange={event => { const next = event.target.value; setHighlights(old => adjustHighlights(old, draftBody, next)); setDraftBody(next); }} placeholder="Write your note…" aria-label="Note text" className="note-editor-input relative min-h-28 break-words" maxLength={4000}/>
+        </div>
         <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Note highlighting">
           {noteColors.map(option => <Button key={option.id} type="button" size="icon" variant="outline" aria-label={`${option.label} highlight color`} title={`${option.label} highlight color`} aria-pressed={color === option.id} onMouseDown={event => event.preventDefault()} onClick={() => setColor(option.id)} className={color === option.id ? 'border-primary' : ''}><span className={`grid size-6 place-items-center rounded-sm ${option.className}`}>{color === option.id && <Check className="size-4"/>}</span></Button>)}
           <Button type="button" size="icon" variant="outline" aria-label="Highlight selected text" title="Highlight selected text" disabled={selection.start === selection.end} onMouseDown={event => event.preventDefault()} onClick={() => highlightSelection(color)}><Highlighter/></Button>
           <Button type="button" size="icon" variant="outline" aria-label="Remove selected highlight" title="Remove selected highlight" disabled={selection.start === selection.end} onMouseDown={event => event.preventDefault()} onClick={() => highlightSelection(null)}><X/></Button>
         </div>
-        {highlights.length > 0 && <div className="mt-4 whitespace-pre-wrap break-words text-sm" aria-label="Highlighted note preview"><HighlightedNote body={draftBody} highlights={highlights}/></div>}
         <div className="mt-4 flex gap-2">
           <Button type="button" onClick={saveDraft} disabled={!draftTitle.trim() && !draftBody.trim()}>
             {editingId ? <Pencil/> : <Plus/>}{editingId ? 'Save changes' : 'Add note'}
