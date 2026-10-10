@@ -106,7 +106,7 @@ function Thinking({ since }: { since: number }) {
 function ChessPage() {
   const { game, state } = useChessStore();
   const [picked, setPicked] = useState<Square | null>(null);
-  const { clock, mode, humanSide, lastMove, thinking, aiNote, paused } = state;
+  const { clock, mode, humanSide, lastMove, thinking, thinkingSince, aiNote, paused } = state;
   const turn = game.turn();
   const flagged = clock.w <= 0 ? 'w' : clock.b <= 0 ? 'b' : null;
   const over = game.isGameOver() || !!flagged;
