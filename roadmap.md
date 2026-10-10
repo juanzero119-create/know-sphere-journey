@@ -53,7 +53,7 @@
 
 # Gray bottom bar
 - [x] Make the bottom navigation bar gray on every page, including the golden Movies section.
-- [x] Set every icon square to the exact same gray as the bar, with no tile visible; mark the current tab only with a brighter icon and label.
+- [x] Make the bar dark gray RGB(45, 45, 45), the icon squares lighter gray RGB(85, 85, 85), and the current tab's square RGB(107, 107, 107); icons brighter than labels.
 - [x] Verify the bar on the Movies and home pages on mobile.
 
 
