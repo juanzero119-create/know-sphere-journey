@@ -19,3 +19,4 @@
 - Keep custom studies added from the Studies page in the same browser-only, visit-scoped store pattern; this isolates them from the built-in discipline cards.
 - Keep added AI model entries as visit-only interface settings, without implying a live provider connection; this separates model management from future AI execution.
 - Use licensed Cburnett chess piece assets with semantic board tokens; this keeps pieces readable on both square colors.
+- Keep the chess game (board, clocks, mode, AI move loop) in the module-level store src/lib/chess-store.ts, not in the route component; this lets the game and AI-vs-AI moves keep running while the user browses other tabs.
