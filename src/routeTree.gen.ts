@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnatomyRouteImport } from './routes/anatomy'
+import { Route as MoviesRouteImport } from './routes/movies'
 import { Route as WatchRouteImport } from './routes/watch'
 import { Route as WordsRouteImport } from './routes/words'
+import { Route as FilmIdRouteImport } from './routes/film.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const AnatomyRoute = AnatomyRouteImport.update({
   id: '/anatomy',
   path: '/anatomy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesRoute = MoviesRouteImport.update({
+  id: '/movies',
+  path: '/movies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WatchRoute = WatchRouteImport.update({
@@ -34,39 +41,59 @@ const WordsRoute = WordsRouteImport.update({
   path: '/words',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FilmIdRoute = FilmIdRouteImport.update({
+  id: '/film/$id',
+  path: '/film/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/anatomy': typeof AnatomyRoute
+  '/movies': typeof MoviesRoute
   '/watch': typeof WatchRoute
   '/words': typeof WordsRoute
+  '/film/$id': typeof FilmIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/anatomy': typeof AnatomyRoute
+  '/movies': typeof MoviesRoute
   '/watch': typeof WatchRoute
   '/words': typeof WordsRoute
+  '/film/$id': typeof FilmIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/anatomy': typeof AnatomyRoute
+  '/movies': typeof MoviesRoute
   '/watch': typeof WatchRoute
   '/words': typeof WordsRoute
+  '/film/$id': typeof FilmIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/anatomy' | '/watch' | '/words'
+  fullPaths: '/' | '/anatomy' | '/movies' | '/watch' | '/words' | '/film/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/anatomy' | '/watch' | '/words'
-  id: '__root__' | '/' | '/anatomy' | '/watch' | '/words'
+  to: '/' | '/anatomy' | '/movies' | '/watch' | '/words' | '/film/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/anatomy'
+    | '/movies'
+    | '/watch'
+    | '/words'
+    | '/film/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnatomyRoute: typeof AnatomyRoute
+  MoviesRoute: typeof MoviesRoute
   WatchRoute: typeof WatchRoute
   WordsRoute: typeof WordsRoute
+  FilmIdRoute: typeof FilmIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +112,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnatomyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/movies': {
+      id: '/movies'
+      path: '/movies'
+      fullPath: '/movies'
+      preLoaderRoute: typeof MoviesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/watch': {
       id: '/watch'
       path: '/watch'
@@ -99,14 +133,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WordsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/film/$id': {
+      id: '/film/$id'
+      path: '/film/$id'
+      fullPath: '/film/$id'
+      preLoaderRoute: typeof FilmIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnatomyRoute: AnatomyRoute,
+  MoviesRoute: MoviesRoute,
   WatchRoute: WatchRoute,
   WordsRoute: WordsRoute,
+  FilmIdRoute: FilmIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
