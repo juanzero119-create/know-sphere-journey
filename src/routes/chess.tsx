@@ -4,6 +4,7 @@ import { Chess, type Square } from 'chess.js';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
+import { ModelManager } from '@/routes/ai';
 
 export const Route = createFileRoute('/chess')({
   head: () => ({ meta: [
@@ -97,7 +98,11 @@ function ChessPage() {
       {history.length === 0 ? <p className="text-sm text-muted-foreground">No moves yet.</p> :
         <ol className="grid grid-cols-[auto_1fr_1fr] gap-x-4 gap-y-1 font-mono text-sm">{Array.from({ length: Math.ceil(history.length / 2) }, (_, i) => <li key={i} className="contents"><span className="text-muted-foreground">{i + 1}.</span><span>{history[i * 2]}</span><span>{history[i * 2 + 1] ?? ''}</span></li>)}</ol>}
     </Section>
-    <Section number="03" title="How the pieces move">
+    <Section number="03" title="Chess AI">
+      <p className="text-sm text-muted-foreground">Choose the AI model for chess. Settings only — the AI does not play moves yet.</p>
+    </Section>
+    <ModelManager/>
+    <Section number="06" title="How the pieces move">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{pieces.map(([n, s, d]) => <div key={n} className="flex gap-3 rounded-lg border border-border bg-card p-4"><span className="text-3xl">{s}</span><div><p className="font-semibold">{n}</p><p className="text-sm text-muted-foreground">{d}</p></div></div>)}</div>
     </Section>
   </Shell>;
