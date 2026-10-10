@@ -36,7 +36,7 @@ export function Quiz({ mode, onClose }: { mode: Mode; onClose: () => void }) {
     <div className="fixed inset-0 z-50 overflow-y-auto bg-background">
       <div className="mx-auto max-w-xl p-5">
         <div className="mb-6 flex items-center gap-3">
-          <Button onClick={onClose} aria-label="Close"><X className="size-7" /></Button>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close"><X className="size-7" /></Button>
           <div className="h-4 flex-1 overflow-hidden rounded-full border-2 bg-muted">
             <div className="h-full bg-success transition-all" style={{ width: `${(Math.min(i, qs.length) / qs.length) * 100}%` }} />
           </div>
@@ -57,7 +57,7 @@ export function Quiz({ mode, onClose }: { mode: Mode; onClose: () => void }) {
               {q?.options.map((o) => {
                 const state = picked && (o === q.answer ? "bg-success text-ink" : o === picked ? "bg-accent text-ink" : "bg-card");
                 return (
-                  <Button key={o} onClick={() => choose(o)} className={`chunky chunky-press w-full rounded-lg p-4 text-left text-lg font-semibold ${state || "bg-card"}`}>
+                  <Button variant="ghost" key={o} onClick={() => choose(o)} className={`chunky chunky-press h-auto min-h-14 w-full justify-start whitespace-normal rounded-lg p-4 text-left text-lg font-semibold ${state || "bg-card"}`}>
                     {o}
                   </Button>
                 );
