@@ -96,10 +96,19 @@ function stopClock() {
   }
 }
 
+let endSoundPlayed = false;
+function maybePlayEndSound() {
+  if (endSoundPlayed || !isOver()) return;
+  endSoundPlayed = true;
+  playGameEndSound();
+}
+
 function applyMove(from: Square, to: Square, turn: 'w' | 'b') {
   state.clock = { ...state.clock, [turn]: state.clock[turn] + (state.started ? INC : 0) };
   state.started = true;
   state.lastMove = [from, to];
+  playMoveSound();
+  maybePlayEndSound();
   startClock();
   emit();
   void maybeAiMove();
