@@ -25,6 +25,6 @@
 - [x] Verify navigation and custom-icon interactions.
 
 # Add studies
-- [ ] Add a plus control beneath the study cards to add more studies.
-- [ ] Let custom studies choose a name, icon, and destination for this visit.
-- [ ] Verify adding, editing, and removing studies.
+- [x] Add a plus control beneath the study cards to add more studies.
+- [x] Let custom studies choose a name, icon, and destination for this visit.
+- [x] Verify adding, editing, and removing studies.
