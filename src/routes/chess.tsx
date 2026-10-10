@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { memo, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import type { Square } from 'chess.js';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
@@ -71,7 +71,7 @@ function ChessPage() {
 
   const targets = useMemo(() => picked ? game.moves({ square: picked, verbose: true }).map(m => m.to) : [], [picked, game, lastMove]);
 
-  function tap(r: number, c: number) {
+  const tap = useCallback((r: number, c: number) => {
     if (over || thinking || paused || mode === 'aivai' || (mode === 'ai' && turn !== humanSide)) return;
     const s = sq(r, c);
     const p = game.get(s);
@@ -80,7 +80,7 @@ function ChessPage() {
       setPicked(null);
     } else if (p && p.color === turn) setPicked(s === picked ? null : s);
     else setPicked(null);
-  }
+  }, [over, thinking, paused, mode, turn, humanSide, picked, targets, game]);
 
   const interactive = !over && !thinking && !paused && mode !== 'aivai' && !(mode === 'ai' && turn !== humanSide);
 
