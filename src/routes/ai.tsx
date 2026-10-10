@@ -6,7 +6,6 @@ import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { ChessModelPick } from '@/components/ChessModelPick';
 import { addChessModel, chooseChessModelForBoth, isDefaultModel, modelById, removeChessModel, useChessModels, type ChessSide } from '@/lib/chess-models';
 
 export const Route = createFileRoute('/ai')({
@@ -22,7 +21,7 @@ export const Route = createFileRoute('/ai')({
 
 const sides: ChessSide[] = ['w', 'b'];
 
-export function ModelManager({ pickers = true }: { pickers?: boolean }) {
+export function ModelManager() {
   const { models, selected } = useChessModels();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
@@ -50,7 +49,6 @@ export function ModelManager({ pickers = true }: { pickers?: boolean }) {
           </div>
         </div>;
       })}</div>
-      {pickers && <ChessModelPick />}
     </Section>
     <Section number="03" title="Chess AI models">
       <div className="mb-4 flex items-center justify-between gap-3"><p className="text-sm text-muted-foreground">No AI service connected</p><Button variant="outline" onClick={() => setOpen(true)}><Plus/>Add model</Button></div>
