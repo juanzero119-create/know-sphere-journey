@@ -6,12 +6,14 @@ afterEach(cleanup);
 describe('Actor editor', () => {
  it('pre-loads the IMDb actor names without the six removed actors', () => {
   render(<ActorEditor/>);
-  expect(screen.getAllByRole('article').length).toBe(50);
+  expect(screen.getAllByRole('article').length).toBe(100);
   expect(screen.getByText('Leonardo')).toBeInTheDocument();
   expect(screen.getByText('DiCaprio')).toBeInTheDocument();
   expect(screen.getAllByText('Kevin').length).toBe(1);
   expect(screen.getByText('Spacey')).toBeInTheDocument();
-  for (const lastName of ['Hurt', 'Ruffalo', 'Damon', 'Kilmer', 'Cage', 'Costner']) {
+  expect(screen.getByText('Robin')).toBeInTheDocument();
+  expect(screen.getByText('Williams')).toBeInTheDocument();
+  for (const lastName of ['Hurt', 'Ruffalo', 'Damon', 'Kilmer', 'Costner']) {
    expect(screen.queryByText(lastName)).not.toBeInTheDocument();
   }
  });
@@ -31,7 +33,7 @@ describe('Actor editor', () => {
   expect(within(screen.getAllByRole('article').at(-1)!).getByText('Annie')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Remove Annie Hathaway' }));
   expect(screen.queryByText('Annie')).not.toBeInTheDocument();
-  expect(screen.getAllByRole('article').length).toBe(50);
+  expect(screen.getAllByRole('article').length).toBe(100);
  });
  it('rejects whitespace-only names', () => {
   render(<ActorEditor/>);
@@ -39,6 +41,6 @@ describe('Actor editor', () => {
   fireEvent.change(screen.getByLabelText('Last name'), { target: { value: 'Smith' } });
   fireEvent.click(screen.getByRole('button', { name: 'Add actor' }));
   expect(screen.getByText('Enter a first and last name.')).toBeInTheDocument();
-  expect(screen.getAllByRole('article').length).toBe(50);
+  expect(screen.getAllByRole('article').length).toBe(100);
  });
 });
