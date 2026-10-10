@@ -9,7 +9,7 @@ describe('Actor editor', () => {
   expect(screen.getAllByRole('article').length).toBe(56);
   expect(screen.getByText('Leonardo')).toBeInTheDocument();
   expect(screen.getByText('DiCaprio')).toBeInTheDocument();
-  expect(screen.getByText('Kevin')).toBeInTheDocument();
+  expect(screen.getAllByText('Kevin').length).toBe(2);
   expect(screen.getByText('Costner')).toBeInTheDocument();
  });
  it('adds, updates, and removes an actor with independent highlights', () => {
