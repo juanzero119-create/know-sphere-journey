@@ -77,8 +77,7 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
         clearNative();
         navigator.vibrate?.(10);
         lockNative(true);
-        const [s, e] = snapToWords(container.textContent ?? '', anchor, anchor);
-        set({ id, start: s, end: e, x, y });
+        set({ id, start: anchor, end: anchor, x, y });
       }, HOLD_MS),
     };
   }, []);
