@@ -29,7 +29,7 @@ function pieceUrl(piece: string) { return assetFiles[`../assets/chess/${piece}.a
 function ChessPage() {
   const [board, setBoard] = useState(start);
   const [picked, setPicked] = useState<[number, number] | null>(null);
-  const [lastMove, setLastMove] = useState<[number, number][]>([[1, 3], [3, 3]]);
+  const [lastMove, setLastMove] = useState<[number, number][]>([]);
   function tap(r: number, c: number) {
     if (picked) {
       const [pr, pc] = picked;
@@ -57,7 +57,7 @@ function ChessPage() {
           {c === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
         </Button>))}
       </div>
-      <div className="mt-4 flex items-center justify-between gap-3"><span className="text-xs text-muted-foreground">Free practice · White at top</span><Button variant="outline" onClick={() => { setBoard(start()); setPicked(null); setLastMove([[1, 3], [3, 3]]); }}>Reset board</Button></div>
+      <div className="mt-4 flex items-center justify-between gap-3"><span className="text-xs text-muted-foreground">Free practice · White at top</span><Button variant="outline" onClick={() => { setBoard(start()); setPicked(null); setLastMove([]); }}>Reset board</Button></div>
       <p className="mt-3 text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
     </Section>
     <Section number="02" title="How the pieces move">
