@@ -1,0 +1,10 @@
+export const anatomyDetails: Record<string, { location: string; role: string; connection: string }> = {
+ 'Femur': { location: 'Thigh, between the hip and knee.', role: 'Supports body weight and acts as a lever for walking, running, and jumping.', connection: 'Articulates with the pelvis at the hip and with the tibia and patella at the knee.' },
+ 'Frontal bone': { location: 'Front of the skull, above the eyes.', role: 'Protects the frontal lobes of the brain and forms part of the eye sockets.', connection: 'Meets the parietal bones at the coronal suture.' },
+ 'Left ventricle': { location: 'Lower left chamber of the heart.', role: 'Contracts to send oxygenated blood through the aortic valve into the aorta.', connection: 'Receives blood from the left atrium through the mitral valve.' },
+ 'Alveoli': { location: 'At the ends of respiratory passages deep inside the lungs.', role: 'Thin walls allow oxygen to enter the blood and carbon dioxide to leave it.', connection: 'Surrounded by capillaries and supported by surfactant, which reduces surface tension.' },
+ 'Hippocampus': { location: 'Within the medial temporal lobe of each brain hemisphere.', role: 'Helps consolidate new declarative memories and supports spatial navigation.', connection: 'Works with surrounding cortex and other structures involved in memory.' },
+ 'Biceps brachii': { location: 'Front of the upper arm.', role: 'Bends the elbow and turns the palm upward, a movement called supination.', connection: 'Its two heads originate at the scapula; its tendon inserts on the radius.' },
+ 'Liver': { location: 'Upper right abdomen, beneath the diaphragm.', role: 'Processes nutrients, metabolizes substances, and makes bile and blood proteins.', connection: 'Receives blood from the hepatic artery and portal vein; bile drains into bile ducts.' },
+ 'Nephron': { location: 'Microscopic structures spanning the cortex and medulla of the kidneys.', role: 'Filters blood and adjusts water, electrolyte, and waste levels to form urine.', connection: 'Includes a renal corpuscle and tubule; fluid eventually passes into collecting ducts.' },
+};
