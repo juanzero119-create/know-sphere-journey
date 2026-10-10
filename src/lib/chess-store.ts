@@ -125,7 +125,7 @@ async function maybeAiMove() {
   try {
     const r = await getAiMove({ data: { fen, model, elo: state.elo[turn] } });
     if (game.fen() !== fen) return; // game was reset while waiting
-    if (isOver()) return; // clock ran out or game ended while the AI was thinking
+    if (isOver() || state.paused) return; // clock ran out, game ended, or the user paused while the AI was thinking
     if ('error' in r && r.error) {
       state.aiNote = r.error;
       return;
