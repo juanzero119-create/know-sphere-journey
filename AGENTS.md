@@ -13,3 +13,4 @@
 - Use Section for numbered content bands and the shared Button for controls; this keeps the expanded learning views consistent.
 
 - Keep the curated film catalog in a browser-safe data module with a Movies leaf and parameterized Film detail leaf; this supports direct links without a live movie API.
+- Keep the actor-entry interface in its own presentation component with independently tokenized name highlights and visit-only state; this isolates custom cast entries from the curated catalog without adding backend behavior.
