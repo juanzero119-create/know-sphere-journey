@@ -31,7 +31,7 @@ function Studies() {
         const destination = studyDestinations.find(item => item.to === study.to);
         return <article key={study.id} className="rounded-lg border border-border bg-card p-6"><StudyIcon className="mb-5 size-8 text-muted-foreground"/><h2 className="text-xl font-semibold">{study.name}</h2><p className="mt-2 text-sm text-muted-foreground">Custom study</p><p className="mt-4 text-sm">Opens {destination?.label ?? 'Vocabulary'}</p><Button asChild className="mt-6"><Link to={study.to}>Open {study.name} <ArrowRight/></Link></Button></article>;
       })}
-      <div className="self-start py-1 pl-1.5"><Button type="button" variant="ghost" aria-label="Add study" onClick={() => setEditorOpen(true)} className="h-auto min-w-[68px] flex-col gap-1.5 rounded-none p-0 py-1 text-[0.65rem] font-medium text-muted-foreground hover:bg-transparent"><span className="nav-tile grid size-12 place-items-center rounded-2xl nav-tile-press" aria-hidden="true"><Plus className="size-5"/></span>Add study</Button></div>
+      <div className="self-start py-1 pl-[14px]"><Button type="button" variant="ghost" aria-label="Add study" onClick={() => setEditorOpen(true)} className="h-auto min-w-[68px] flex-col gap-1.5 rounded-none p-0 py-1 text-[0.65rem] font-medium text-muted-foreground hover:bg-transparent"><span className="nav-tile grid size-12 place-items-center rounded-2xl nav-tile-press" aria-hidden="true"><Plus className="size-5"/></span>Add study</Button></div>
     </div>
     <StudyEditor open={editorOpen} onOpenChange={setEditorOpen}/>
   </Section></Shell>;
