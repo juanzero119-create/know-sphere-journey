@@ -68,6 +68,10 @@ function startClock() {
     const now = Date.now();
     const d = now - lastTick;
     lastTick = now;
+    if (game.isGameOver()) {
+      stopClock();
+      return;
+    }
     const turn = game.turn();
     state.clock = { ...state.clock, [turn]: state.clock[turn] - d };
     emit();
