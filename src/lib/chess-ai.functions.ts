@@ -56,7 +56,25 @@ export const getAiMove = createServerFn({ method: 'POST' })
     try { game = new Chess(data.fen); } catch { return { error: 'Invalid position.' }; }
     const legal = game.moves();
     if (!legal.length) return { error: 'No legal moves.' };
-    const prompt = `You are a strong chess engine playing ${game.turn() === 'w' ? 'White' : 'Black'}. Position (FEN): ${data.fen}\nLegal moves (SAN): ${legal.join(' ')}\nPick the best move. Reply with ONLY one move from the list, nothing else.`;
+    const tactics = [
+      'Fork: one piece attacks two or more enemy pieces at once — knights are best, but any piece can fork.',
+      'Pin: attack a piece that cannot move without exposing a more valuable piece behind it; absolute pins (king behind) freeze the piece completely.',
+      'Skewer: attack a valuable piece so that when it moves away, you capture the piece behind it.',
+      'Discovered attack / discovered check: move one piece to unleash an attack from a piece behind it; discovered checks are the most dangerous.',
+      'Double check: two pieces give check at once — the king must move.',
+      'Deflection: force a defending piece away from a square or piece it protects.',
+      'Decoy: lure an enemy piece onto a bad square, often with a sacrifice.',
+      'Removing the defender: capture or chase off the piece guarding a target, then take the target.',
+      'Back rank mate: trap a king behind its own pawns with a rook or queen on the back rank.',
+      'Overloading: attack a piece that is defending too many things at once.',
+      'Interference: place a piece between two enemy pieces to cut their communication.',
+      'Zwischenzug (in-between move): before making an expected recapture, insert a forcing move like a check.',
+      'X-ray attack: attack through an enemy piece to a target behind it.',
+      'Trapped piece: leave an enemy piece with no safe squares.',
+      'Pawn promotion: push passed pawns; a pawn about to queen is worth a piece.',
+      'General technique: develop pieces early, castle to safety, control the center, connect rooks, keep the king safe, and never hang pieces — before moving, check what your opponent threatens.',
+    ].map((t, i) => `${i + 1}. ${t}`).join('\n');
+    const prompt = `You are a strong chess engine playing ${game.turn() === 'w' ? 'White' : 'Black'}. Position (FEN): ${data.fen}\nLegal moves (SAN): ${legal.join(' ')}\n\nUse these tactics and techniques when choosing your move:\n${tactics}\n\nLook for winning tactics first (checks, captures, threats), then improve your position. Pick the best move. Reply with ONLY one move from the list, nothing else.`;
     const out = await ask(data.model, prompt, key);
     if ('error' in out) return { error: out.error };
     const tokens = (out.text ?? '').replace(/[.,!*`"]/g, ' ').split(/\s+/).filter(Boolean);
