@@ -25,20 +25,20 @@ describe('Actor editor', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'First-name highlight: Rose' }));
   fireEvent.click(screen.getByRole('button', { name: 'Last-name highlight: Green' }));
   fireEvent.click(screen.getByRole('button', { name: 'Add actor' }));
-  const actor = screen.getAllByRole('article').at(-1)!;
+  const actor = screen.getAllByRole('article').find(el => within(el).queryByText('Hathaway'))!;
   expect(within(actor).getByText('Anne')).toHaveClass('bg-name-rose');
   expect(within(actor).getByText('Hathaway')).toHaveClass('bg-name-green');
   fireEvent.click(screen.getByRole('button', { name: 'Edit Anne Hathaway' }));
   fireEvent.change(screen.getByLabelText('First name'), { target: { value: 'Annie' } });
   fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
-  expect(within(screen.getAllByRole('article').at(-1)!).getByText('Annie')).toBeInTheDocument();
+  expect(within(screen.getAllByRole('article').find(el => within(el).queryByText('Hathaway'))!).getByText('Annie')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Remove Annie Hathaway' }));
   expect(screen.queryByText('Annie')).not.toBeInTheDocument();
   expect(screen.getAllByRole('article').length).toBe(101);
  });
  it('hides an actor\'s film tiles until Details is clicked', async () => {
   await renderWithRouter(<ActorEditor/>);
-  const card = screen.getAllByRole('article')[0]!;
+  const card = screen.getByRole('button', { name: 'Show details for Leonardo DiCaprio' }).closest('article')!;
   expect(within(card).queryByRole('link', { name: /The Revenant/ })).not.toBeInTheDocument();
   fireEvent.click(within(card).getByRole('button', { name: 'Show details for Leonardo DiCaprio' }));
   expect(within(card).getByRole('link', { name: /The Revenant/ })).toBeInTheDocument();
