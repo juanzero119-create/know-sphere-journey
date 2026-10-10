@@ -14,6 +14,7 @@
 
 - Keep the curated film catalog in a browser-safe data module with a Movies leaf and parameterized Film detail leaf; this supports direct links without a live movie API.
 - Keep the actor-entry interface in its own presentation component with independently tokenized name highlights and visit-only state; this isolates custom cast entries from the curated catalog without adding backend behavior.
+- Render every film an actor appears in through the shared FilmChip tile with its token-driven bevel, poster thumbnail and optional role note; this keeps actor filmography links identical across film pages and search and readable on both themes.
 - Group discipline links on the Studies leaf while preserving their direct routes; this consolidates navigation without removing learning content.
 - Keep custom navigation shortcuts in a browser-only, visit-scoped shared store with a fixed empty SSR snapshot; this preserves shortcuts across page navigation without adding persistence or server behavior.
 - Keep custom studies added from the Studies page in the same browser-only, visit-scoped store pattern; this isolates them from the built-in discipline cards.

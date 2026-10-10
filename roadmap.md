@@ -78,3 +78,8 @@
 
 
 - [x] Add a live thinking timer (0.0s count-up) next to the AI's countdown ring on the left of the clock row.
+
+# Beveled film tiles
+- [x] Turn each movie listed under an actor into a raised, beveled tile with a poster thumbnail.
+- [x] Use the same tiles for actor results in the movies search, with the role shown underneath.
+- [x] Verify the tiles on a film page and in search on the golden Movies theme.
