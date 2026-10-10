@@ -22,3 +22,4 @@
 - Use licensed Cburnett chess piece assets with semantic board tokens; this keeps pieces readable on both square colors.
 - Keep the chess game (board, clocks, mode, AI move loop) in the module-level store src/lib/chess-store.ts, not in the route component; this lets the game and AI-vs-AI moves keep running while the user browses other tabs.
 - Keep per-side chess Elo targets in the visit-scoped chess store and validate them with a shared schema; this preserves difficulty across navigation and resets without claiming calibrated engine ratings.
+- Keep the player's built-up chess rating in the browser-only chess-rating store, updated by the chess store when a Vs AI game ends; this keeps rating logic separate from AI difficulty targets.
