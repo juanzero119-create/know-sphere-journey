@@ -12,3 +12,9 @@
 - [x] Remove the pressed-in bevel effect from the icon tiles.
 - [x] Use a flat gray tile that turns a slightly darker gray while pressed.
 - [x] Verify resting, active, and pressed tile shades on a mobile-sized preview.
+
+# Dark gray layout
+- [x] Switch the whole app to a dark gray palette with light text.
+- [x] Keep bottom nav tiles flat gray, turning slightly darker while pressed.
+- [x] Retune quiz panels, name highlights, and the anatomy illustration for dark.
+- [x] Verify every page on mobile and desktop.
