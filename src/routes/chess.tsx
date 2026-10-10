@@ -89,12 +89,17 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
   </div>;
 });
 
-function Thinking() {
-  return <span role="status" aria-label="AI is thinking" className="chess-thinking-circle inline-flex size-5 items-center justify-center">
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" strokeWidth="4.5">
-      <circle className="chess-thinking-track" cx="12" cy="12" r="9" />
-      <circle className="chess-thinking-progress" cx="12" cy="12" r="9" pathLength="100" strokeDasharray="100" transform="rotate(-90 12 12)" />
-    </svg>
+function Thinking({ since }: { since: number }) {
+  // The 250ms clock tick re-renders the page, so this live count stays fresh.
+  const elapsed = since ? Math.max(0, Date.now() - since) : 0;
+  return <span role="status" aria-label="AI is thinking" className="inline-flex items-center gap-1.5">
+    <span className="chess-thinking-circle inline-flex size-5 items-center justify-center">
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" strokeWidth="4.5">
+        <circle className="chess-thinking-track" cx="12" cy="12" r="9" />
+        <circle className="chess-thinking-progress" cx="12" cy="12" r="9" pathLength="100" strokeDasharray="100" transform="rotate(-90 12 12)" />
+      </svg>
+    </span>
+    <span className="font-mono text-xs tabular-nums opacity-80">{(elapsed / 1000).toFixed(1)}s</span>
   </span>;
 }
 
