@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { buildQuiz, type Q } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
@@ -23,9 +24,9 @@ export function Quiz({ mode, onClose }: { mode: Mode; onClose: () => void }) {
 
   useEffect(() => { if (done) addXp(score * 10); }, [done]); // eslint-disable-line
 
-  const q = qs[i]!;
+  const q = qs[i];
   const choose = (o: string) => {
-    if (picked) return;
+    if (picked || !q) return;
     setPicked(o);
     if (o === q.answer) setScore((s) => s + 1); else setLives((l) => l - 1);
     setTimeout(() => { setPicked(null); setI((n) => n + 1); }, mode.seconds ? 500 : 1100);
@@ -35,7 +36,7 @@ export function Quiz({ mode, onClose }: { mode: Mode; onClose: () => void }) {
     <div className="fixed inset-0 z-50 overflow-y-auto bg-background">
       <div className="mx-auto max-w-xl p-5">
         <div className="mb-6 flex items-center gap-3">
-          <button onClick={onClose} aria-label="Close"><X className="size-7" /></button>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close"><X className="size-7" /></Button>
           <div className="h-4 flex-1 overflow-hidden rounded-full border-2 bg-muted">
             <div className="h-full bg-success transition-all" style={{ width: `${(Math.min(i, qs.length) / qs.length) * 100}%` }} />
           </div>
@@ -43,26 +44,26 @@ export function Quiz({ mode, onClose }: { mode: Mode; onClose: () => void }) {
           {mode.seconds && <span className="font-semibold">⏱ {time}s</span>}
         </div>
         {done ? (
-          <div className="chunky mt-10 rounded-3xl bg-primary p-8 text-center text-primary-foreground">
+          <div className="chunky mt-10 rounded-lg bg-primary p-8 text-center text-primary-foreground">
             <p className="font-display text-5xl">{score}/{qs.length}</p>
             <p className="mt-2 text-lg">{mode.name} complete · +{score * 10} XP</p>
-            <button onClick={onClose} className="chunky chunky-press mt-6 rounded-full bg-cream px-6 py-3 font-semibold text-ink">Continue</button>
+            <Button onClick={onClose} className="chunky chunky-press mt-6 rounded-full bg-cream px-6 py-3 font-semibold text-ink">Continue</Button>
           </div>
         ) : (
           <>
             <p className="section-label">{mode.name}</p>
-            <h2 className="mt-2 mb-8 text-2xl font-bold">{q.prompt}</h2>
+            <h2 className="mt-2 mb-8 text-2xl font-bold">{q?.prompt}</h2>
             <div className="space-y-3">
-              {q.options.map((o) => {
+              {q?.options.map((o) => {
                 const state = picked && (o === q.answer ? "bg-success text-ink" : o === picked ? "bg-accent text-ink" : "bg-card");
                 return (
-                  <button key={o} onClick={() => choose(o)} className={`chunky chunky-press w-full rounded-2xl p-4 text-left text-lg font-semibold ${state || "bg-card"}`}>
+                  <Button variant="ghost" key={o} onClick={() => choose(o)} className={`chunky chunky-press h-auto min-h-14 w-full justify-start whitespace-normal rounded-lg p-4 text-left text-lg font-semibold ${state || "bg-card"}`}>
                     {o}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
-            {picked && q.note && <p className="mt-6 text-muted-foreground italic">{q.note}</p>}
+            {picked && q?.note && <p className="mt-6 text-muted-foreground italic">{q.note}</p>}
           </>
         )}
       </div>
