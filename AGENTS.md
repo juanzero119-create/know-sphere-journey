@@ -18,6 +18,7 @@
 - Keep custom navigation shortcuts in a browser-only, visit-scoped shared store with a fixed empty SSR snapshot; this preserves shortcuts across page navigation without adding persistence or server behavior.
 - Keep custom studies added from the Studies page in the same browser-only, visit-scoped store pattern; this isolates them from the built-in discipline cards.
 - Keep added AI model entries as visit-only interface settings, without implying a live provider connection; this separates model management from future AI execution.
+- Keep each chess colour's chosen AI model in the browser-only chess-models store (one selection per side, persisted separately) rather than a single shared choice; this lets White and Black run different models without adding a live provider connection.
 - Use licensed Cburnett chess piece assets with semantic board tokens; this keeps pieces readable on both square colors.
 - Keep the chess game (board, clocks, mode, AI move loop) in the module-level store src/lib/chess-store.ts, not in the route component; this lets the game and AI-vs-AI moves keep running while the user browses other tabs.
 - Keep per-side chess Elo targets in the visit-scoped chess store and validate them with a shared schema; this preserves difficulty across navigation and resets without claiming calibrated engine ratings.

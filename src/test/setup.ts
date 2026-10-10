@@ -7,7 +7,7 @@ if (typeof globalThis.ResizeObserver === "undefined") {
     unobserve() {}
     disconnect() {}
   }
-  (globalThis as Record<string, unknown>).ResizeObserver = ResizeObserverStub;
+  globalThis.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
 }
 
 Object.defineProperty(window, "scrollTo", {
