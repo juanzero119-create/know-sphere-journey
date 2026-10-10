@@ -5,6 +5,7 @@ import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { ModelManager } from '@/routes/ai';
+import { getAiMove } from '@/lib/chess-ai.functions';
 
 export const Route = createFileRoute('/chess')({
   head: () => ({ meta: [
@@ -38,6 +39,9 @@ function ChessPage() {
   const [lastMove, setLastMove] = useState<[Square, Square] | null>(null);
   const [clock, setClock] = useState({ w: BLITZ, b: BLITZ });
   const [started, setStarted] = useState(false);
+  const [vsAi, setVsAi] = useState(true);
+  const [thinking, setThinking] = useState(false);
+  const [aiNote, setAiNote] = useState('');
   const turn = game.turn();
   const flagged = clock.w <= 0 ? 'w' : clock.b <= 0 ? 'b' : null;
   const over = game.isGameOver() || !!flagged;
@@ -53,7 +57,7 @@ function ChessPage() {
   const checkSq = game.inCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === turn)?.square : undefined;
 
   function tap(r: number, c: number) {
-    if (over) return;
+    if (over || thinking || (vsAi && game.turn() === 'b')) return;
     const s = sq(r, c);
     const p = game.get(s);
     if (picked && targets.includes(s)) {
@@ -63,7 +67,24 @@ function ChessPage() {
     } else if (p && p.color === turn) setPicked(s === picked ? null : s);
     else setPicked(null);
   }
-  function reset() { setGame(new Chess()); setPicked(null); setLastMove(null); setClock({ w: BLITZ, b: BLITZ }); setStarted(false); }
+  useEffect(() => {
+    if (!vsAi || over || turn !== 'b' || thinking) return;
+    let cancelled = false;
+    const fen = game.fen();
+    const model = localStorage.getItem('lexi-ai-model') || 'openai/gpt-6-astra';
+    setThinking(true); setAiNote('');
+    getAiMove({ data: { fen, model } }).then(r => {
+      if (cancelled || game.fen() !== fen) return;
+      if ('error' in r && r.error) { setAiNote(r.error); return; }
+      if (!('move' in r) || !r.move) return;
+      const m = game.move(r.move);
+      setClock(cl => ({ ...cl, b: cl.b + INC }));
+      setLastMove([m.from, m.to]); setPicked(null); setTick(t => t + 1);
+      if (r.fallback) setAiNote('The AI gave an unclear answer, so a random legal move was played.');
+    }).catch(() => { if (!cancelled) setAiNote('The AI could not move. Try again.'); }).finally(() => { if (!cancelled) setThinking(false); });
+    return () => { cancelled = true; setThinking(false); };
+  }, [vsAi, over, turn, game, lastMove]);
+  function reset() { setAiNote(''); setGame(new Chess()); setPicked(null); setLastMove(null); setClock({ w: BLITZ, b: BLITZ }); setStarted(false); }
 
   const status = flagged ? `${flagged === 'w' ? 'White' : 'Black'} ran out of time — ${flagged === 'w' ? 'Black' : 'White'} wins`
     : game.isCheckmate() ? `Checkmate — ${turn === 'w' ? 'Black' : 'White'} wins`
@@ -89,7 +110,9 @@ function ChessPage() {
           }))}
         </div>
         <Clock side="b" />
-        <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><Button variant="outline" onClick={reset}>New game</Button></div>
+        <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex gap-2"><Button variant={vsAi ? 'secondary' : 'outline'} aria-pressed={vsAi} onClick={() => { setVsAi(v => !v); reset(); }}>{vsAi ? 'Vs AI' : '2 players'}</Button><Button variant="outline" onClick={reset}>New game</Button></div></div>
+        {vsAi && <p className="text-xs text-muted-foreground">You play White. The AI plays Black using the model chosen below.{thinking ? ' AI is thinking…' : ''}</p>}
+        {aiNote && <p role="alert" className="text-xs text-destructive">{aiNote}</p>}
         <p className="text-xs text-muted-foreground">Full rules: legal moves only, check, checkmate, castling, en passant, promotion. Clock starts after White's first move.</p>
         <p className="text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
       </div>
@@ -99,7 +122,7 @@ function ChessPage() {
         <ol className="grid grid-cols-[auto_1fr_1fr] gap-x-4 gap-y-1 font-mono text-sm">{Array.from({ length: Math.ceil(history.length / 2) }, (_, i) => <li key={i} className="contents"><span className="text-muted-foreground">{i + 1}.</span><span>{history[i * 2]}</span><span>{history[i * 2 + 1] ?? ''}</span></li>)}</ol>}
     </Section>
     <Section number="03" title="Chess AI">
-      <p className="text-sm text-muted-foreground">Choose the AI model for chess. Settings only — the AI does not play moves yet.</p>
+      <p className="text-sm text-muted-foreground">Choose the AI model for chess. The AI opponent plays Black with the model you pick here.</p>
     </Section>
     <ModelManager/>
     <Section number="06" title="How the pieces move">
