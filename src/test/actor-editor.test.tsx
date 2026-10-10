@@ -1,11 +1,12 @@
-import { fireEvent, render, screen, within, cleanup } from '@testing-library/react';
+import { fireEvent, screen, within, cleanup } from '@testing-library/react';
+import { renderWithRouter } from './router';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ActorEditor } from '@/components/ActorEditor';
 
 afterEach(cleanup);
 describe('Actor editor', () => {
  it('pre-loads the IMDb actor names without the six removed actors', () => {
-  render(<ActorEditor/>);
+  renderWithRouter(<ActorEditor/>);
   expect(screen.getAllByRole('article').length).toBe(100);
   expect(screen.getByText('Leonardo')).toBeInTheDocument();
   expect(screen.getByText('DiCaprio')).toBeInTheDocument();
@@ -18,7 +19,7 @@ describe('Actor editor', () => {
   }
  });
  it('adds, updates, and removes an actor with independent highlights', { timeout: 20000 }, () => {
-  render(<ActorEditor/>);
+  renderWithRouter(<ActorEditor/>);
   fireEvent.change(screen.getByLabelText('First name'), { target: { value: 'Anne' } });
   fireEvent.change(screen.getByLabelText('Last name'), { target: { value: 'Hathaway' } });
   fireEvent.click(screen.getByRole('button', { name: 'First-name highlight: Rose' }));
@@ -36,7 +37,7 @@ describe('Actor editor', () => {
   expect(screen.getAllByRole('article').length).toBe(100);
  });
  it('rejects whitespace-only names', () => {
-  render(<ActorEditor/>);
+  renderWithRouter(<ActorEditor/>);
   fireEvent.change(screen.getByLabelText('First name'), { target: { value: '  ' } });
   fireEvent.change(screen.getByLabelText('Last name'), { target: { value: 'Smith' } });
   fireEvent.click(screen.getByRole('button', { name: 'Add actor' }));
