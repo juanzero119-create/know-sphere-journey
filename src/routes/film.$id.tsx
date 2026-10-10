@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { useState } from 'react';
 import { ArrowLeft, Star } from 'lucide-react';
+import { FilmChip } from '@/components/FilmChip';
 import { FilmPoster } from '@/components/FilmPoster';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
