@@ -180,6 +180,9 @@ nav [data-status='active'] .nav-tile {
   --nav-tile-press: oklch(0.24 0 0);
 }
 .bottom-nav .nav-tile { box-shadow: none; }
+.bottom-nav a { color: var(--muted-foreground); }
+.bottom-nav [data-status='active'] { color: var(--foreground); }
+
 
 
 
