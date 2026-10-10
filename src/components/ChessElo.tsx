@@ -2,10 +2,12 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { eloLabel, eloPresets } from '@/lib/chess-elo';
 import { setChessElo, useChessStore } from '@/lib/chess-store';
+import { chooseChessModel, modelById, useChessModels, type ChessSide } from '@/lib/chess-models';
 
 export function ChessElo() {
   const { state } = useChessStore();
-  const sides: ('w' | 'b')[] = ['w', 'b'];
+  const { models, selected } = useChessModels();
+  const sides: ChessSide[] = ['w', 'b'];
   return <div className="space-y-5 border-t border-border pt-5">
     <div className="flex flex-wrap items-baseline justify-between gap-2">
       <h3 className="text-sm font-semibold">AI difficulty</h3>
@@ -15,6 +17,7 @@ export function ChessElo() {
       {sides.map(side => {
         const name = side === 'w' ? 'White AI' : 'Black AI';
         const elo = state.elo[side];
+        const current = modelById(models, selected[side]);
         return <div key={side} className="min-w-0 space-y-4">
           <div className="flex items-center justify-between gap-3">
             <label id={`elo-label-${side}`} className="text-sm font-medium">{name}</label>
@@ -29,6 +32,16 @@ export function ChessElo() {
               {eloPresets.map(preset => <SelectItem key={preset.elo} value={String(preset.elo)}>{preset.elo} · {preset.label}</SelectItem>)}
             </SelectContent>
           </Select>
+          <div className="space-y-2">
+            <span className="block text-sm font-medium">{name} model</span>
+            <Select value={current.id} onValueChange={id => chooseChessModel(side, id)}>
+              <SelectTrigger aria-label={`${name} model`}><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {models.map(model => <SelectItem key={model.id} value={model.id}>{model.name} · {model.maker}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <p className="break-all text-xs text-muted-foreground">{current.maker} · {current.id}</p>
+          </div>
         </div>;
       })}
     </div>
