@@ -113,6 +113,35 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Recover once from stale module chunks (e.g. after an update) instead of a blank screen.
+  useEffect(() => {
+    const key = "lexi-chunk-reload";
+    const isChunkError = (msg: string) =>
+      /Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i.test(msg);
+    const recover = (msg: string) => {
+      if (!isChunkError(msg) || sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+      window.location.reload();
+    };
+    const onPreload = (e: Event) => {
+      e.preventDefault();
+      recover("Importing a module script failed");
+    };
+    const onRejection = (e: PromiseRejectionEvent) => recover(String(e.reason?.message ?? e.reason));
+    const onError = (e: ErrorEvent) => recover(String(e.message));
+    window.addEventListener("vite:preloadError", onPreload);
+    window.addEventListener("unhandledrejection", onRejection);
+    window.addEventListener("error", onError);
+    const clear = window.setTimeout(() => sessionStorage.removeItem(key), 10000);
+    return () => {
+      window.removeEventListener("vite:preloadError", onPreload);
+      window.removeEventListener("unhandledrejection", onRejection);
+      window.removeEventListener("error", onError);
+      window.clearTimeout(clear);
+    };
+  }, []);
+
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
