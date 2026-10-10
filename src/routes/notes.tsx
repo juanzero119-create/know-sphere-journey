@@ -50,23 +50,36 @@ function Notes() {
   const [color, setColor] = useState<NoteColor>('gold');
   const [selection, setSelection] = useState({ start: 0, end: 0 });
   const editor = useRef<HTMLTextAreaElement>(null);
+  const backdrop = useRef<HTMLDivElement>(null);
+  const settleTimer = useRef<number | undefined>(undefined);
+  const colorRef = useRef(color);
+  colorRef.current = color;
+  useEffect(() => () => window.clearTimeout(settleTimer.current), []);
+  const applyEditorSelection = () => {
+    const element = editor.current;
+    if (!element || element.selectionStart === element.selectionEnd) return;
+    const { selectionStart: start, selectionEnd: end } = element;
+    setHighlights(old => applyHighlight(old, start, end, colorRef.current));
+    setSelection({ start, end });
+    // Collapse the selection so the system's blue selection gives way to the app's highlight.
+    element.setSelectionRange(end, end);
+  };
   const captureSelection = () => {
     const element = editor.current;
-    if (element) setSelection({ start: element.selectionStart, end: element.selectionEnd });
+    if (!element) return;
+    setSelection({ start: element.selectionStart, end: element.selectionEnd });
+    // Phones adjust selections with drag handles that never send a pointer-up to the box,
+    // so apply the highlight once the selection stops changing.
+    window.clearTimeout(settleTimer.current);
+    if (element.selectionStart !== element.selectionEnd) settleTimer.current = window.setTimeout(applyEditorSelection, 700);
   };
   const highlightSelection = (chosen: NoteColor | null) => {
     setHighlights(old => applyHighlight(old, selection.start, selection.end, chosen));
     editor.current?.focus();
-    editor.current?.setSelectionRange(selection.start, selection.end);
+    editor.current?.setSelectionRange(selection.end, selection.end);
   };
   const highlightDraggedText = () => {
-    requestAnimationFrame(() => {
-      const element = editor.current;
-      if (!element || element.selectionStart === element.selectionEnd) return;
-      const { selectionStart: start, selectionEnd: end } = element;
-      setSelection({ start, end });
-      setHighlights(old => applyHighlight(old, start, end, color));
-    });
+    requestAnimationFrame(() => { window.clearTimeout(settleTimer.current); applyEditorSelection(); });
   };
   const highlightSavedText = (element: HTMLParagraphElement, note: Note) => {
     const selected = window.getSelection();
