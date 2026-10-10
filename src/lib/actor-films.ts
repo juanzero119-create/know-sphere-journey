@@ -50,6 +50,7 @@ const rows: Row[] = [
  ['unforgiven','Unforgiven',1992,130,'R','Drama/Western','Clint Eastwood',8.2,'A retired gunslinger takes one last job.',[['Clint Eastwood','William Munny'],['Gene Hackman','Little Bill'],['Morgan Freeman','Ned Logan']]],
  ['mystic-river','Mystic River',2003,138,'R','Crime/Drama/Mystery','Clint Eastwood',7.9,'A murder reunites three childhood friends scarred by the past.',[['Sean Penn','Jimmy Markum'],['Tim Robbins','Dave Boyle']]],
  ['fellowship-of-the-ring','The Lord of the Rings: The Fellowship of the Ring',2001,178,'PG-13','Action/Adventure/Drama','Peter Jackson',8.9,'A hobbit and companions set out to destroy a powerful ring.',[['Ian McKellen','Gandalf']]],
+ ['the-fugitive','The Fugitive',1993,130,'PG-13','Action/Crime/Thriller','Andrew Davis',7.8,'A doctor wrongly convicted of his wife’s murder escapes custody and hunts the real killer.',[['Tommy Lee Jones','Samuel Gerard']]],
  ['the-pianist','The Pianist',2002,150,'R','Biography/Drama/Music','Roman Polanski',8.5,'A Jewish pianist struggles to survive the destruction of the Warsaw ghetto.',[['Adrien Brody','Władysław Szpilman']]],
 ];
 
