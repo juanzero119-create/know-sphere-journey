@@ -320,3 +320,10 @@ html.press-highlighting, html.press-highlighting * {
   touch-action: none;
 }
 html.press-highlighting textarea { caret-color: transparent; }
+
+/* Launched from the iPhone home screen: keep the top bar clear of the status bar. */
+.app-header { padding-top: env(safe-area-inset-top); height: calc(4rem + env(safe-area-inset-top)); }
+
+/* Home-screen launch: no rubber-band reveal behind the page, no blue tap flash. */
+html { overscroll-behavior-y: none; background: var(--background); }
+body { -webkit-tap-highlight-color: transparent; }
