@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, Briefcase, ChevronLeft, ChevronRight, Gauge, Heart, HelpCircle, PenLine, Repeat, RotateCcw, Search, Shuffle, Smile, Timer, Users, Zap } from "lucide-react";
+import { ArrowRight, BookOpen, Briefcase, ChevronLeft, ChevronRight, Gauge, Heart, HelpCircle, PenLine, Repeat, RotateCcw, Shuffle, Smile, Timer, Users, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Section } from "@/components/Section";
 import { useState } from "react";
 import { Shell } from "@/components/Shell";
 import { Quiz, type Mode } from "@/components/Quiz";
 import { partsOfSpeech, words, type PartOfSpeech } from "@/lib/data";
 import { categories, categoryQuiz, fillInTheGap, gameShuffle, guessTheWord, matchSynonyms, meaningMatch } from "@/lib/word-games";
+import { WordLibrary } from "@/components/WordLibrary";
 
 export const Route = createFileRoute("/words")({
   head: () => ({
@@ -24,9 +24,8 @@ export const Route = createFileRoute("/words")({
 });
 
 function Words() {
- const [i,setI]=useState(0); const [flip,setFlip]=useState(false); const [quiz,setQuiz]=useState(false); const [search,setSearch]=useState(''); const [posFilter,setPosFilter]=useState<PartOfSpeech|null>(null); const [game,setGame]=useState<Mode|null>(null);
+ const [i,setI]=useState(0); const [flip,setFlip]=useState(false); const [quiz,setQuiz]=useState(false); const [posFilter,setPosFilter]=useState<PartOfSpeech|null>(null); const [game,setGame]=useState<Mode|null>(null);
  const w=words[i]; if(!w) return null;
- const list=words.filter(w=>(!posFilter||w.pos===posFilter)&&`${w.word} ${w.meaning}`.toLowerCase().includes(search.toLowerCase()));
  return <Shell title="Vocabulary">
  <Section number="01" title="Daily flashcards" subtitle="Essential vocabulary · Collection 01" action={<span className="text-sm text-muted-foreground">{i+1} / {words.length}</span>}>
  <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]"><div><Button variant="ghost" aria-label="Flip vocabulary card" onClick={()=>setFlip(!flip)} className="flex h-64 w-full flex-col whitespace-normal rounded-lg border border-border bg-card px-6 text-center hover:bg-card"><span className="text-xs font-normal text-muted-foreground">{flip ? 'DEFINITION' : 'WORD OF THE MOMENT'}</span><span className="mt-2 rounded-full border border-border px-3 py-0.5 text-xs font-normal uppercase tracking-wide text-muted-foreground">{w.pos}</span><span className={flip?'mt-4 text-xl font-semibold':'mt-4 text-4xl font-semibold'}>{flip?w.meaning:w.word}</span>{flip && <span className="mt-4 text-sm font-normal italic text-muted-foreground">“{w.example}”</span>}<RotateCcw className="mt-6 text-muted-foreground"/></Button><div className="mt-3 flex items-center justify-between"><Button variant="outline" size="icon" title="Previous word" aria-label="Previous word" onClick={()=>{setFlip(false);setI((i-1+words.length)%words.length)}}><ChevronLeft/></Button><span className="text-xs text-muted-foreground">{String(i+1).padStart(2,'0')} — {String(words.length).padStart(2,'0')}</span><Button variant="outline" size="icon" title="Next word" aria-label="Next word" onClick={()=>{setFlip(false);setI((i+1)%words.length)}}><ChevronRight/></Button></div></div><div className="self-center"><BookOpen className="mb-4 size-7 text-muted-foreground"/><h3 className="text-xl font-semibold">Put your words to work.</h3><p className="mt-3 text-sm leading-relaxed text-muted-foreground">Meaning is only the beginning. Connect each word to its example, then test your recall.</p><div className="my-5 flex gap-5 text-sm"><span>6 questions</span><span className="text-muted-foreground">Up to 60 XP</span></div><Button onClick={()=>setQuiz(true)}>Start vocabulary quiz <ArrowRight/></Button></div></div>
