@@ -128,3 +128,7 @@
 # Bug audit
 - [x] Validate saved word-list entries so damaged data cannot crash Vocabulary.
 - [x] Verify recovery, page navigation and existing tests.
+
+# Split combined word entry
+- [x] Replace "Bureaucratic charlatan" with separate Bureaucrat and Charlatan entries, each with its own meaning, example, synonym and full definition.
+- [x] Verify both words appear in the library, topics and flashcards with their own details.
