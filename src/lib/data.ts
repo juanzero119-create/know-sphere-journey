@@ -76,6 +76,8 @@ export const words: { word: string; meaning: string; example: string; pos: PartO
   { word: "Demagogue", meaning: "A leader who stirs people up with emotions and prejudice", example: "The demagogue blamed every woe on outsiders.", pos: "noun", synonym: "Rabble-rouser" },
   { word: "Dilettante", meaning: "A dabbler with only a superficial interest", example: "A dilettante with no real training.", pos: "noun", synonym: "Amateur" },
   { word: "Cynical", meaning: "Distrustful of people’s motives", example: "She was cynical about the charity’s motives.", pos: "adjective", synonym: "Skeptical" },
+  { word: "Kleptocracy", meaning: "A state whose rulers use their offices to steal public wealth", example: "Billions vanished while a kleptocracy ran the treasury.", pos: "noun", synonym: "Corrupt regime" },
+  { word: "Hegemony", meaning: "Dominion of one group or state over others", example: "The treaty left the empire’s hegemony over the region intact.", pos: "noun", synonym: "Supremacy" },
 ];
 
 export const anatomy: { part: string; system: string; fact: string }[] = [
