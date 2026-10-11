@@ -25,15 +25,15 @@ describe("ExploreTopics", () => {
   it("opens a topic and shows its words with detail keys", async () => {
     await renderWithRouter(<ExploreTopics onPickPos={() => {}} />);
     fireEvent.click(screen.getByRole("button", { name: /Emotions/ }));
-    expect(screen.getByText("Euphoria")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Show full definition of Euphoria/ }));
-    expect(screen.getByText(/Intense happiness/)).toBeInTheDocument();
+    expect(screen.getByText("Animosity")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Show full definition of Animosity/ }));
+    expect(screen.getByText(/Strong hostility/)).toBeInTheDocument();
   });
 
   it("filters topics by search", async () => {
     await renderWithRouter(<ExploreTopics onPickPos={() => {}} />);
-    fireEvent.change(screen.getByLabelText("Search topics"), { target: { value: "slang" } });
-    expect(screen.getByRole("button", { name: /Slang/ })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Search topics"), { target: { value: "talking" } });
+    expect(screen.getByRole("button", { name: /Talking/ })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Emotions/ })).not.toBeInTheDocument();
   });
 
