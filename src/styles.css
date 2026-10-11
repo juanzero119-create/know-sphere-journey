@@ -50,6 +50,8 @@
   --color-name-teal: var(--name-teal);
   --color-name-lime: var(--name-lime);
   --color-name-olive: var(--name-olive);
+  --color-name-coral: var(--name-coral);
+  --color-name-cyan: var(--name-cyan);
   --color-play: var(--play);
   --color-play-foreground: var(--play-foreground);
 }
@@ -97,6 +99,8 @@
   --name-teal: oklch(0.84 0.08 200);
   --name-lime: oklch(0.88 0.12 125);
   --name-olive: oklch(0.82 0.08 110);
+  --name-coral: oklch(0.81 0.13 25);
+  --name-cyan: oklch(0.88 0.1 215);
   --name-on: oklch(0.2 0 0);
   --chip: oklch(0.34 0 0);
   --chip-foreground: oklch(0.93 0 0);
@@ -327,13 +331,20 @@ nav [data-status='active'] .nav-tile {
 
 /* Name highlight chips stay bright, so their text goes dark. */
 .bg-name-gold, .bg-name-blue, .bg-name-rose, .bg-name-green,
-.bg-name-orange, .bg-name-purple, .bg-name-teal, .bg-name-lime, .bg-name-olive { color: var(--name-on); }
+.bg-name-orange, .bg-name-purple, .bg-name-teal, .bg-name-lime, .bg-name-olive,
+.bg-name-coral, .bg-name-cyan { color: var(--name-on); }
 
 /* Notes: selecting text shows the chosen highlight color instead of the system blue. */
 .note-select { --note-sel: var(--name-gold); }
 .note-select[data-color='blue'] { --note-sel: var(--name-blue); }
 .note-select[data-color='rose'] { --note-sel: var(--name-rose); }
 .note-select[data-color='green'] { --note-sel: var(--name-green); }
+.note-select[data-color='orange'] { --note-sel: var(--name-orange); }
+.note-select[data-color='coral'] { --note-sel: var(--name-coral); }
+.note-select[data-color='purple'] { --note-sel: var(--name-purple); }
+.note-select[data-color='cyan'] { --note-sel: var(--name-cyan); }
+.note-select[data-color='teal'] { --note-sel: var(--name-teal); }
+.note-select[data-color='lime'] { --note-sel: var(--name-lime); }
 .note-select ::selection, .note-select::selection { background: var(--note-sel); color: var(--name-on); }
 .note-editor-input { color: transparent; caret-color: var(--foreground); -webkit-text-fill-color: transparent; }
 .note-editor-input::placeholder { -webkit-text-fill-color: var(--muted-foreground); }

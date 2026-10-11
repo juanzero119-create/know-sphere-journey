@@ -1,8 +1,14 @@
 export const noteColors = [
-  { id: 'gold', label: 'Gold', className: 'bg-name-gold' },
+  { id: 'gold', label: 'Yellow', className: 'bg-name-gold' },
+  { id: 'orange', label: 'Orange', className: 'bg-name-orange' },
+  { id: 'coral', label: 'Coral', className: 'bg-name-coral' },
+  { id: 'rose', label: 'Pink', className: 'bg-name-rose' },
+  { id: 'purple', label: 'Purple', className: 'bg-name-purple' },
   { id: 'blue', label: 'Blue', className: 'bg-name-blue' },
-  { id: 'rose', label: 'Rose', className: 'bg-name-rose' },
+  { id: 'cyan', label: 'Cyan', className: 'bg-name-cyan' },
+  { id: 'teal', label: 'Teal', className: 'bg-name-teal' },
   { id: 'green', label: 'Green', className: 'bg-name-green' },
+  { id: 'lime', label: 'Lime', className: 'bg-name-lime' },
 ] as const;
 export type BaseNoteColor = (typeof noteColors)[number]['id'];
 // Blended colors produced by highlighting over a different color.
