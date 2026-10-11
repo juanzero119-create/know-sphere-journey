@@ -34,7 +34,7 @@ const collectionSchema = z.object({
   words: z.array(z.string()).catch([]),
 });
 
-function validEntries<T>(value: unknown, schema: z.ZodType<T>): T[] {
+function validEntries<S extends z.ZodTypeAny>(value: unknown, schema: S): z.output<S>[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap(entry => {
     const result = schema.safeParse(entry);
@@ -54,10 +54,10 @@ function load(): Lists {
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return empty;
     const stored = parsed as Record<string, unknown>;
     return {
-      favorites: validEntries(stored.favorites, z.string()),
-      customWords: validEntries(stored.customWords, customWordSchema),
-      history: validEntries(stored.history, z.string()),
-      collections: validEntries(stored.collections, collectionSchema),
+      favorites: validEntries(stored['favorites'], z.string()),
+      customWords: validEntries(stored['customWords'], customWordSchema),
+      history: validEntries(stored['history'], z.string()),
+      collections: validEntries(stored['collections'], collectionSchema),
     };
   } catch {
     return empty;
