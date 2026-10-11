@@ -119,3 +119,8 @@
 - [x] Give every topic its own word list opened in a panel with compact rows and detail keys.
 - [x] Make Favorites, Collections, Your own words and History functional and saved on the device.
 - [x] Verify with tests and on a phone-sized screen.
+
+# Dictionary-style word details
+- [ ] Add original expanded meanings, pronunciation, examples and usage facts for every built-in vocabulary word.
+- [ ] Show the same rich details in the library, topics and flashcards while keeping closed rows compact.
+- [ ] Verify coverage, detail controls and mobile readability.
