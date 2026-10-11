@@ -178,7 +178,7 @@ function Notes() {
     update(notesRef.current.map(item => item.id === id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
     if (editingId === id && draftBody === note.body) setHighlights(nextHighlights);
   });
-  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, hitAt(base, drag.anchor) ? null : color) : base;
+  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, drag.end < drag.anchor && hitAt(base, drag.anchor) ? null : color) : base;
 
   useEffect(() => {
     // iPhone: stop Safari's own long-press loupe in the writing box so press-and-hold
