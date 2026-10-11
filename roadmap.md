@@ -136,3 +136,8 @@
 # Alphabetical sorting
 - [x] Add a shared alphabetical sorting algorithm (collator-based, numeric-aware, accent-insensitive, stable) and use it for the word library, films, actors, videos and search tie-breaks.
 - [x] Add an A–Z / Z–A toggle to the word library and verify ordering live on mobile and desktop.
+
+# Added words: Kleptocracy and Hegemony
+- [x] Add Kleptocracy and Hegemony to the word library with meaning, example, synonym and part of speech.
+- [x] Place both in the Society, Advanced, GRE and Greek root topic panels.
+- [x] Write full definitions with pronunciation, second example and word fact, and verify the detail panels open live.
