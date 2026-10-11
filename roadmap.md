@@ -126,5 +126,5 @@
 - [x] Verify coverage, detail controls and mobile readability.
 
 # Bug audit
-- [ ] Validate saved word-list entries so damaged data cannot crash Vocabulary.
-- [ ] Verify recovery, page navigation and existing tests.
+- [x] Validate saved word-list entries so damaged data cannot crash Vocabulary.
+- [x] Verify recovery, page navigation and existing tests.

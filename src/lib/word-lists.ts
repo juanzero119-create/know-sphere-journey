@@ -8,7 +8,7 @@ import { z } from "zod";
  * hook in sync within the visit.
  */
 
-export type CustomWord = TopicWord & { custom?: boolean };
+export type CustomWord = TopicWord & { custom?: boolean | undefined };
 export type Collection = { id: string; name: string; words: string[] };
 
 type Lists = {
