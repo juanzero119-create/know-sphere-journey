@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { adjustHighlights, applyHighlight, colorClass, isNoteColor, noteColors } from '@/lib/note-highlights';
+import { adjustHighlights, applyHighlight, blendColors, colorClass, isNoteColor, noteColors } from '@/lib/note-highlights';
 
 describe('note highlighting', () => {
   it('offers ten unique colors and preserves saved blend colors', () => {
@@ -9,6 +9,13 @@ describe('note highlighting', () => {
       expect(isNoteColor(color.id)).toBe(true);
       expect(colorClass(color.id)).toBe(color.className);
       expect(applyHighlight([], 0, 5, color.id)).toEqual([{ start: 0, end: 5, color: color.id }]);
+    }
+    for (const a of noteColors) for (const b of noteColors) {
+      expect(blendColors(a.id, b.id)).toBe(blendColors(b.id, a.id));
+      if (a.id !== b.id) {
+        expect(blendColors(a.id, b.id)).not.toBe(a.id);
+        expect(blendColors(a.id, b.id)).not.toBe(b.id);
+      }
     }
     expect(isNoteColor('olive')).toBe(true);
     expect(isNoteColor('unknown')).toBe(false);
