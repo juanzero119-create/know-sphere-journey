@@ -8,6 +8,7 @@ import { playGameEndSound, playMoveSound } from '@/lib/chess-sounds';
 import { recordRatedGame } from '@/lib/chess-rating';
 
 export type ChessMode = 'ai' | '2p' | 'aivai';
+export type ChessOrientation = 'w' | 'b';
 
 const startMs = (time: ChessTime) => time.minutes * 60 * 1000;
 const incMs = (time: ChessTime) => time.incrementSec * 1000;
@@ -18,6 +19,7 @@ export interface ChessState {
   started: boolean;
   mode: ChessMode;
   humanSide: 'w' | 'b';
+  orientation: ChessOrientation;
   lastMove: [Square, Square] | null;
   thinking: boolean;
   thinkingSince: number;
@@ -34,6 +36,7 @@ const initialState: ChessState = {
   started: false,
   mode: 'ai',
   humanSide: 'w',
+  orientation: 'w',
   lastMove: null,
   thinking: false,
   thinkingSince: 0,
@@ -231,6 +234,7 @@ export function resetChess(mode?: ChessMode) {
     version: state.version + 1,
     mode: nextMode,
     humanSide: state.humanSide,
+    orientation: state.orientation,
     clock: { w: startMs(state.time), b: startMs(state.time) },
     elo: { ...state.elo },
     time: { ...state.time },
@@ -247,7 +251,8 @@ export function setChessMode(mode: ChessMode) {
 
 export function setChessHumanSide(side: 'w' | 'b') {
   if (state.humanSide === side) return;
-  state = { ...state, humanSide: side, version: state.version + 1 };
+  // Picking a colour also turns the board so that colour is closest to you.
+  state = { ...state, humanSide: side, orientation: side, version: state.version + 1 };
   resetChess();
 }
 
@@ -264,6 +269,18 @@ export function setChessTime(time: ChessTime) {
   if (parsed.data.minutes === state.time.minutes && parsed.data.incrementSec === state.time.incrementSec) return;
   state = { ...state, time: parsed.data };
   resetChess(); // new clocks apply from the next game
+}
+
+// Which colour sits at the bottom of the board. Visit-scoped like the rest of
+// the game: a flip survives navigating to other tabs, and a new game keeps it.
+export function setChessOrientation(orientation: ChessOrientation) {
+  if (state.orientation === orientation) return;
+  state = { ...state, orientation };
+  emit();
+}
+
+export function flipChessBoard() {
+  setChessOrientation(state.orientation === 'w' ? 'b' : 'w');
 }
 
 export function setChessPaused(paused: boolean) {
