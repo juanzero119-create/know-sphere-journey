@@ -150,3 +150,8 @@
 # New game is ready, not paused
 - [x] Make a new game start unpaused and ready, with the AI holding its first move until Play is pressed.
 - [x] Show "Ready" in the game status and verify New game, Play and Pause live on the Chess page.
+
+# Flip the board between white and black
+- [x] Add a flip control that turns the board so the chosen colour is closest to you, with the clocks following.
+- [x] Orient the board to the colour the human picks and keep the chosen side through a new game.
+- [x] Verify flipping, clock order and a move made after flipping live on the Chess page.
