@@ -188,10 +188,21 @@ async function maybeAiMove() {
   }
 }
 
+// Play a few random legal opening plies so every new game starts from a
+// different position. Kept modest (6 plies) so the game is still fresh.
+function randomizeOpening(g: Chess) {
+  for (let i = 0; i < 6; i++) {
+    const moves = g.moves();
+    if (!moves.length) break;
+    g.move(moves[Math.floor(Math.random() * moves.length)]);
+  }
+}
+
 export function resetChess(mode?: ChessMode) {
   stopClock();
   endSoundPlayed = false;
   game = new Chess();
+  randomizeOpening(game);
   const nextMode = mode ?? state.mode;
   // When the AI moves first (AI vs AI, or the human chose Black), hold the
   // new game paused until the player presses Play — nothing moves on its own.
