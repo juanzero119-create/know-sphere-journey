@@ -189,7 +189,9 @@ export const topicGroups: TopicGroup[] = [
       {
         id: "business", label: "Business", icon: Briefcase, blurb: "Words for work and trade.",
         words: [
-          w("Bureaucratic charlatan", "A fake expert hiding behind official procedure", "A bureaucratic charlatan sold worthless permits.", "noun", "Fraud"),
+          w("Bureaucrat", "An official who works through fixed rules and paperwork", "A bureaucrat buried the application in forms.", "noun", "Functionary"),
+          w("Charlatan", "A fake expert who pretends to have special skill or knowledge", "The miracle cure was sold by a charlatan.", "noun", "Fraud"),
+
           w("Pragmatic", "Dealing with things in a practical way", "A pragmatic fix saved time and money.", "adjective", "Practical"),
           w("Meticulous", "Extremely careful about small details", "Meticulous notes made the audit easy.", "adjective", "Thorough"),
           w("Acculturate", "To adopt the customs of another culture", "Immigrants acculturate over generations.", "verb", "Assimilate"),
@@ -237,7 +239,9 @@ export const topicGroups: TopicGroup[] = [
         id: "french-root", label: "French root", icon: Landmark, blurb: "Words that came via French.",
         words: [
           w("Opaque", "Not transparent; hard to understand", "The report was deliberately opaque.", "adjective", "Unclear"),
-          w("Bureaucratic charlatan", "A fake expert hiding behind official procedure", "A bureaucratic charlatan sold worthless permits.", "noun", "Fraud"),
+          w("Bureaucrat", "An official who works through fixed rules and paperwork", "A bureaucrat buried the application in forms.", "noun", "Functionary"),
+          w("Charlatan", "A fake expert who pretends to have special skill or knowledge", "The miracle cure was sold by a charlatan.", "noun", "Fraud"),
+
         ],
       },
       {
