@@ -29,7 +29,7 @@ export function WordLibrary({ posFilter }: { posFilter: PartOfSpeech | null }) {
           className="h-9 bg-card pl-9 text-sm"
         />
       </div>
-      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 grid items-start gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {list.map(w => {
           const shown = open === w.word;
           return (
@@ -49,7 +49,7 @@ export function WordLibrary({ posFilter }: { posFilter: PartOfSpeech | null }) {
                   aria-label={`${shown ? "Hide" : "Show"} full definition of ${w.word}`}
                   title="Full definition"
                   onClick={() => setOpen(shown ? null : w.word)}
-                  className="chip-icon ml-auto"
+                  className="chip-icon ml-auto h-7 w-7 p-0"
                 >
                   {shown ? <X className="size-3.5" /> : <Info className="size-3.5" />}
                 </Button>
