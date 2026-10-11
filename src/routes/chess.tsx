@@ -9,8 +9,8 @@ import { ChessElo } from '@/components/ChessElo';
 import { ChessTime } from '@/components/ChessTime';
 import { timeLabel } from '@/lib/chess-time';
 import { ChessRating } from '@/components/ChessRating';
-import { Pause, Play, Volume2, VolumeX } from 'lucide-react';
-import { playMove, resetChess, setChessHumanSide, setChessMode, setChessPaused, startChess, useChessStore } from '@/lib/chess-store';
+import { FlipVertical, Pause, Play, Volume2, VolumeX } from 'lucide-react';
+import { flipChessBoard, playMove, resetChess, setChessHumanSide, setChessMode, setChessPaused, startChess, useChessStore, type ChessOrientation } from '@/lib/chess-store';
 import { setChessMuted, useChessMuted } from '@/lib/chess-sounds';
 
 export const Route = createFileRoute('/chess')({
@@ -41,13 +41,15 @@ interface BoardProps {
   picked: Square | null;
   lastMove: [Square, Square] | null;
   interactive: boolean;
+  orientation: ChessOrientation;
   onTap: (r: number, c: number) => void;
 }
 
 // Memoized so clock ticks (which bump state but not these props) don't
 // re-render the 64 squares — the board only repaints on real moves.
-const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }: BoardProps) {
+const Board = memo(function Board({ game, picked, lastMove, interactive, orientation, onTap }: BoardProps) {
   const turn = game.turn();
+  const flip = orientation === 'b';
   const targets = picked ? game.moves({ square: picked, verbose: true }).map(m => m.to) : [];
   const checkSq = game.inCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === turn)?.square : undefined;
 
@@ -72,20 +74,24 @@ const Board = memo(function Board({ game, picked, lastMove, interactive, onTap }
     return () => { cancelAnimationFrame(raf); clearTimeout(t); };
   }, [anim]);
 
-  const rc = (s: Square) => ({ r: Number(s[1]!) - 1, c: FILES.indexOf(s[0]!) });
+  // Display coordinates: on a flipped board every square's row and column are
+  // mirrored, so the sliding-piece overlay has to travel the mirrored way too.
+  const rc = (s: Square) => { const r = Number(s[1]!) - 1; const c = FILES.indexOf(s[0]!); return flip ? { r: 7 - r, c: 7 - c } : { r, c }; };
   const a1 = anim ? rc(anim.from) : null;
   const a2 = anim ? rc(anim.to) : null;
 
-  return <div role="group" aria-label="Chess board" className="relative grid aspect-square w-full grid-cols-8 overflow-hidden">
-    {Array.from({ length: 8 }, (_, r) => Array.from({ length: 8 }, (_, c) => {
+  return <div role="group" aria-label={flip ? 'Chess board, black at the bottom' : 'Chess board, white at the bottom'} className="relative grid aspect-square w-full grid-cols-8 overflow-hidden">
+    {Array.from({ length: 8 }, (_, dr) => Array.from({ length: 8 }, (_, dc) => {
+      // dr/dc are the visible cell; r/c the real square it shows.
+      const r = flip ? 7 - dr : dr; const c = flip ? 7 - dc : dc;
       const s = sq(r, c); const p = game.get(s); const isTarget = targets.includes(s);
       return <Button variant="ghost" key={s} aria-label={`Square ${s}${p ? ' ' + (p.color === 'w' ? 'white' : 'black') + ' ' + pieceNames[p.type] : ''}`} aria-pressed={picked === s} onClick={() => interactive && onTap(r, c)} className={'chess-square relative h-auto min-w-0 rounded-none p-0 aspect-square ' + ((r + c) % 2 ? 'chess-dark ' : '') + (lastMove?.includes(s) || picked === s ? 'chess-last' : '')}>
         {lastMove?.[0] === s && <span aria-hidden="true" className="chess-square chess-origin absolute inset-0"/>}
         {checkSq === s && <span aria-hidden="true" className="absolute inset-0 bg-destructive/60"/>}
         {p && anim?.to !== s && <img src={pieceUrl(p.color, p.type)} alt="" draggable={false} className="relative h-[90%] w-[90%] object-contain"/>}
         {isTarget && (p ? <span aria-hidden="true" className="absolute inset-[4%] rounded-full border-4 border-ink/30"/> : <span aria-hidden="true" className="absolute size-1/3 rounded-full bg-ink/25"/>)}
-        {r === 0 && <span aria-hidden="true" className="absolute right-1 top-0.5 text-xs font-semibold sm:right-2 sm:top-1 sm:text-base">{FILES[c]}</span>}
-        {c === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
+        {dr === 0 && <span aria-hidden="true" className="absolute right-1 top-0.5 text-xs font-semibold sm:right-2 sm:top-1 sm:text-base">{FILES[c]}</span>}
+        {dc === 0 && <span aria-hidden="true" className="absolute bottom-0.5 left-1 text-xs font-semibold sm:bottom-1 sm:left-2 sm:text-base">{r + 1}</span>}
       </Button>;
     }))}
     {anim && a1 && a2 && <img src={pieceUrl(anim.color, anim.type)} alt="" aria-hidden="true" draggable={false} className="pointer-events-none absolute z-10 object-contain transition-transform duration-200 ease-out" style={{ left: `${a1.c * 12.5}%`, top: `${a1.r * 12.5}%`, width: '12.5%', height: '12.5%', padding: '0.4%', transform: animGo ? `translate(${(a2.c - a1.c) * 100}%, ${(a2.r - a1.r) * 100}%)` : 'none' }} />}
@@ -115,7 +121,7 @@ function ChessPage() {
   const { game, state } = useChessStore();
   const [picked, setPicked] = useState<Square | null>(null);
   const muted = useChessMuted();
-  const { clock, mode, humanSide, lastMove, thinking, aiNote, paused, playPressed } = state;
+  const { clock, mode, humanSide, orientation, lastMove, thinking, aiNote, paused, playPressed } = state;
   const turn = game.turn();
   const flagged = clock.w <= 0 ? 'w' : clock.b <= 0 ? 'b' : null;
   const over = game.isGameOver() || !!flagged;
@@ -145,9 +151,9 @@ function ChessPage() {
   return <Shell title="Chess">
     <Section number="01" title={`Game · ${timeLabel(state.time)}`}>
       <div className="mx-auto max-w-2xl space-y-2">
-        {renderClock('w')}
-        <Board game={game} picked={picked} lastMove={lastMove} interactive={interactive} onTap={tap} />
-        {renderClock('b')}
+        {renderClock(orientation === 'w' ? 'b' : 'w')}
+        <Board game={game} picked={picked} lastMove={lastMove} interactive={interactive} orientation={orientation} onTap={tap} />
+        {renderClock(orientation)}
         <div className="flex items-center justify-between gap-3 pt-2"><span role="status" className="text-sm font-semibold">{status}</span><div className="flex flex-wrap gap-2"><Button size="icon" variant="outline" aria-pressed={muted} aria-label={muted ? 'Unmute the sounds' : 'Mute the sounds'} title={muted ? 'Unmute' : 'Mute'} onClick={() => setChessMuted(!muted)}>{muted ? <VolumeX /> : <Volume2 />}</Button>{mode !== '2p' && !over && <><Button size="icon" variant="outline" aria-pressed={paused} aria-label="Pause the game" title="Pause" className={playPressed && paused ? 'btn-pause-paused' : undefined} onClick={() => setChessPaused(true)}><Pause /></Button><Button size="icon" variant="outline" aria-pressed={!paused} aria-label={paused ? 'Start the game' : 'Play the game'} title={paused ? 'Start' : 'Play'} className={playPressed && !paused ? 'btn-play-live' : undefined} onClick={() => startChess()}><Play /></Button></>}<Button variant={mode === 'ai' ? 'secondary' : 'outline'} aria-pressed={mode === 'ai'} onClick={() => setChessMode('ai')}>Vs AI</Button><Button variant={mode === '2p' ? 'secondary' : 'outline'} aria-pressed={mode === '2p'} onClick={() => setChessMode('2p')}>2 players</Button><Button variant={mode === 'aivai' ? 'secondary' : 'outline'} aria-pressed={mode === 'aivai'} onClick={() => setChessMode('aivai')}>AI vs AI</Button><Button variant="outline" onClick={() => resetChess()}>New game</Button></div></div>
         {mode === 'ai' && <div className="flex flex-wrap items-center gap-2"><span className="text-xs text-muted-foreground">You play</span><Button variant={humanSide === 'w' ? 'secondary' : 'outline'} aria-pressed={humanSide === 'w'} onClick={() => setChessHumanSide('w')}>White</Button><Button variant={humanSide === 'b' ? 'secondary' : 'outline'} aria-pressed={humanSide === 'b'} onClick={() => setChessHumanSide('b')}>Black</Button></div>}
         {mode === 'ai' && <p className="text-xs text-muted-foreground">You play {humanSide === 'w' ? 'White' : 'Black'}. The AI plays {humanSide === 'w' ? 'Black' : 'White'} using the model chosen for its colour below.</p>}
