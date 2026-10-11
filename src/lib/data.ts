@@ -1,14 +1,35 @@
 export type Q = { prompt: string; answer: string; options: string[]; note?: string };
 
-export const words: { word: string; meaning: string; example: string }[] = [
-  { word: "Ephemeral", meaning: "Lasting a very short time", example: "The ephemeral beauty of a sunset." },
-  { word: "Ubiquitous", meaning: "Found everywhere", example: "Phones are ubiquitous today." },
-  { word: "Candid", meaning: "Truthful and straightforward", example: "She gave a candid answer." },
-  { word: "Resilient", meaning: "Able to recover quickly", example: "Kids are remarkably resilient." },
-  { word: "Meticulous", meaning: "Very careful and precise", example: "A meticulous editor." },
-  { word: "Lethargic", meaning: "Sluggish and lacking energy", example: "The heat made us lethargic." },
-  { word: "Benevolent", meaning: "Kind and well-meaning", example: "A benevolent ruler." },
-  { word: "Pragmatic", meaning: "Dealing with things practically", example: "A pragmatic solution." },
+export type PartOfSpeech = "noun" | "pronoun" | "verb" | "adjective" | "adverb";
+
+export const partsOfSpeech: { pos: PartOfSpeech; meaning: string; example: string }[] = [
+  { pos: "noun", meaning: "Names a person, place, thing, or idea.", example: "The sunset glowed over the harbor." },
+  { pos: "pronoun", meaning: "Stands in for a noun.", example: "She gave her answer quickly." },
+  { pos: "verb", meaning: "Shows an action or a state of being.", example: "Kids recover quickly from setbacks." },
+  { pos: "adjective", meaning: "Describes or limits a noun.", example: "A meticulous editor checked every page." },
+  { pos: "adverb", meaning: "Describes a verb, adjective, or another adverb.", example: "She answered remarkably candidly." },
+];
+
+export const words: { word: string; meaning: string; example: string; pos: PartOfSpeech }[] = [
+  { word: "Ephemeral", meaning: "Lasting a very short time", example: "The ephemeral beauty of a sunset.", pos: "adjective" },
+  { word: "Ubiquitous", meaning: "Found everywhere", example: "Phones are ubiquitous today.", pos: "adjective" },
+  { word: "Candid", meaning: "Truthful and straightforward", example: "She gave a candid answer.", pos: "adjective" },
+  { word: "Resilient", meaning: "Able to recover quickly", example: "Kids are remarkably resilient.", pos: "adjective" },
+  { word: "Meticulous", meaning: "Very careful and precise", example: "A meticulous editor.", pos: "adjective" },
+  { word: "Lethargic", meaning: "Sluggish and lacking energy", example: "The heat made us lethargic.", pos: "adjective" },
+  { word: "Benevolent", meaning: "Kind and well-meaning", example: "A benevolent ruler.", pos: "adjective" },
+  { word: "Pragmatic", meaning: "Dealing with things practically", example: "A pragmatic solution.", pos: "adjective" },
+  { word: "Serendipity", meaning: "A happy discovery made by accident", example: "Meeting her was pure serendipity.", pos: "noun" },
+  { word: "Candor", meaning: "The quality of being open and honest", example: "He spoke with refreshing candor.", pos: "noun" },
+  { word: "Resilience", meaning: "The ability to recover from difficulty", example: "Her resilience inspired the team.", pos: "noun" },
+  { word: "Whoever", meaning: "Any person who; no matter who", example: "Whoever finishes first wins.", pos: "pronoun" },
+  { word: "Itself", meaning: "Refers back to the subject", example: "The door closed itself.", pos: "pronoun" },
+  { word: "Persevere", meaning: "To keep going despite difficulty", example: "Persevere through the hard days.", pos: "verb" },
+  { word: "Clarify", meaning: "To make something clear", example: "Let me clarify the rules.", pos: "verb" },
+  { word: "Wander", meaning: "To move without a fixed course", example: "We wandered through the old town.", pos: "verb" },
+  { word: "Quickly", meaning: "At a fast speed", example: "She answered quickly.", pos: "adverb" },
+  { word: "Remarkably", meaning: "In a way worth noticing", example: "The test was remarkably easy.", pos: "adverb" },
+  { word: "Gently", meaning: "In a soft, careful way", example: "He spoke gently to the child.", pos: "adverb" },
 ];
 
 export const anatomy: { part: string; system: string; fact: string }[] = [
