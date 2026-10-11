@@ -40,6 +40,7 @@ export function applyHighlight(ranges: NoteHighlight[], start: number, end: numb
     if (range.end <= start || range.start >= end) return [range];
     const overlapStart = Math.max(range.start, start);
     const overlapEnd = Math.min(range.end, end);
+    covered.push({ start: overlapStart, end: overlapEnd });
     return [
       ...(range.start < overlapStart ? [{ ...range, end: overlapStart }] : []),
       // Overlapping part: blend with the new color, or remove when erasing.
