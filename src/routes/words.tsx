@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Info, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/Section";
 import { useState } from "react";
@@ -8,14 +8,15 @@ import { Quiz } from "@/components/Quiz";
 import { partsOfSpeech, words, type PartOfSpeech } from "@/lib/data";
 import { WordLibrary } from "@/components/WordLibrary";
 import { ExploreTopics } from "@/components/ExploreTopics";
+import { WordDetails } from "@/components/WordDetails";
 
 export const Route = createFileRoute("/words")({
   head: () => ({
     meta: [
       { title: "Words — Lexi vocabulary builder" },
-      { name: "description", content: "Flip through vocabulary cards and explore words by topic." },
+      { name: "description", content: "Explore vocabulary with fuller meanings, pronunciation, examples and word origins, grouped by topic." },
       { property: "og:title", content: "Words — Lexi vocabulary builder" },
-      { property: "og:description", content: "Flip through vocabulary cards and explore words by topic." },
+      { property: "og:description", content: "Explore vocabulary with fuller meanings, pronunciation, examples and word origins, grouped by topic." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -27,6 +28,7 @@ function Words() {
   const [i, setI] = useState(0);
   const [flip, setFlip] = useState(false);
   const [quiz, setQuiz] = useState(false);
+  const [details, setDetails] = useState(false);
   const [posFilter, setPosFilter] = useState<PartOfSpeech | null>(null);
   const w = words[i];
   if (!w) return null;
@@ -43,10 +45,12 @@ function Words() {
               <RotateCcw className="mt-6 text-muted-foreground" />
             </Button>
             <div className="mt-3 flex items-center justify-between">
-              <Button variant="outline" size="icon" title="Previous word" aria-label="Previous word" onClick={() => { setFlip(false); setI((i - 1 + words.length) % words.length); }}><ChevronLeft /></Button>
+              <Button variant="outline" size="icon" title="Previous word" aria-label="Previous word" onClick={() => { setFlip(false); setDetails(false); setI((i - 1 + words.length) % words.length); }}><ChevronLeft /></Button>
               <span className="text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")} — {String(words.length).padStart(2, "0")}</span>
-              <Button variant="outline" size="icon" title="Next word" aria-label="Next word" onClick={() => { setFlip(false); setI((i + 1) % words.length); }}><ChevronRight /></Button>
+              <Button variant="ghost" size="icon" className="chip-icon" title="Full word details" aria-label={`${details ? "Hide" : "Show"} flashcard details`} aria-expanded={details} onClick={() => setDetails(!details)}>{details ? <X /> : <Info />}</Button>
+              <Button variant="outline" size="icon" title="Next word" aria-label="Next word" onClick={() => { setFlip(false); setDetails(false); setI((i + 1) % words.length); }}><ChevronRight /></Button>
             </div>
+            {details && <div className="mt-4 border-t border-border pb-4"><WordDetails word={w} /></div>}
           </div>
           <div className="self-center">
             <BookOpen className="mb-4 size-7 text-muted-foreground" />

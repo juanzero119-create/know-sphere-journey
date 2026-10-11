@@ -33,3 +33,4 @@
 - Keep vocabulary topic data in the browser-safe module src/lib/topics.ts (grouped topics, each with its own word list); parts-of-speech tiles filter the main library instead of carrying words.
 - Keep favorites, custom words, history and collections in the localStorage-backed store src/lib/word-lists.ts with a fixed empty SSR snapshot; this persists word lists on the device without a backend.
 - Render compact word rows through the shared WordRows component (detail key plus favorite star) so the library, topic panels and quick tiles behave identically.
+- Keep original dictionary-style editorial content in the browser-safe word-details module, keyed by normalized word, and render it through shared WordDetails in rows and flashcards; this prevents topic copies from showing inconsistent facts and preserves user-added words without invented editorial content.
