@@ -152,15 +152,24 @@ async function maybeAiMove() {
   // locally, so games don't all start with the same position. From the
   // second move on the chosen AI model decides everything itself.
   if (game.history().length < 2) {
+    // Wait a beat before each opening pawn move so White's and Black's moves
+    // land one after the other instead of appearing at the same instant.
+    const fenBefore = game.fen();
+    state.thinking = true;
+    state.thinkingSince = Date.now();
+    emit();
+    await new Promise((r) => setTimeout(r, 900));
+    state.thinking = false;
+    aiRunning = false;
+    if (game.fen() !== fenBefore || isOver() || state.paused) {
+      emit();
+      return;
+    }
     const pawns = game.moves({ verbose: true }).filter((m) => m.piece === 'p');
     const pick = pawns[Math.floor(Math.random() * pawns.length)];
-    if (pick) {
-      const m = game.move(pick.san);
-      if (m) applyMove(m.from, m.to, turn);
-    }
-    aiRunning = false;
-    emit();
-    void maybeAiMove();
+    const m = pick ? game.move(pick.san) : null;
+    if (m) applyMove(m.from, m.to, turn);
+    else emit();
     return;
   }
   state.thinking = true;
