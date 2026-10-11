@@ -6,6 +6,8 @@ import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { ModelManager } from '@/routes/ai';
 import { ChessElo } from '@/components/ChessElo';
+import { ChessTime } from '@/components/ChessTime';
+import { timeLabel } from '@/lib/chess-time';
 import { ChessRating } from '@/components/ChessRating';
 import { Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import { playMove, resetChess, setChessHumanSide, setChessMode, setChessPaused, useChessStore } from '@/lib/chess-store';
