@@ -45,6 +45,11 @@
   --color-name-blue: var(--name-blue);
   --color-name-rose: var(--name-rose);
   --color-name-green: var(--name-green);
+  --color-name-orange: var(--name-orange);
+  --color-name-purple: var(--name-purple);
+  --color-name-teal: var(--name-teal);
+  --color-name-lime: var(--name-lime);
+  --color-name-olive: var(--name-olive);
   --color-play: var(--play);
   --color-play-foreground: var(--play-foreground);
 }
@@ -87,6 +92,11 @@
   --name-blue: oklch(0.83 0.08 240);
   --name-rose: oklch(0.83 0.09 10);
   --name-green: oklch(0.85 0.09 155);
+  --name-orange: oklch(0.84 0.12 55);
+  --name-purple: oklch(0.8 0.09 300);
+  --name-teal: oklch(0.84 0.08 200);
+  --name-lime: oklch(0.88 0.12 125);
+  --name-olive: oklch(0.82 0.08 110);
   --name-on: oklch(0.2 0 0);
   --chip: oklch(0.34 0 0);
   --chip-foreground: oklch(0.93 0 0);
@@ -316,7 +326,8 @@ nav [data-status='active'] .nav-tile {
 }
 
 /* Name highlight chips stay bright, so their text goes dark. */
-.bg-name-gold, .bg-name-blue, .bg-name-rose, .bg-name-green { color: var(--name-on); }
+.bg-name-gold, .bg-name-blue, .bg-name-rose, .bg-name-green,
+.bg-name-orange, .bg-name-purple, .bg-name-teal, .bg-name-lime, .bg-name-olive { color: var(--name-on); }
 
 /* Notes: selecting text shows the chosen highlight color instead of the system blue. */
 .note-select { --note-sel: var(--name-gold); }

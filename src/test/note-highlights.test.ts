@@ -2,11 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { adjustHighlights, applyHighlight } from '@/lib/note-highlights';
 
 describe('note highlighting', () => {
-  it('applies a chosen color and splits overlaps when recoloring', () => {
+  it('blends colors where a new highlight overlaps a different color', () => {
     const ranges = applyHighlight([], 0, 10, 'gold');
     expect(applyHighlight(ranges, 3, 7, 'blue')).toEqual([
-      { start: 0, end: 3, color: 'gold' }, { start: 3, end: 7, color: 'blue' }, { start: 7, end: 10, color: 'gold' },
+      { start: 0, end: 3, color: 'gold' }, { start: 3, end: 7, color: 'green' }, { start: 7, end: 10, color: 'gold' },
     ]);
+  });
+  it('keeps the color when highlighting over the same color and blends every base pair', () => {
+    expect(applyHighlight([{ start: 0, end: 5, color: 'gold' }], 0, 5, 'gold')).toEqual([{ start: 0, end: 5, color: 'gold' }]);
+    expect(applyHighlight([{ start: 0, end: 5, color: 'gold' }], 0, 5, 'rose')).toEqual([{ start: 0, end: 5, color: 'orange' }]);
+    expect(applyHighlight([{ start: 0, end: 5, color: 'blue' }], 0, 5, 'rose')).toEqual([{ start: 0, end: 5, color: 'purple' }]);
+    expect(applyHighlight([{ start: 0, end: 5, color: 'blue' }], 0, 5, 'green')).toEqual([{ start: 0, end: 5, color: 'teal' }]);
+    expect(applyHighlight([{ start: 0, end: 5, color: 'gold' }], 0, 5, 'green')).toEqual([{ start: 0, end: 5, color: 'lime' }]);
+    expect(applyHighlight([{ start: 0, end: 5, color: 'rose' }], 0, 5, 'green')).toEqual([{ start: 0, end: 5, color: 'olive' }]);
   });
   it('removes highlights only from the selected text', () => {
     expect(applyHighlight([{ start: 0, end: 10, color: 'rose' }], 0, 5, null)).toEqual([{ start: 5, end: 10, color: 'rose' }]);
