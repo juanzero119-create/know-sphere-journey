@@ -64,7 +64,7 @@ function loadNotes(): Note[] {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as Note[];
-    return Array.isArray(parsed) ? parsed.filter(note => note && typeof note.title === 'string' && typeof note.body === 'string').map(note => ({ ...note, folder: typeof note.folder === 'string' ? note.folder : 'Notes', pinned: note.pinned === true, locked: note.locked === true, highlights: Array.isArray(note.highlights) ? note.highlights.filter(range => range && Number.isInteger(range.start) && Number.isInteger(range.end) && range.start >= 0 && range.end > range.start && range.end <= note.body.length && noteColors.some(color => color.id === range.color)).sort((a, b) => a.start - b.start) : [] })) : [];
+    return Array.isArray(parsed) ? parsed.filter(note => note && typeof note.title === 'string' && typeof note.body === 'string').map(note => ({ ...note, folder: typeof note.folder === 'string' ? note.folder : 'Notes', pinned: note.pinned === true, locked: note.locked === true, highlights: Array.isArray(note.highlights) ? note.highlights.filter(range => range && Number.isInteger(range.start) && Number.isInteger(range.end) && range.start >= 0 && range.end > range.start && range.end <= note.body.length && isNoteColor(range.color)).sort((a, b) => a.start - b.start) : [] })) : [];
   } catch {
     return [];
   }
