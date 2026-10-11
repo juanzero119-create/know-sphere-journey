@@ -164,20 +164,10 @@ export const topicGroups: TopicGroup[] = [
       {
         id: "distinctive", label: "Distinctive words", icon: Sparkles, blurb: "Words with character.",
         words: [
-          w("Itinerant", "Traveling from place to place, often for work", "An itinerant preacher visited weekly.", "adjective", "Nomadic"),
           w("Rudimentary", "Basic; at the earliest stage of development", "He has a rudimentary grasp of Italian.", "adjective", "Basic"),
           w("Superfluous", "More than is needed; unnecessary", "Delete the superfluous paragraphs.", "adjective", "Unnecessary"),
           w("Intangible", "Impossible to touch or grasp physically", "Trust is an intangible asset.", "adjective", "Untouchable"),
           w("Asinine", "Extremely silly or foolish", "An asinine excuse fooled no one.", "adjective", "Foolish"),
-        ],
-      },
-      {
-        id: "officialdom", label: "Officialdom", icon: Briefcase, blurb: "Words for power and paperwork.",
-        words: [
-          w("Bureaucratic charlatan", "A fake expert hiding behind official procedure", "A bureaucratic charlatan sold worthless permits.", "noun", "Fraud"),
-          w("Pragmatic", "Dealing with things in a practical way", "A pragmatic fix saved time and money.", "adjective", "Practical"),
-          w("Meticulous", "Extremely careful about small details", "Meticulous notes made the audit easy.", "adjective", "Thorough"),
-          w("Acculturate", "To adopt the customs of another culture", "Immigrants acculturate over generations.", "verb", "Assimilate"),
         ],
       },
       {
@@ -188,6 +178,27 @@ export const topicGroups: TopicGroup[] = [
           w("Abstain", "To choose not to do or take something", "He abstained from the final vote.", "verb", "Refrain"),
           w("Peruse", "To read or examine carefully", "She perused the contract before signing.", "verb", "Study"),
           w("Fornication", "Sexual relations between people not married to each other", "Old statutes once punished fornication.", "noun"),
+        ],
+      },
+    ],
+  },
+  {
+    id: "world",
+    title: "The world around us",
+    topics: [
+      {
+        id: "business", label: "Business", icon: Briefcase, blurb: "Words for work and trade.",
+        words: [
+          w("Bureaucratic charlatan", "A fake expert hiding behind official procedure", "A bureaucratic charlatan sold worthless permits.", "noun", "Fraud"),
+          w("Pragmatic", "Dealing with things in a practical way", "A pragmatic fix saved time and money.", "adjective", "Practical"),
+          w("Meticulous", "Extremely careful about small details", "Meticulous notes made the audit easy.", "adjective", "Thorough"),
+          w("Acculturate", "To adopt the customs of another culture", "Immigrants acculturate over generations.", "verb", "Assimilate"),
+        ],
+      },
+      {
+        id: "travel", label: "Travel", icon: Plane, blurb: "Words for journeys.",
+        words: [
+          w("Itinerant", "Traveling from place to place, often for work", "An itinerant preacher visited weekly.", "adjective", "Nomadic"),
         ],
       },
     ],
