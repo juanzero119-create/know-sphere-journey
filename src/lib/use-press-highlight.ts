@@ -73,7 +73,7 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
         clearNative();
         navigator.vibrate?.(10);
         lockNative(true);
-        set({ id, start: anchor, end: anchor, x, y });
+        set({ id, start: anchor, end: anchor, x, y, anchor });
       }, HOLD_MS),
     };
   }, []);
@@ -94,7 +94,7 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
       clearNative();
       const prev = dragRef.current;
       if (prev.start === s && prev.end === e && Math.abs(prev.x - x) < 1 && Math.abs(prev.y - y) < 1) return;
-      set({ id: t.id, start: s, end: e, x, y });
+      set({ id: t.id, start: s, end: e, x, y, anchor: t.anchor });
     };
     const move = (x: number, y: number) => {
       if (pending.current && Math.hypot(x - pending.current.x, y - pending.current.y) > MOVE_TOLERANCE) cancelPending();
@@ -115,7 +115,7 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
       lastFocus = null;
       lockNative(false);
       const current = dragRef.current;
-      if (current) commitRef.current(current.id, current.start, current.end);
+      if (current) commitRef.current(current.id, current.start, current.end, current.anchor);
       if (current) clearNative();
       target.current = null;
       set(null);
