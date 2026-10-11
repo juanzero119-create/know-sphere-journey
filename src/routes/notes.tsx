@@ -86,52 +86,49 @@ function Notes() {
   const [highlights, setHighlights] = useState<NoteHighlight[]>([]);
   const [color, setColor] = useState<NoteColor>('gold');
   const [selection, setSelection] = useState({ start: 0, end: 0 });
+  // Floating color bar shown next to the current text selection (draft box or saved note).
+  const [selMenu, setSelMenu] = useState<{ target: 'draft' | string; x: number; y: number; start: number; end: number } | null>(null);
   const editor = useRef<HTMLTextAreaElement>(null);
   const backdrop = useRef<HTMLDivElement>(null);
-  const settleTimer = useRef<number | undefined>(undefined);
+  const draftBox = useRef<HTMLDivElement>(null);
   const colorRef = useRef(color);
   colorRef.current = color;
-  useEffect(() => () => window.clearTimeout(settleTimer.current), []);
-  const applyEditorSelection = () => {
-    const element = editor.current;
-    if (!element || element.selectionStart === element.selectionEnd) return;
-    const { selectionStart: start, selectionEnd: end } = element;
-    setHighlights(old => applyHighlight(old, start, end, colorRef.current));
-    setSelection({ start, end });
-    // Collapse the selection so the system's blue selection gives way to the app's highlight.
-    element.setSelectionRange(end, end);
-  };
   const captureSelection = () => {
     const element = editor.current;
     if (!element) return;
     setSelection({ start: element.selectionStart, end: element.selectionEnd });
-    // Phones adjust selections with drag handles that never send a pointer-up to the box,
-    // so apply the highlight once the selection stops changing.
-    window.clearTimeout(settleTimer.current);
-    if (element.selectionStart !== element.selectionEnd) settleTimer.current = window.setTimeout(applyEditorSelection, 700);
   };
   const highlightSelection = (chosen: NoteColor | null) => {
-    setHighlights(old => applyHighlight(old, selection.start, selection.end, chosen));
-    editor.current?.focus();
-    editor.current?.setSelectionRange(selection.end, selection.end);
+    // Read the live selection straight from the box — the stored state can lag on phones.
+    const element = editor.current;
+    const start = element && element.selectionStart !== element.selectionEnd ? element.selectionStart : selection.start;
+    const end = element && element.selectionStart !== element.selectionEnd ? element.selectionEnd : selection.end;
+    if (start === end) return;
+    setHighlights(old => applyHighlight(old, start, end, chosen));
+    setSelMenu(null);
+    element?.focus();
+    element?.setSelectionRange(end, end);
+    setSelection({ start: end, end });
   };
-  const highlightDraggedText = () => {
-    requestAnimationFrame(() => { window.clearTimeout(settleTimer.current); applyEditorSelection(); });
-  };
-  const highlightSavedText = (element: HTMLParagraphElement, note: Note) => {
+  const savedRange = (element: HTMLParagraphElement) => {
     const selected = window.getSelection();
-    if (!selected || selected.isCollapsed || selected.rangeCount === 0) return;
+    if (!selected || selected.isCollapsed || selected.rangeCount === 0) return null;
     const range = selected.getRangeAt(0);
-    if (!element.contains(range.startContainer) || !element.contains(range.endContainer)) return;
+    if (!element.contains(range.startContainer) || !element.contains(range.endContainer)) return null;
     const prefix = range.cloneRange();
     prefix.selectNodeContents(element);
     prefix.setEnd(range.startContainer, range.startOffset);
     const start = prefix.toString().length;
-    const end = start + range.toString().length;
-    const nextHighlights = applyHighlight(note.highlights ?? [], start, end, color);
-    update(notes.map(item => item.id === note.id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
+    return { start, end: start + range.toString().length };
+  };
+  const highlightSavedText = (element: HTMLParagraphElement, note: Note, chosen: NoteColor | null) => {
+    const offsets = savedRange(element);
+    if (!offsets) return;
+    const nextHighlights = applyHighlight(note.highlights ?? [], offsets.start, offsets.end, chosen);
+    update(notesRef.current.map(item => item.id === note.id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
     if (editingId === note.id && draftBody === note.body) setHighlights(nextHighlights);
-    selected.removeAllRanges();
+    window.getSelection()?.removeAllRanges();
+    setSelMenu(null);
   };
 
   useEffect(() => { setNotes(loadNotes()); }, []);
