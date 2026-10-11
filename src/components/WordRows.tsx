@@ -3,6 +3,7 @@ import { Info, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { TopicWord } from "@/lib/topics";
 import { recordHistory, toggleFavorite, useWordLists } from "@/lib/word-lists";
+import { WordDetails } from "@/components/WordDetails";
 
 /**
  * Compact word rows shared by the word library and topic panels. Each row
@@ -14,14 +15,14 @@ export function WordRows({ list }: { list: TopicWord[] }) {
   const { favorites } = useWordLists();
 
   return (
-    <div className="gap-2 sm:columns-2 lg:columns-3">
+    <div className="grid items-start gap-2 sm:grid-cols-2 lg:grid-cols-3">
       {list.map(w => {
         const shown = open === w.word;
         const fav = favorites.includes(w.word);
         return (
           <article
             key={w.word}
-            className={`mb-2 break-inside-avoid rounded-md border bg-card px-3 py-2 ${shown ? "border-primary ring-2 ring-ring" : "border-border"}`}
+            className={`min-w-0 rounded-md border bg-card px-3 py-2 ${shown ? "col-span-full border-primary ring-2 ring-ring" : "border-border"}`}
           >
             <div className="flex items-center gap-2">
               <h3 className="min-w-0 flex-1 truncate text-sm font-semibold">{w.word}</h3>
@@ -56,14 +57,8 @@ export function WordRows({ list }: { list: TopicWord[] }) {
               </Button>
             </div>
             {shown && (
-              <div className="mt-2 border-t border-border pt-2">
-                <p className="text-sm leading-snug">{w.meaning}</p>
-                <p className="mt-1.5 text-xs italic text-muted-foreground">“{w.example}”</p>
-                {w.synonym && (
-                  <p className="mt-1.5 text-xs text-muted-foreground">
-                    Synonym: <span className="font-medium text-foreground">{w.synonym}</span>
-                  </p>
-                )}
+              <div className="mx-auto mt-2 max-w-2xl border-t border-border pb-4 pt-2 sm:px-3">
+                <WordDetails word={w} />
               </div>
             )}
           </article>
