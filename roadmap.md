@@ -132,3 +132,7 @@
 # Split combined word entry
 - [x] Replace "Bureaucratic charlatan" with separate Bureaucrat and Charlatan entries, each with its own meaning, example, synonym and full definition.
 - [x] Verify both words appear in the library, topics and flashcards with their own details.
+
+# Alphabetical sorting
+- [x] Add a shared alphabetical sorting algorithm (collator-based, numeric-aware, accent-insensitive, stable) and use it for the word library, films, actors, videos and search tie-breaks.
+- [x] Add an A–Z / Z–A toggle to the word library and verify ordering live on mobile and desktop.
