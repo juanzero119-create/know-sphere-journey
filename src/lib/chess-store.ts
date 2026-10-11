@@ -147,6 +147,10 @@ async function maybeAiMove() {
   const turn = game.turn();
   const aiTurn = state.mode === 'aivai' || (state.mode === 'ai' && turn !== state.humanSide);
   if (!aiTurn || isOver() || state.paused || aiRunning) return;
+  // A fresh game waits for Play: the AI never plays the very first move by
+  // itself, so "New game" leaves the board ready instead of paused. Once any
+  // move has landed (the human's, or Play was pressed) the loop runs normally.
+  if (!state.playPressed && game.history().length === 0) return;
   aiRunning = true;
   // Opening variety: each side's first move is a random pawn move played
   // locally, so games don't all start with the same position. From the
@@ -219,9 +223,9 @@ export function resetChess(mode?: ChessMode) {
   endSoundPlayed = false;
   game = new Chess();
   const nextMode = mode ?? state.mode;
-  // When the AI moves first (AI vs AI, or the human chose Black), hold the
-  // new game paused until the player presses Play — nothing moves on its own.
-  const aiOpens = nextMode === 'aivai' || (nextMode === 'ai' && state.humanSide === 'b');
+  // A new game is never paused — it is ready to start. Nothing moves on its own
+  // because the AI holds its first move until Play is pressed (see the
+  // playPressed guard in maybeAiMove), so the board simply waits.
   state = {
     ...initialState,
     version: state.version + 1,
@@ -230,11 +234,11 @@ export function resetChess(mode?: ChessMode) {
     clock: { w: startMs(state.time), b: startMs(state.time) },
     elo: { ...state.elo },
     time: { ...state.time },
-    paused: aiOpens,
+    paused: false,
     playPressed: false,
   };
   listeners.forEach((l) => l());
-  void maybeAiMove(); // a no-op while paused; Play resumes it
+  void maybeAiMove(); // a no-op until Play; the guard keeps the AI from opening
 }
 
 export function setChessMode(mode: ChessMode) {
@@ -270,8 +274,8 @@ export function setChessPaused(paused: boolean) {
 }
 
 // The Play button: pressing it is what turns the game "live" (and the button
-// green). A new game starts unplayed, so the green only appears once Play is
-// pressed — even when the game was already unpaused (human plays White).
+// green). A new game starts unplayed but ready — not paused — so the green only
+// appears once Play is pressed, whatever colour the human chose.
 export function startChess() {
   if (state.playPressed && !state.paused) return;
   state = { ...state, playPressed: true, paused: false, version: state.version + 1 };
