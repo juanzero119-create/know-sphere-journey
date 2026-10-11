@@ -26,7 +26,7 @@ export function FilmMedia({ movie }: { movie: Movie }) {
           aria-expanded={panel === 'photos'}
           onClick={() => toggle('photos')}
         >
-          <span className="grid size-6 shrink-0 place-items-center rounded border border-chip-hi bg-secondary text-secondary-foreground" aria-hidden>
+          <span className="grid size-6 shrink-0 place-items-center rounded bg-secondary text-secondary-foreground" style={{ border: '1px solid var(--chip-hi)' }} aria-hidden>
             <Images className="size-3.5" />
           </span>
           <span className="film-chip-label">Photos</span>
@@ -37,7 +37,7 @@ export function FilmMedia({ movie }: { movie: Movie }) {
           aria-expanded={panel === 'trailer'}
           onClick={() => toggle('trailer')}
         >
-          <span className="grid size-6 shrink-0 place-items-center rounded border border-chip-hi bg-secondary text-secondary-foreground" aria-hidden>
+          <span className="grid size-6 shrink-0 place-items-center rounded bg-secondary text-secondary-foreground" style={{ border: '1px solid var(--chip-hi)' }} aria-hidden>
             <Play className="size-3.5" />
           </span>
           <span className="film-chip-label">Trailer</span>

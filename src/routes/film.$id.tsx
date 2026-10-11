@@ -4,6 +4,7 @@ import { ArrowLeft, Star } from 'lucide-react';
 import { FilmChip } from '@/components/FilmChip';
 import { FilmPoster } from '@/components/FilmPoster';
 import { ActorPortrait } from '@/components/ActorPortrait';
+import { FilmMedia } from '@/components/FilmMedia';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
