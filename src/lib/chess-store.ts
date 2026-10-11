@@ -9,8 +9,8 @@ import { recordRatedGame } from '@/lib/chess-rating';
 
 export type ChessMode = 'ai' | '2p' | 'aivai';
 
-const BLITZ = 3 * 60 * 1000;
-const INC = 2000;
+const startMs = (time: ChessTime) => time.minutes * 60 * 1000;
+const incMs = (time: ChessTime) => time.incrementSec * 1000;
 
 export interface ChessState {
   version: number;
@@ -24,6 +24,7 @@ export interface ChessState {
   aiNote: string;
   elo: { w: number; b: number };
   paused: boolean;
+  time: ChessTime;
 }
 
 const initialState: ChessState = {
