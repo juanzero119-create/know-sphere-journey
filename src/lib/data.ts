@@ -68,7 +68,9 @@ export const words: { word: string; meaning: string; example: string; pos: PartO
   { word: "Diligent", meaning: "Working carefully and steadily", example: "A diligent student finished early.", pos: "adjective", synonym: "Hardworking" },
   { word: "Pragmatic", meaning: "Dealing with things in a practical way", example: "A pragmatic fix saved time and money.", pos: "adjective", synonym: "Practical" },
   { word: "Forthcoming", meaning: "Willing to give information or help", example: "He wasn’t forthcoming with the facts.", pos: "adjective", synonym: "Candid" },
-  { word: "Bureaucratic charlatan", meaning: "A fake expert hiding behind official procedure", example: "A bureaucratic charlatan sold worthless permits.", pos: "noun", synonym: "Fraud" },
+  { word: "Bureaucrat", meaning: "An official who works through fixed rules and paperwork", example: "A bureaucrat buried the application in forms.", pos: "noun", synonym: "Functionary" },
+  { word: "Charlatan", meaning: "A fake expert who pretends to have special skill or knowledge", example: "The miracle cure was sold by a charlatan.", pos: "noun", synonym: "Fraud" },
+
   { word: "Puerile", meaning: "Childishly silly; immature", example: "Puerile jokes disrupted the meeting.", pos: "adjective", synonym: "Immature" },
   { word: "Vindicate", meaning: "To clear of blame or prove right", example: "The appeal vindicated the defendant.", pos: "verb", synonym: "Exonerate" },
   { word: "Demagogue", meaning: "A leader who stirs people up with emotions and prejudice", example: "The demagogue blamed every woe on outsiders.", pos: "noun", synonym: "Rabble-rouser" },
