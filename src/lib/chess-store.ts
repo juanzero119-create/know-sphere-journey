@@ -3,6 +3,7 @@ import { Chess, type Square } from 'chess.js';
 import { getAiMove } from '@/lib/chess-ai.functions';
 import { getChessModelFor } from '@/lib/chess-models';
 import { DEFAULT_ELO, eloSchema } from '@/lib/chess-elo';
+import { DEFAULT_TIME, timeSchema, type ChessTime } from '@/lib/chess-time';
 import { playGameEndSound, playMoveSound } from '@/lib/chess-sounds';
 import { recordRatedGame } from '@/lib/chess-rating';
 
