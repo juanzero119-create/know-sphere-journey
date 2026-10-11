@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getChessSnapshot, resetChess, setChessPaused } from '@/lib/chess-store';
+import { getChessSnapshot, resetChess, setChessPaused, startChess } from '@/lib/chess-store';
 
 describe('chess pause', () => {
   it('starts unpaused and toggles', () => {
@@ -23,5 +23,27 @@ describe('chess pause', () => {
     setChessPaused(false);
     expect(getChessSnapshot().version).toBe(before);
     expect(getChessSnapshot().paused).toBe(false);
+  });
+
+  it('a new game is not live until Play is pressed', () => {
+    resetChess();
+    expect(getChessSnapshot().playPressed).toBe(false);
+    startChess();
+    expect(getChessSnapshot().playPressed).toBe(true);
+    resetChess();
+    expect(getChessSnapshot().playPressed).toBe(false);
+  });
+
+  it('Play turns the game live and resumes a pause', () => {
+    resetChess();
+    startChess();
+    const before = getChessSnapshot().version;
+    startChess();
+    expect(getChessSnapshot().version).toBe(before);
+    setChessPaused(true);
+    expect(getChessSnapshot().paused).toBe(true);
+    startChess();
+    expect(getChessSnapshot().paused).toBe(false);
+    expect(getChessSnapshot().playPressed).toBe(true);
   });
 });

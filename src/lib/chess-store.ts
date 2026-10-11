@@ -24,6 +24,7 @@ export interface ChessState {
   aiNote: string;
   elo: { w: number; b: number };
   paused: boolean;
+  playPressed: boolean;
   time: ChessTime;
 }
 
@@ -39,6 +40,7 @@ const initialState: ChessState = {
   aiNote: '',
   elo: { w: DEFAULT_ELO, b: DEFAULT_ELO },
   paused: false,
+  playPressed: false,
   time: DEFAULT_TIME,
 };
 
@@ -192,6 +194,7 @@ export function resetChess(mode?: ChessMode) {
     elo: { ...state.elo },
     time: { ...state.time },
     paused: aiOpens,
+    playPressed: false,
   };
   listeners.forEach((l) => l());
   void maybeAiMove(); // a no-op while paused; Play resumes it
@@ -228,3 +231,14 @@ export function setChessPaused(paused: boolean) {
   emit();
   if (!paused) void maybeAiMove(); // resume the AI loop where it stopped
 }
+
+// The Play button: pressing it is what turns the game "live" (and the button
+// green). A new game starts unplayed, so the green only appears once Play is
+// pressed — even when the game was already unpaused (human plays White).
+export function startChess() {
+  if (state.playPressed && !state.paused) return;
+  state = { ...state, playPressed: true, paused: false, version: state.version + 1 };
+  emit();
+  void maybeAiMove();
+}
+
