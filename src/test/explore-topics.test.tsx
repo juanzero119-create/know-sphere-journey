@@ -51,7 +51,8 @@ describe("ExploreTopics", () => {
     fireEvent.click(tile);
     expect(screen.getByRole("heading", { name: label })).toBeInTheDocument();
     const matching = words.filter(w => w.pos === pos);
-    for (const word of matching) expect(screen.getByRole("button", { name: `Show full definition of ${word.word}` })).toBeInTheDocument();
+    const detailButtons = screen.getAllByRole("button", { name: /^Show full definition of / });
+    expect(detailButtons.map(button => button.getAttribute("aria-label"))).toEqual(matching.map(word => `Show full definition of ${word.word}`));
     const other = words.find(w => w.pos !== pos);
     if (other) expect(screen.queryByRole("button", { name: `Show full definition of ${other.word}` })).not.toBeInTheDocument();
     fireEvent.click(tile);
