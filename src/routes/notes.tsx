@@ -1,30 +1,62 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
-import { Check, Highlighter, NotebookPen, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { Check, ChevronDown, ChevronRight, Folder, FolderPlus, Highlighter, Lock, NotebookPen, Pencil, Pin, PinOff, Plus, ScanFace, Search, SquarePen, Trash2, Unlock, X } from 'lucide-react';
 import { Shell } from '@/components/Shell';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { HighlightedNote } from '@/components/HighlightedNote';
+import { NoteLockDialog } from '@/components/NoteLockDialog';
 import { usePressHighlight } from '@/lib/use-press-highlight';
+import { disableFaceId, enableFaceId, faceIdAvailable, hasFaceId } from '@/lib/note-lock';
 import { adjustHighlights, applyHighlight, noteColors, type NoteColor, type NoteHighlight } from '@/lib/note-highlights';
 
 export const Route = createFileRoute('/notes')({
   head: () => ({ meta: [
     { title: 'Notes — Lexi' },
-    { name: 'description', content: 'Write and keep your own notes in Lexi, saved on this device.' },
+    { name: 'description', content: 'Write notes in folders, pin them, and lock private notes with Face ID or a password.' },
     { property: 'og:title', content: 'Notes — Lexi' },
-    { property: 'og:description', content: 'Write and keep your own notes in Lexi, saved on this device.' },
+    { property: 'og:description', content: 'Write notes in folders, pin them, and lock private notes with Face ID or a password.' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
   ] }),
   component: Notes,
 });
 
-type Note = { id: string; title: string; body: string; updatedAt: number; highlights?: NoteHighlight[] };
+type Note = { id: string; title: string; body: string; updatedAt: number; highlights?: NoteHighlight[]; folder?: string; pinned?: boolean; locked?: boolean };
 
 const STORAGE_KEY = 'lexi-notes';
+const FOLDERS_KEY = 'lexi-note-folders';
+
+function loadFolders(): string[] {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(FOLDERS_KEY) ?? '[]') as unknown;
+    const names = Array.isArray(parsed) ? parsed.filter((n): n is string => typeof n === 'string' && n.trim() !== '' && n !== 'Notes') : [];
+    return ['Notes', ...new Set(names)];
+  } catch { return ['Notes']; }
+}
+
+function groupNotes(list: Note[]) {
+  const now = new Date();
+  const groups: { label: string; notes: Note[] }[] = [];
+  const add = (label: string, note: Note) => {
+    const found = groups.find(g => g.label === label);
+    if (found) found.notes.push(note); else groups.push({ label, notes: [note] });
+  };
+  list.filter(n => n.pinned).forEach(n => add('Pinned', n));
+  list.filter(n => !n.pinned).forEach(n => {
+    const d = new Date(n.updatedAt);
+    const days = (now.getTime() - d.getTime()) / 86_400_000;
+    const label = days < 1 && d.getDate() === now.getDate() ? 'Today'
+      : days < 7 ? 'Previous 7 Days'
+      : days < 30 ? 'Previous 30 Days'
+      : d.getFullYear() === now.getFullYear() ? d.toLocaleDateString(undefined, { month: 'long' })
+      : String(d.getFullYear());
+    add(label, n);
+  });
+  return groups;
+}
 
 function loadNotes(): Note[] {
   if (typeof window === 'undefined') return [];
@@ -32,7 +64,7 @@ function loadNotes(): Note[] {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as Note[];
-    return Array.isArray(parsed) ? parsed.filter(note => note && typeof note.title === 'string' && typeof note.body === 'string').map(note => ({ ...note, highlights: Array.isArray(note.highlights) ? note.highlights.filter(range => range && Number.isInteger(range.start) && Number.isInteger(range.end) && range.start >= 0 && range.end > range.start && range.end <= note.body.length && noteColors.some(color => color.id === range.color)).sort((a, b) => a.start - b.start) : [] })) : [];
+    return Array.isArray(parsed) ? parsed.filter(note => note && typeof note.title === 'string' && typeof note.body === 'string').map(note => ({ ...note, folder: typeof note.folder === 'string' ? note.folder : 'Notes', pinned: note.pinned === true, locked: note.locked === true, highlights: Array.isArray(note.highlights) ? note.highlights.filter(range => range && Number.isInteger(range.start) && Number.isInteger(range.end) && range.start >= 0 && range.end > range.start && range.end <= note.body.length && noteColors.some(color => color.id === range.color)).sort((a, b) => a.start - b.start) : [] })) : [];
   } catch {
     return [];
   }
@@ -157,15 +189,68 @@ function Notes() {
     setNotes(next);
     saveNotes(next);
   };
+  const patch = (id: string, changes: Partial<Note>) => update(notesRef.current.map(note => note.id === id ? { ...note, ...changes } : note));
+
+  // Folders, search, grouping and the device lock.
+  const [folders, setFolders] = useState<string[]>(['Notes']);
+  useEffect(() => { setFolders(loadFolders()); }, []);
+  const saveFolderList = (next: string[]) => { setFolders(next); try { window.localStorage.setItem(FOLDERS_KEY, JSON.stringify(next)); } catch { /* blocked */ } };
+  const [activeFolder, setActiveFolder] = useState('all');
+  const [draftFolder, setDraftFolder] = useState('Notes');
+  const [query, setQuery] = useState('');
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [lockOpen, setLockOpen] = useState(false);
+  const [canFace, setCanFace] = useState(false);
+  const [faceOn, setFaceOn] = useState(false);
+  useEffect(() => { void faceIdAvailable().then(setCanFace); setFaceOn(hasFaceId()); }, []);
+  const pending = useRef<(() => void) | null>(null);
+  const requireUnlock = (action: () => void) => {
+    if (unlocked) { action(); return; }
+    pending.current = action; setLockOpen(true);
+  };
+  // Re-lock when the app is hidden, like Apple Notes.
+  useEffect(() => {
+    const onHide = () => { if (document.visibilityState === 'hidden') { setUnlocked(false); setOpenId(null); } };
+    document.addEventListener('visibilitychange', onHide);
+    return () => document.removeEventListener('visibilitychange', onHide);
+  }, []);
+  const addFolder = () => {
+    const name = window.prompt('New folder name')?.trim();
+    if (!name || folders.includes(name) || name === 'All Notes') return;
+    saveFolderList([...folders, name]);
+  };
+  const renameFolder = (old: string) => {
+    const name = window.prompt('Rename folder', old)?.trim();
+    if (!name || name === old || folders.includes(name) || name === 'All Notes') return;
+    saveFolderList(folders.map(f => f === old ? name : f));
+    update(notes.map(note => note.folder === old ? { ...note, folder: name } : note));
+    if (activeFolder === old) setActiveFolder(name);
+  };
+  const deleteFolder = (name: string) => {
+    if (!window.confirm(`Delete "${name}"? Its notes move to Notes.`)) return;
+    saveFolderList(folders.filter(f => f !== name));
+    update(notes.map(note => note.folder === name ? { ...note, folder: 'Notes' } : note));
+    if (activeFolder === name) setActiveFolder('all');
+  };
+  const folderOf = (note: Note) => note.folder && folders.includes(note.folder) ? note.folder : 'Notes';
+  const needle = query.trim().toLowerCase();
+  const visible = notes
+    .filter(note => activeFolder === 'all' || folderOf(note) === activeFolder)
+    .filter(note => !needle || note.title.toLowerCase().includes(needle) || (!(note.locked && !unlocked) && note.body.toLowerCase().includes(needle)))
+    .sort((a, b) => b.updatedAt - a.updatedAt);
+  const groups = groupNotes(visible);
+  const newNote = () => { setEditingId(null); setDraftTitle(''); setDraftBody(''); setHighlights([]); setDraftFolder(activeFolder === 'all' ? 'Notes' : activeFolder); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
   const saveDraft = () => {
     const title = draftTitle.trim();
     const body = draftBody;
     if (!title && !body.trim()) return;
     if (editingId) {
-      update(notes.map(note => note.id === editingId ? { ...note, title: title || 'Untitled note', body, highlights, updatedAt: Date.now() } : note));
+      update(notes.map(note => note.id === editingId ? { ...note, title: title || 'Untitled note', body, highlights, folder: draftFolder, updatedAt: Date.now() } : note));
     } else {
-      update([{ id: String(Date.now()), title: title || 'Untitled note', body, highlights, updatedAt: Date.now() }, ...notes]);
+      update([{ id: String(Date.now()), title: title || 'Untitled note', body, highlights, folder: draftFolder, updatedAt: Date.now() }, ...notes]);
     }
     setDraftTitle('');
     setDraftBody('');
@@ -175,16 +260,25 @@ function Notes() {
   };
 
   const startEdit = (note: Note) => {
-    setEditingId(note.id);
-    setDraftTitle(note.title === 'Untitled note' ? '' : note.title);
-    setDraftBody(note.body);
-    setHighlights(note.highlights ?? []);
-    setSelection({ start: 0, end: 0 });
+    const go = () => {
+      setEditingId(note.id);
+      setDraftTitle(note.title === 'Untitled note' ? '' : note.title);
+      setDraftBody(note.body);
+      setHighlights(note.highlights ?? []);
+      setDraftFolder(folderOf(note));
+      setSelection({ start: 0, end: 0 });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    if (note.locked) requireUnlock(go); else go();
   };
 
   const removeNote = (id: string) => {
-    update(notes.filter(note => note.id !== id));
-    if (editingId === id) { setEditingId(null); setDraftTitle(''); setDraftBody(''); setHighlights([]); setSelection({ start: 0, end: 0 }); }
+    const note = notes.find(item => item.id === id);
+    const go = () => {
+      update(notesRef.current.filter(item => item.id !== id));
+      if (editingId === id) { setEditingId(null); setDraftTitle(''); setDraftBody(''); setHighlights([]); setSelection({ start: 0, end: 0 }); }
+    };
+    if (note?.locked) requireUnlock(go); else go();
   };
 
   const pillColor = noteColors.find(option => option.id === color)?.className ?? '';
@@ -202,7 +296,10 @@ function Notes() {
           <Button type="button" size="icon" variant="outline" aria-label="Highlight selected text" title="Highlight selected text" disabled={selection.start === selection.end} onMouseDown={event => event.preventDefault()} onClick={() => highlightSelection(color)}><Highlighter/></Button>
           <Button type="button" size="icon" variant="outline" aria-label="Remove selected highlight" title="Remove selected highlight" disabled={selection.start === selection.end} onMouseDown={event => event.preventDefault()} onClick={() => highlightSelection(null)}><X/></Button>
         </div>
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
+          <select value={folders.includes(draftFolder) ? draftFolder : 'Notes'} onChange={event => setDraftFolder(event.target.value)} aria-label="Folder" className="h-10 rounded-md border border-input bg-background px-2 text-sm">
+            {folders.map(name => <option key={name} value={name}>{name}</option>)}
+          </select>
           <Button type="button" onClick={saveDraft} disabled={!draftTitle.trim() && !draftBody.trim()}>
             {editingId ? <Pencil/> : <Plus/>}{editingId ? 'Save changes' : 'Add note'}
           </Button>
