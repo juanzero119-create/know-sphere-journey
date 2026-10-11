@@ -29,13 +29,13 @@ export function WordLibrary({ posFilter }: { posFilter: PartOfSpeech | null }) {
           className="h-9 bg-card pl-9 text-sm"
         />
       </div>
-      <div className="mt-3 grid items-start gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 gap-2 sm:columns-2 lg:columns-3">
         {list.map(w => {
           const shown = open === w.word;
           return (
             <article
               key={w.word}
-              className={`rounded-md border bg-card px-3 py-2 ${shown ? "border-primary ring-2 ring-ring" : "border-border"}`}
+              className={`mb-2 break-inside-avoid rounded-md border bg-card px-3 py-2 ${shown ? "border-primary ring-2 ring-ring" : "border-border"}`}
             >
               <div className="flex items-center gap-2">
                 <h3 className="min-w-0 flex-1 truncate text-sm font-semibold">{w.word}</h3>
