@@ -159,12 +159,12 @@ function Notes() {
     };
   }, []);
 
-  // Dragging right paints the chosen color; dragging left erases; holding still on a
-  // highlight without dragging removes that highlight (undo).
+  // A drag that starts on plain text paints the chosen color; a drag that starts on an
+  // existing highlight erases what it covers; holding still on a highlight removes it (undo).
   const hitAt = (ranges: NoteHighlight[], at: number) =>
     ranges.find(range => range.start <= at && at < range.end) ?? ranges.find(range => range.start < at && at <= range.end);
   const paint = (ranges: NoteHighlight[], start: number, end: number, anchor: number) => {
-    if (end > start) return applyHighlight(ranges, start, end, anchor === start ? colorRef.current : null);
+    if (end > start) return applyHighlight(ranges, start, end, hitAt(ranges, anchor) ? null : colorRef.current);
     const hit = hitAt(ranges, anchor);
     return hit ? applyHighlight(ranges, hit.start, hit.end, null) : ranges;
   };
@@ -177,7 +177,7 @@ function Notes() {
     update(notesRef.current.map(item => item.id === id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
     if (editingId === id && draftBody === note.body) setHighlights(nextHighlights);
   });
-  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, drag.anchor === drag.start ? color : null) : base;
+  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, hitAt(base, drag.anchor) ? null : color) : base;
 
   useEffect(() => {
     // iPhone: stop Safari's own long-press loupe in the writing box so press-and-hold
