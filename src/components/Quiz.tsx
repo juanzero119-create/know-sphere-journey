@@ -4,11 +4,11 @@ import { X } from "lucide-react";
 import { buildQuiz, type Q } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
 
-export type Mode = { kind: "words" | "anatomy" | "mixed"; name: string; lives?: number; seconds?: number };
+export type Mode = { kind: "words" | "anatomy" | "mixed"; name: string; lives?: number; seconds?: number; questions?: Q[] };
 
 export function Quiz({ mode, onClose }: { mode: Mode; onClose: () => void }) {
   const { addXp } = useProgress();
-  const [qs] = useState<Q[]>(() => buildQuiz(mode.kind, mode.seconds ? 10 : 6));
+  const [qs] = useState<Q[]>(() => mode.questions ?? buildQuiz(mode.kind, mode.seconds ? 10 : 6));
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [score, setScore] = useState(0);
