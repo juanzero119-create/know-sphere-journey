@@ -31,7 +31,9 @@ export const hasFaceId = () => Boolean(read()?.credentialId);
 export async function setLockPassword(password: string) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const previous = read();
-  write({ salt: toB64(salt), hash: await derive(password, salt), credentialId: previous?.credentialId });
+  const next: LockConfig = { salt: toB64(salt), hash: await derive(password, salt) };
+  if (previous?.credentialId) next.credentialId = previous.credentialId;
+  write(next);
 }
 
 export async function verifyLockPassword(password: string) {
