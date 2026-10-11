@@ -109,7 +109,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var k="lexi-boot-reload",re=/Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i;function r(m){try{if(!re.test(m||"")||sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1");location.reload();}catch(e){}}addEventListener("error",function(e){r(e.message||(e.target&&e.target.src?"Importing a module script failed":""))},true);addEventListener("unhandledrejection",function(e){r(String(e.reason&&e.reason.message||e.reason))});addEventListener("vite:preloadError",function(e){e.preventDefault();r("Importing a module script failed")});setTimeout(function(){try{sessionStorage.removeItem(k)}catch(e){}},10000);})();`,
+            __html: `(function(){var k="lexi-boot-reload",busy=false,re=/Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i;function show(){if(document.getElementById("lexi-recover"))return;var d=document.createElement("div");d.id="lexi-recover";d.setAttribute("style","position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#2a2a2a;color:#eee;font:16px system-ui;text-align:center;padding:24px");d.innerHTML='<div>Lexi is updating. Please reload.</div><button style="padding:12px 24px;border-radius:10px;border:0;background:#EFC500;color:#111;font:600 16px system-ui">Reload</button>';d.querySelector("button").onclick=function(){try{sessionStorage.removeItem(k)}catch(e){}location.reload()};(document.body||document.documentElement).appendChild(d)}function r(m){try{if(busy||!re.test(m||""))return;var n=+(sessionStorage.getItem(k)||0);if(n>=3){if(document.body)show();else addEventListener("DOMContentLoaded",show);return}busy=true;sessionStorage.setItem(k,String(n+1));setTimeout(function(){location.reload()},400+n*1200)}catch(e){}}addEventListener("error",function(e){r(e.message||(e.target&&e.target.tagName==="SCRIPT"?"Importing a module script failed":""))},true);addEventListener("unhandledrejection",function(e){r(String(e.reason&&e.reason.message||e.reason))});addEventListener("vite:preloadError",function(e){e.preventDefault();r("Importing a module script failed")});addEventListener("load",function(){setTimeout(function(){try{if(!document.getElementById("lexi-recover"))sessionStorage.removeItem(k)}catch(e){}},10000)});})();`,
           }}
         />
         <HeadContent />
@@ -127,12 +127,14 @@ function RootComponent() {
 
   // Recover once from stale module chunks (e.g. after an update) instead of a blank screen.
   useEffect(() => {
-    const key = "lexi-chunk-reload";
+    const key = "lexi-boot-reload";
     const isChunkError = (msg: string) =>
       /Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i.test(msg);
     const recover = (msg: string) => {
-      if (!isChunkError(msg) || sessionStorage.getItem(key)) return;
-      sessionStorage.setItem(key, "1");
+      if (!isChunkError(msg)) return;
+      const n = Number(sessionStorage.getItem(key) || 0);
+      if (n >= 3) return;
+      sessionStorage.setItem(key, String(n + 1));
       window.location.reload();
     };
     const onPreload = (e: Event) => {
