@@ -140,18 +140,31 @@ function Notes() {
   const notesRef = useRef(notes);
   notesRef.current = notes;
   useEffect(() => {
-    // Touch selections on saved notes finish with drag handles, so apply once the selection settles.
+    // Show the floating color bar once a text selection exists (draft box or saved note).
     let timer: number | undefined;
     const onChange = () => {
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
+        // Draft box selection: anchor the bar above the writing box.
+        const box = editor.current;
+        if (box && document.activeElement === box && box.selectionStart !== box.selectionEnd) {
+          const rect = draftBox.current?.getBoundingClientRect();
+          if (rect) setSelMenu({ target: 'draft', x: rect.left + rect.width / 2, y: rect.top, start: box.selectionStart, end: box.selectionEnd });
+          return;
+        }
         const selected = window.getSelection();
-        if (!selected || selected.isCollapsed || !selected.anchorNode) return;
+        if (!selected || selected.isCollapsed || !selected.anchorNode) { setSelMenu(null); return; }
         const start = selected.anchorNode instanceof Element ? selected.anchorNode : selected.anchorNode.parentElement;
         const element = start?.closest<HTMLParagraphElement>('[data-note-id]');
-        const note = element && notesRef.current.find(item => item.id === element.dataset['noteId']);
-        if (element && note) savedHighlighter.current(element, note);
-      }, 700);
+        if (!element) { setSelMenu(null); return; }
+        const range = selected.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        const prefix = range.cloneRange();
+        prefix.selectNodeContents(element);
+        prefix.setEnd(range.startContainer, range.startOffset);
+        const from = prefix.toString().length;
+        setSelMenu({ target: element.dataset['noteId'] ?? '', x: rect.left + rect.width / 2, y: rect.top, start: from, end: from + range.toString().length });
+      }, 250);
     };
     const onEditorSelect = () => { if (document.activeElement === editor.current) captureRef.current(); };
     document.addEventListener('selectionchange', onChange);
