@@ -210,29 +210,84 @@ function Notes() {
         </div>
       </div>
     </Section>
-    <Section number="02" title="Your notes" subtitle={`${notes.length} note${notes.length === 1 ? '' : 's'}`}>
-      {notes.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          <NotebookPen className="mx-auto mb-3 size-8"/>
-          No notes yet — write your first one above.
-        </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {notes.map(note => (
-            <article key={note.id} className="rounded-lg border border-border bg-card p-5">
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="break-words text-lg font-semibold">{note.title}</h3>
-                <div className="flex shrink-0 gap-1">
-                  <Button type="button" variant="ghost" size="icon" aria-label={`Edit ${note.title}`} onClick={() => startEdit(note)}><Pencil className="size-4"/></Button>
-                  <Button type="button" variant="ghost" size="icon" aria-label={`Delete ${note.title}`} onClick={() => removeNote(note.id)}><Trash2 className="size-4"/></Button>
-                </div>
-              </div>
-              {note.body && <p data-note-id={note.id} data-color={color} onPointerDown={event => begin(event, note.id, event.currentTarget)} onPointerUp={event => highlightSavedText(event.currentTarget, note)} className="note-select note-press mt-2 select-text whitespace-pre-wrap break-words text-sm text-muted-foreground"><HighlightedNote body={note.body} highlights={withDrag(note.id, note.highlights ?? [])}/></p>}
-              <p className="mt-3 text-xs text-muted-foreground">{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-            </article>
-          ))}
-        </div>
-      )}
+    <Section number="02" title="Folders" subtitle={`${notes.length} note${notes.length === 1 ? '' : 's'}`}>
+      <div className="overflow-hidden rounded-2xl bg-card">
+        {[{ id: 'all', name: 'All Notes', count: notes.length }, ...folders.map(name => ({ id: name, name, count: notes.filter(note => folderOf(note) === name).length }))].map(item => (
+          <div key={item.id} className="group flex items-center">
+            <button type="button" onClick={() => setActiveFolder(item.id)} aria-pressed={activeFolder === item.id} className={`flex min-w-0 flex-1 items-center gap-4 px-4 py-3 text-left ${activeFolder === item.id ? 'bg-secondary' : ''}`}>
+              <Folder className="size-6 shrink-0 text-primary"/>
+              <span className="flex min-w-0 flex-1 items-center gap-3 border-b border-border pb-3 -mb-3">
+                <span className="truncate text-base">{item.name}</span>
+                <span className="ml-auto text-muted-foreground">{item.count}</span>
+                <ChevronRight className="size-4 shrink-0 text-muted-foreground"/>
+              </span>
+            </button>
+            {item.id !== 'all' && item.id !== 'Notes' && <div className="flex pr-2">
+              <Button type="button" variant="ghost" size="icon" aria-label={`Rename ${item.name}`} onClick={() => renameFolder(item.id)}><Pencil className="size-4"/></Button>
+              <Button type="button" variant="ghost" size="icon" aria-label={`Delete ${item.name}`} onClick={() => deleteFolder(item.id)}><Trash2 className="size-4"/></Button>
+            </div>}
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button type="button" variant="outline" onClick={addFolder}><FolderPlus/>New folder</Button>
+        {unlocked ? <Button type="button" variant="outline" onClick={() => setUnlocked(false)}><Lock/>Lock notes now</Button>
+          : notes.some(note => note.locked) && <Button type="button" variant="outline" onClick={() => requireUnlock(() => undefined)}><Unlock/>Unlock notes</Button>}
+        {unlocked && canFace && !faceOn && <Button type="button" variant="outline" onClick={async () => { try { await enableFaceId(); setFaceOn(true); } catch { /* cancelled */ } }}><ScanFace/>Turn on Face ID</Button>}
+        {faceOn && unlocked && <Button type="button" variant="ghost" onClick={() => { disableFaceId(); setFaceOn(false); }}>Turn off Face ID</Button>}
+      </div>
     </Section>
+    <Section number="03" title={activeFolder === 'all' ? 'All Notes' : activeFolder} subtitle={`${visible.length} note${visible.length === 1 ? '' : 's'}`}>
+      <div className="sticky bottom-3 z-20 order-last mb-4 flex items-center gap-2">
+        <label className="flex flex-1 items-center gap-2 rounded-full border border-border bg-secondary/90 px-4 py-2 backdrop-blur">
+          <Search className="size-5 text-muted-foreground"/>
+          <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search" aria-label="Search notes" className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground"/>
+        </label>
+        <Button type="button" size="icon" variant="outline" className="size-11 rounded-full" aria-label="New note" onClick={newNote}><SquarePen/></Button>
+      </div>
+      {visible.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+          <NotebookPen className="mx-auto mb-3 size-8"/>
+          {query ? 'No notes match your search.' : 'No notes here yet — write one above.'}
+        </div>
+      ) : groups.map(group => (
+        <div key={group.label} className="mb-6">
+          <button type="button" className="mb-2 flex w-full items-center justify-between text-xl font-bold" onClick={() => setCollapsed(old => ({ ...old, [group.label]: !old[group.label] }))} aria-expanded={!collapsed[group.label]}>
+            {group.label}<ChevronDown className={`size-5 text-muted-foreground transition-transform ${collapsed[group.label] ? '-rotate-90' : ''}`}/>
+          </button>
+          {!collapsed[group.label] && <div className="overflow-hidden rounded-2xl bg-card">
+            {group.notes.map(note => {
+              const hidden = note.locked && !unlocked;
+              const open = openId === note.id && !hidden;
+              return <article key={note.id} className="border-b border-border px-4 py-3 last:border-b-0">
+                <div className="flex items-start gap-2">
+                  {note.locked ? <Lock className="mt-1 size-4 shrink-0 text-muted-foreground"/> : <span className="w-4 shrink-0"/>}
+                  <button type="button" className="min-w-0 flex-1 text-left" onClick={() => hidden ? requireUnlock(() => setOpenId(note.id)) : setOpenId(open ? null : note.id)} aria-expanded={open}>
+                    <h3 className="truncate text-base font-semibold">{note.title}</h3>
+                    <p className="truncate text-sm text-muted-foreground"><span className="mr-2">{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: '2-digit' })}</span>{hidden ? 'Locked' : note.body.split('\n')[0] || 'No additional text'}</p>
+                    <p className="flex items-center gap-1 text-sm text-muted-foreground"><Folder className="size-3.5"/>{folderOf(note)}</p>
+                  </button>
+                  <div className="flex shrink-0">
+                    <Button type="button" variant="ghost" size="icon" aria-label={note.pinned ? `Unpin ${note.title}` : `Pin ${note.title}`} aria-pressed={!!note.pinned} onClick={() => patch(note.id, { pinned: !note.pinned })}>{note.pinned ? <PinOff className="size-4"/> : <Pin className="size-4"/>}</Button>
+                    <Button type="button" variant="ghost" size="icon" aria-label={note.locked ? `Remove lock from ${note.title}` : `Lock ${note.title}`} onClick={() => requireUnlock(() => patch(note.id, { locked: !note.locked }))}>{note.locked ? <Unlock className="size-4"/> : <Lock className="size-4"/>}</Button>
+                  </div>
+                </div>
+                {open && <div className="mt-3 pl-6">
+                  {note.body && <p data-note-id={note.id} data-color={color} onPointerDown={event => begin(event, note.id, event.currentTarget)} onPointerUp={event => highlightSavedText(event.currentTarget, note)} className="note-select note-press select-text whitespace-pre-wrap break-words text-sm text-muted-foreground"><HighlightedNote body={note.body} highlights={withDrag(note.id, note.highlights ?? [])}/></p>}
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <select value={folderOf(note)} onChange={event => patch(note.id, { folder: event.target.value })} aria-label={`Folder for ${note.title}`} className="h-9 rounded-md border border-input bg-background px-2 text-sm">
+                      {folders.map(name => <option key={name} value={name}>{name}</option>)}
+                    </select>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => startEdit(note)}><Pencil className="size-4"/>Edit</Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => removeNote(note.id)}><Trash2 className="size-4"/>Delete</Button>
+                  </div>
+                </div>}
+              </article>;
+            })}
+          </div>}
+        </div>
+      ))}
+    </Section>
+    <NoteLockDialog open={lockOpen} onOpenChange={open => { setLockOpen(open); if (!open) pending.current = null; }} onUnlocked={() => { setUnlocked(true); setFaceOn(hasFaceId()); const run = pending.current; pending.current = null; run?.(); }}/>
   </Shell>;
 }
