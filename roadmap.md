@@ -107,3 +107,8 @@
 - [x] Keep the top bar clear of the status bar and the bottom bar clear of the home indicator.
 - [x] Fit every bottom tab on one row on a phone-sized screen.
 - [x] Verify the install files and the phone layout.
+
+# Compact word library
+- [x] Shrink each word to a single-line tile showing only the word and its part of speech.
+- [x] Add a beveled detail key that opens the full definition, example and synonym inline.
+- [x] Verify the library, the detail key, the part-of-speech filter and the phone layout.

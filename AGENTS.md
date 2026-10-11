@@ -29,3 +29,4 @@
 - Keep per-side chess Elo targets in the visit-scoped chess store and validate them with a shared schema; this preserves difficulty across navigation and resets without claiming calibrated engine ratings.
 - Keep the player's built-up chess rating in the browser-only chess-rating store, updated by the chess store when a Vs AI game ends; this keeps rating logic separate from AI difficulty targets.
 - Keep iPhone installability manifest-only (public/manifest.webmanifest plus icon PNGs in public/, no service worker); this gives a home-screen app icon without stale-cache blank screens in preview.
+- Render compact list detail toggles through the shared beveled .chip-icon key and reveal the extra text inline in the same tile; this keeps detail controls consistent with film chips and avoids modal layers over plain lists.

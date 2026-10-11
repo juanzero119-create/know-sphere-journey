@@ -240,9 +240,33 @@ nav [data-status='active'] .nav-tile {
   line-height: 1.15;
   max-width: 9rem;
 }
+
+/* Icon-only beveled key: the same raised surface as .film-chip, square and
+   label-free, so compact list rows can carry a detail toggle. */
+.chip-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  flex: none;
+  border-radius: 0.45rem;
+  background: var(--chip);
+  color: var(--chip-foreground);
+  box-shadow:
+    inset 0 1px 0 var(--chip-hi),
+    inset 0 -2px 0 var(--chip-lo),
+    0 2px 0 var(--chip-edge);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.chip-icon:hover { transform: translateY(-1px); }
+.chip-icon:active { transform: translateY(1px); }
+.chip-icon:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
 @media (prefers-reduced-motion: reduce) {
   .film-chip { transition: none; }
   .film-chip:hover { transform: none; }
+  .chip-icon { transition: none; }
+  .chip-icon:hover, .chip-icon:active { transform: none; }
 }
 
 /* The Play button turns green while the game is running. */
