@@ -29,7 +29,7 @@ export interface ChessState {
 
 const initialState: ChessState = {
   version: 0,
-  clock: { w: BLITZ, b: BLITZ },
+  clock: { w: startMs(DEFAULT_TIME), b: startMs(DEFAULT_TIME) },
   started: false,
   mode: 'ai',
   humanSide: 'w',
@@ -39,6 +39,7 @@ const initialState: ChessState = {
   aiNote: '',
   elo: { w: DEFAULT_ELO, b: DEFAULT_ELO },
   paused: false,
+  time: DEFAULT_TIME,
 };
 
 // Module-level game + state: survives route unmounts, so the game (and AI
