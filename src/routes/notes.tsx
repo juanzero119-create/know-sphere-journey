@@ -292,6 +292,16 @@ function Notes() {
   const pillColor = noteColors.find(option => option.id === color)?.className ?? '';
   return <Shell title="Notes">
     {drag && <div aria-hidden="true" className={`pointer-events-none fixed z-50 grid h-7 w-12 -translate-x-1/2 -translate-y-full place-items-center rounded-full shadow-lg ring-2 ring-background ${pillColor}`} style={{ left: drag.x, top: drag.y - 14 }}><Highlighter className="size-4"/></div>}
+    {selMenu && !drag && <div role="toolbar" aria-label="Highlight selection" className="fixed z-50 flex -translate-x-1/2 -translate-y-full items-center gap-1 rounded-full border border-border bg-card p-1 shadow-xl" style={{ left: Math.min(Math.max(selMenu.x, 110), window.innerWidth - 110), top: Math.max(selMenu.y - 10, 60) }}>
+      {noteColors.map(option => <Button key={option.id} type="button" size="icon" variant="ghost" aria-label={`${option.label} highlight`} title={`${option.label} highlight`} onPointerDown={event => event.preventDefault()} onClick={() => {
+        if (selMenu.target === 'draft') { setHighlights(old => applyHighlight(old, selMenu.start, selMenu.end, option.id)); editor.current?.setSelectionRange(selMenu.end, selMenu.end); setSelection({ start: selMenu.end, end: selMenu.end }); setSelMenu(null); }
+        else { const element = document.querySelector<HTMLParagraphElement>(`[data-note-id="${selMenu.target}"]`); const note = notesRef.current.find(item => item.id === selMenu.target); if (element && note) { const nextHighlights = applyHighlight(note.highlights ?? [], selMenu.start, selMenu.end, option.id); update(notesRef.current.map(item => item.id === note.id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item)); window.getSelection()?.removeAllRanges(); setSelMenu(null); } }
+      }}><span className={`size-5 rounded-sm ${option.className}`}/></Button>)}
+      <Button type="button" size="icon" variant="ghost" aria-label="Remove highlight" title="Remove highlight" onPointerDown={event => event.preventDefault()} onClick={() => {
+        if (selMenu.target === 'draft') { setHighlights(old => applyHighlight(old, selMenu.start, selMenu.end, null)); setSelMenu(null); }
+        else { const note = notesRef.current.find(item => item.id === selMenu.target); if (note) { update(notesRef.current.map(item => item.id === note.id ? { ...item, highlights: applyHighlight(note.highlights ?? [], selMenu.start, selMenu.end, null), updatedAt: Date.now() } : item)); window.getSelection()?.removeAllRanges(); setSelMenu(null); } }
+      }}><X className="size-4"/></Button>
+    </div>}
     <Section number="01" title="Write a note" subtitle="Saved on this device">
       <div className="rounded-lg border border-border bg-card p-6">
         <Input value={draftTitle} onChange={event => setDraftTitle(event.target.value)} placeholder="Note title" aria-label="Note title" maxLength={80} disabled={!ready}/>
