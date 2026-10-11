@@ -8,40 +8,40 @@ describe('Word library', () => {
   it('shows only the word and its part of speech until the detail key is used', async () => {
     await renderWithRouter(<WordLibrary posFilter={null} />);
 
-    expect(screen.getByText('Ephemeral')).toBeInTheDocument();
-    expect(screen.queryByText('Lasting a very short time')).toBeNull();
+    expect(screen.getByText('Immutable')).toBeInTheDocument();
+    expect(screen.queryByText('Unchanging forever')).toBeNull();
 
-    const key = screen.getByRole('button', { name: 'Show full definition of Ephemeral' });
+    const key = screen.getByRole('button', { name: 'Show full definition of Immutable' });
     expect(key).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(key);
 
-    expect(screen.getByText('Lasting a very short time')).toBeInTheDocument();
-    expect(screen.getByText('“The ephemeral beauty of a sunset.”')).toBeInTheDocument();
-    expect(screen.getByText('Fleeting')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Hide full definition of Ephemeral' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('Unchanging forever')).toBeInTheDocument();
+    expect(screen.getByText('“The laws of physics are immutable.”')).toBeInTheDocument();
+    expect(screen.getByText('Permanent')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Hide full definition of Immutable' })).toHaveAttribute('aria-expanded', 'true');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Hide full definition of Ephemeral' }));
-    expect(screen.queryByText('Lasting a very short time')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Hide full definition of Immutable' }));
+    expect(screen.queryByText('Unchanging forever')).toBeNull();
   });
 
   it('opens one word at a time', async () => {
     await renderWithRouter(<WordLibrary posFilter={null} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Show full definition of Ephemeral' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Show full definition of Candid' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Show full definition of Immutable' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Show full definition of Callous' }));
 
-    expect(screen.queryByText('Lasting a very short time')).toBeNull();
-    expect(screen.getByText('Truthful and straightforward')).toBeInTheDocument();
+    expect(screen.queryByText('Unchanging forever')).toBeNull();
+    expect(screen.getByText('Unfeeling toward others’ suffering')).toBeInTheDocument();
   });
 
   it('keeps the part-of-speech filter and search working', async () => {
     await renderWithRouter(<WordLibrary posFilter="verb" />);
 
-    expect(screen.getByText('Persevere')).toBeInTheDocument();
-    expect(screen.queryByText('Ephemeral')).toBeNull();
+    expect(screen.getByText('Forgo')).toBeInTheDocument();
+    expect(screen.queryByText('Immutable')).toBeNull();
 
-    fireEvent.change(screen.getByLabelText('Search words'), { target: { value: 'persevere' } });
-    expect(screen.queryByText('Clarify')).toBeNull();
+    fireEvent.change(screen.getByLabelText('Search words'), { target: { value: 'forgo' } });
+    expect(screen.queryByText('Contemplating')).toBeNull();
 
     fireEvent.change(screen.getByLabelText('Search words'), { target: { value: 'zzz' } });
     expect(screen.getByText('No words match your search.')).toBeInTheDocument();
