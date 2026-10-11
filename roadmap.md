@@ -112,3 +112,10 @@
 - [x] Shrink each word to a single-line tile showing only the word and its part of speech.
 - [x] Add a beveled detail key that opens the full definition, example and synonym inline.
 - [x] Verify the library, the detail key, the part-of-speech filter and the phone layout.
+
+# Explore topics
+- [x] Remove the Practice section (level test, challenges, games, categories) from Vocabulary.
+- [x] Add an Explore topics section with search and grouped tiles: quick tiles, About ourselves, By parts of speech, Culture, By level, Lexicon, The world around us, By test, By origin, Languages.
+- [x] Give every topic its own word list opened in a panel with compact rows and detail keys.
+- [x] Make Favorites, Collections, Your own words and History functional and saved on the device.
+- [x] Verify with tests and on a phone-sized screen.

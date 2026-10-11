@@ -30,3 +30,6 @@
 - Keep the player's built-up chess rating in the browser-only chess-rating store, updated by the chess store when a Vs AI game ends; this keeps rating logic separate from AI difficulty targets.
 - Keep iPhone installability manifest-only (public/manifest.webmanifest plus icon PNGs in public/, no service worker); this gives a home-screen app icon without stale-cache blank screens in preview.
 - Render compact list detail toggles through the shared beveled .chip-icon key and reveal the extra text inline in the same tile; this keeps detail controls consistent with film chips and avoids modal layers over plain lists.
+- Keep vocabulary topic data in the browser-safe module src/lib/topics.ts (grouped topics, each with its own word list); parts-of-speech tiles filter the main library instead of carrying words.
+- Keep favorites, custom words, history and collections in the localStorage-backed store src/lib/word-lists.ts with a fixed empty SSR snapshot; this persists word lists on the device without a backend.
+- Render compact word rows through the shared WordRows component (detail key plus favorite star) so the library, topic panels and quick tiles behave identically.
