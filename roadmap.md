@@ -1,4 +1,5 @@
 # Movie section
+- [x] Add available trailer frames to every movie's Photos gallery and verify viewing controls.
 - [x] Show portraits beside cast names on every film detail page.
 - [x] Fill missing cast portraits and verify photo coverage.
 - [x] Add a separate IMDb-style Movies page with detailed film information.

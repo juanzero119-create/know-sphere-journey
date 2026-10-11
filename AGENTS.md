@@ -14,6 +14,7 @@
 - Use Section for numbered content bands and the shared Button for controls; this keeps the expanded learning views consistent.
 
 - Keep the curated film catalog in a browser-safe data module with a Movies leaf and parameterized Film detail leaf; this supports direct links without a live movie API.
+- Keep trailer photo frames in project asset pointers, indexed by the browser-safe film-photos module; this avoids external image hotlinks and keeps galleries separate from trailer playback.
 - Render cast portraits through ActorPortrait with normalized apostrophes and an image-error fallback; this keeps every movie's cast photos consistent and prevents broken images.
 - Keep the actor-entry interface in its own presentation component with independently tokenized name highlights and visit-only state; this isolates custom cast entries from the curated catalog without adding backend behavior.
 - Render every film an actor appears in through the shared FilmChip tile with its token-driven bevel, poster thumbnail and optional role note; this keeps actor filmography links identical across film pages, actor cards and search and readable on both themes.
