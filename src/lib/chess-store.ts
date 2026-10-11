@@ -154,6 +154,7 @@ async function maybeAiMove() {
   if (game.history().length < 2) {
     // Wait a beat before each opening pawn move so White's and Black's moves
     // land one after the other instead of appearing at the same instant.
+    const gameBefore = game;
     const fenBefore = game.fen();
     state.thinking = true;
     state.thinkingSince = Date.now();
@@ -161,8 +162,9 @@ async function maybeAiMove() {
     await new Promise((r) => setTimeout(r, 900));
     state.thinking = false;
     aiRunning = false;
-    if (game.fen() !== fenBefore || isOver() || state.paused) {
+    if (game !== gameBefore || game.fen() !== fenBefore || isOver() || state.paused) {
       emit();
+      void maybeAiMove(); // re-check from scratch (no-op while paused)
       return;
     }
     const pawns = game.moves({ verbose: true }).filter((m) => m.piece === 'p');
