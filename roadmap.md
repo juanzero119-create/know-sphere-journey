@@ -121,6 +121,6 @@
 - [x] Verify with tests and on a phone-sized screen.
 
 # Dictionary-style word details
-- [ ] Add original expanded meanings, pronunciation, examples and usage facts for every built-in vocabulary word.
-- [ ] Show the same rich details in the library, topics and flashcards while keeping closed rows compact.
-- [ ] Verify coverage, detail controls and mobile readability.
+- [x] Add original expanded meanings, pronunciation, examples and usage facts for every built-in vocabulary word.
+- [x] Show the same rich details in the library, topics and flashcards while keeping closed rows compact.
+- [x] Verify coverage, detail controls and mobile readability.
