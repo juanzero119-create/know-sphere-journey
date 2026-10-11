@@ -47,6 +47,7 @@ const initialState: ChessState = {
 // Module-level game + state: survives route unmounts, so the game (and AI
 // moves) keep running while the user browses other tabs. Visit-scoped only.
 let game = new Chess();
+randomizeOpening(game);
 let state: ChessState = initialState;
 const listeners = new Set<() => void>();
 
