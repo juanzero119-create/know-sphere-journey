@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Info, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/Section";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Shell } from "@/components/Shell";
 import { Quiz } from "@/components/Quiz";
 import { partsOfSpeech, words, type PartOfSpeech } from "@/lib/data";
@@ -30,6 +30,7 @@ function Words() {
   const [quiz, setQuiz] = useState(false);
   const [details, setDetails] = useState(false);
   const [posFilter, setPosFilter] = useState<PartOfSpeech | null>(null);
+  const libraryRef = useRef<HTMLDivElement>(null);
   const w = words[i];
   if (!w) return null;
   return (
@@ -67,7 +68,7 @@ function Words() {
       <Section number="03" title="Parts of speech" subtitle="Noun, pronoun, verb, adjective, adverb — tap one to filter the library.">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {partsOfSpeech.map(p => (
-            <Button variant="ghost" key={p.pos} aria-pressed={posFilter === p.pos} onClick={() => setPosFilter(posFilter === p.pos ? null : p.pos)} className={`flex h-auto flex-col items-start gap-2 whitespace-normal rounded-lg border bg-card p-4 text-left hover:bg-card ${posFilter === p.pos ? "border-primary ring-2 ring-ring" : "border-border"}`}>
+            <Button variant="ghost" key={p.pos} aria-pressed={posFilter === p.pos} onClick={() => { setPosFilter(posFilter === p.pos ? null : p.pos); libraryRef.current?.scrollIntoView({ block: "start" }); }} className={`flex h-auto flex-col items-start gap-2 whitespace-normal rounded-lg border bg-card p-4 text-left hover:bg-card ${posFilter === p.pos ? "border-primary ring-2 ring-ring" : "border-border"}`}>
               <span className="text-sm font-semibold capitalize">{p.pos}</span>
               <span className="text-xs font-normal leading-relaxed text-muted-foreground">{p.meaning}</span>
               <span className="border-t border-border pt-2 text-xs font-normal italic text-muted-foreground">“{p.example}”</span>
@@ -76,7 +77,7 @@ function Words() {
         </div>
       </Section>
       <Section number="04" title="Word library" subtitle="Tap a word’s detail key for its full definition.">
-        <WordLibrary posFilter={posFilter} />
+        <div ref={libraryRef} className="scroll-mt-6"><WordLibrary posFilter={posFilter} /></div>
       </Section>
       {quiz && <Quiz mode={{ kind: "words", name: "Word quiz" }} onClose={() => setQuiz(false)} />}
     </Shell>
