@@ -3,13 +3,14 @@ import { Chess, type Square } from 'chess.js';
 import { getAiMove } from '@/lib/chess-ai.functions';
 import { getChessModelFor } from '@/lib/chess-models';
 import { DEFAULT_ELO, eloSchema } from '@/lib/chess-elo';
+import { DEFAULT_TIME, timeSchema, type ChessTime } from '@/lib/chess-time';
 import { playGameEndSound, playMoveSound } from '@/lib/chess-sounds';
 import { recordRatedGame } from '@/lib/chess-rating';
 
 export type ChessMode = 'ai' | '2p' | 'aivai';
 
-const BLITZ = 3 * 60 * 1000;
-const INC = 2000;
+const startMs = (time: ChessTime) => time.minutes * 60 * 1000;
+const incMs = (time: ChessTime) => time.incrementSec * 1000;
 
 export interface ChessState {
   version: number;
@@ -23,11 +24,12 @@ export interface ChessState {
   aiNote: string;
   elo: { w: number; b: number };
   paused: boolean;
+  time: ChessTime;
 }
 
 const initialState: ChessState = {
   version: 0,
-  clock: { w: BLITZ, b: BLITZ },
+  clock: { w: startMs(DEFAULT_TIME), b: startMs(DEFAULT_TIME) },
   started: false,
   mode: 'ai',
   humanSide: 'w',
@@ -37,6 +39,7 @@ const initialState: ChessState = {
   aiNote: '',
   elo: { w: DEFAULT_ELO, b: DEFAULT_ELO },
   paused: false,
+  time: DEFAULT_TIME,
 };
 
 // Module-level game + state: survives route unmounts, so the game (and AI
@@ -119,7 +122,7 @@ function maybePlayEndSound() {
 }
 
 function applyMove(from: Square, to: Square, turn: 'w' | 'b') {
-  state.clock = { ...state.clock, [turn]: state.clock[turn] + (state.started ? INC : 0) };
+  state.clock = { ...state.clock, [turn]: state.clock[turn] + (state.started ? incMs(state.time) : 0) };
   state.started = true;
   state.lastMove = [from, to];
   playMoveSound();
@@ -181,8 +184,9 @@ export function resetChess(mode?: ChessMode) {
     version: state.version + 1,
     mode: mode ?? state.mode,
     humanSide: state.humanSide,
-    clock: { w: BLITZ, b: BLITZ },
+    clock: { w: startMs(state.time), b: startMs(state.time) },
     elo: { ...state.elo },
+    time: { ...state.time },
   };
   listeners.forEach((l) => l());
   void maybeAiMove();
@@ -203,6 +207,14 @@ export function setChessElo(side: 'w' | 'b', elo: number) {
   if (!parsed.success) return;
   state = { ...state, elo: { ...state.elo, [side]: parsed.data } };
   emit();
+}
+
+export function setChessTime(time: ChessTime) {
+  const parsed = timeSchema.safeParse(time);
+  if (!parsed.success) return;
+  if (parsed.data.minutes === state.time.minutes && parsed.data.incrementSec === state.time.incrementSec) return;
+  state = { ...state, time: parsed.data };
+  resetChess(); // new clocks apply from the next game
 }
 
 export function setChessPaused(paused: boolean) {
