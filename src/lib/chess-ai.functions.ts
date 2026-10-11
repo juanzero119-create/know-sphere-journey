@@ -48,10 +48,15 @@ async function ask(model: string, prompt: string, key: string) {
 }
 
 export const getAiMove = createServerFn({ method: 'POST' })
-  .inputValidator((d: { fen: string; model: string; elo?: number }) => z.object({
+  .inputValidator((d: { fen: string; model: string; elo?: number; clockSec?: { own: number; opponent: number; increment: number } }) => z.object({
     fen: z.string().trim().min(1).max(120),
     model: z.string().trim().min(1).max(160).regex(/^[a-zA-Z0-9._:/-]+$/),
     elo: eloSchema.default(DEFAULT_ELO),
+    clockSec: z.object({
+      own: z.number().int().min(0).max(86400),
+      opponent: z.number().int().min(0).max(86400),
+      increment: z.number().int().min(0).max(600),
+    }).optional(),
   }).parse(d))
   .handler(async ({ data }) => {
     const key = process.env['LOVABLE_API_KEY'];
