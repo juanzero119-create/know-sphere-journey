@@ -18,7 +18,7 @@ export function colorClass(color: NoteColor): string {
   return `bg-name-${color}`;
 }
 
-const blends: Record<string, BlendNoteColor> = {
+const blends: Record<string, NoteColor> = {
   'blue+gold': 'green',
   'gold+rose': 'orange',
   'gold+green': 'lime',
