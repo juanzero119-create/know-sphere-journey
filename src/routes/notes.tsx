@@ -164,7 +164,8 @@ function Notes() {
   const hitAt = (ranges: NoteHighlight[], at: number) =>
     ranges.find(range => range.start <= at && at < range.end) ?? ranges.find(range => range.start < at && at <= range.end);
   const paint = (ranges: NoteHighlight[], start: number, end: number, anchor: number) => {
-    if (end > start) return applyHighlight(ranges, start, end, hitAt(ranges, anchor) ? null : colorRef.current);
+    // Erase only when dragging backward (right-to-left) over a highlight; forward drags always paint.
+    if (end > start) return applyHighlight(ranges, start, end, end < anchor && hitAt(ranges, anchor) ? null : colorRef.current);
     const hit = hitAt(ranges, anchor);
     return hit ? applyHighlight(ranges, hit.start, hit.end, null) : ranges;
   };
