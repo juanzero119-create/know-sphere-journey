@@ -65,7 +65,7 @@ function Watch() {
 
   // Initial load + topic changes
   useEffect(() => {
-    runSearch(TOPIC_QUERIES[topic] ?? TOPIC_QUERIES.All);
+    runSearch(TOPIC_QUERIES[topic] ?? TOPIC_QUERIES["All"]!);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topic]);
 
