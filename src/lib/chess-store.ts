@@ -179,17 +179,22 @@ export function resetChess(mode?: ChessMode) {
   stopClock();
   endSoundPlayed = false;
   game = new Chess();
+  const nextMode = mode ?? state.mode;
+  // When the AI moves first (AI vs AI, or the human chose Black), hold the
+  // new game paused until the player presses Play — nothing moves on its own.
+  const aiOpens = nextMode === 'aivai' || (nextMode === 'ai' && state.humanSide === 'b');
   state = {
     ...initialState,
     version: state.version + 1,
-    mode: mode ?? state.mode,
+    mode: nextMode,
     humanSide: state.humanSide,
     clock: { w: startMs(state.time), b: startMs(state.time) },
     elo: { ...state.elo },
     time: { ...state.time },
+    paused: aiOpens,
   };
   listeners.forEach((l) => l());
-  void maybeAiMove();
+  void maybeAiMove(); // a no-op while paused; Play resumes it
 }
 
 export function setChessMode(mode: ChessMode) {
