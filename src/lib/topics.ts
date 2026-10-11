@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  Palette, BookOpen, MessagesSquare, Users, Briefcase,
+  Palette, BookOpen, MessagesSquare, Users, Briefcase, Plane,
   GraduationCap, Landmark, Scroll, Omega, Languages, Smile,
   PersonStanding, Fingerprint, Sparkles, Scale, Zap,
   Heart, FolderHeart, PenLine, History,
