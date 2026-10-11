@@ -164,7 +164,8 @@ function Notes() {
   const hitAt = (ranges: NoteHighlight[], at: number) =>
     ranges.find(range => range.start <= at && at < range.end) ?? ranges.find(range => range.start < at && at <= range.end);
   const paint = (ranges: NoteHighlight[], start: number, end: number, anchor: number) => {
-    if (end > start) return applyHighlight(ranges, start, end, hitAt(ranges, anchor) ? null : colorRef.current);
+    // Erase only when dragging backward (right-to-left) over a highlight; forward drags always paint.
+    if (end > start) return applyHighlight(ranges, start, end, end < anchor && hitAt(ranges, anchor) ? null : colorRef.current);
     const hit = hitAt(ranges, anchor);
     return hit ? applyHighlight(ranges, hit.start, hit.end, null) : ranges;
   };
@@ -177,7 +178,7 @@ function Notes() {
     update(notesRef.current.map(item => item.id === id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
     if (editingId === id && draftBody === note.body) setHighlights(nextHighlights);
   });
-  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, hitAt(base, drag.anchor) ? null : color) : base;
+  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, drag.end < drag.anchor && hitAt(base, drag.anchor) ? null : color) : base;
 
   useEffect(() => {
     // iPhone: stop Safari's own long-press loupe in the writing box so press-and-hold
