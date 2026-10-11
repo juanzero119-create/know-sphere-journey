@@ -9,30 +9,30 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep learning content in separate TanStack leaf routes within the shared Shell; this preserves direct navigation to each learning discipline.
-- Store note highlights as validated text ranges alongside plain-text notes and render them as React marks; this preserves existing device-saved notes without storing or injecting HTML.
-- Use Section for numbered content bands and the shared Button for controls; this keeps the expanded learning views consistent.
+- Keep learning content in separate TanStack leaf routes within the shared Shell for direct navigation to each discipline.
+- Store note highlights as validated text ranges with plain-text notes and render them as React marks; this avoids storing or injecting HTML.
+- Use Section for numbered bands and the shared Button for controls to keep learning views consistent.
 
-- Keep the curated film catalog in a browser-safe data module with a Movies leaf and parameterized Film detail leaf; this supports direct links without a live movie API.
-- Keep trailer photo frames in project asset pointers, indexed by the browser-safe film-photos module; this avoids external image hotlinks and keeps galleries separate from trailer playback.
-- Render cast portraits through ActorPortrait with normalized apostrophes and an image-error fallback; this keeps every movie's cast photos consistent and prevents broken images.
-- Keep the actor-entry interface in its own presentation component with independently tokenized name highlights and visit-only state; this isolates custom cast entries from the curated catalog without adding backend behavior.
-- Render every film an actor appears in through the shared FilmChip tile with its token-driven bevel, poster thumbnail and optional role note; this keeps actor filmography links identical across film pages, actor cards and search and readable on both themes.
-- Test any component that renders a Link with the awaitable renderWithRouter helper in src/test/router.tsx; this gives the link a real router so component tests don't fail on missing router context.
-- Group discipline links on the Studies leaf while preserving their direct routes; this consolidates navigation without removing learning content.
-- Keep custom navigation shortcuts in a browser-only, visit-scoped shared store with a fixed empty SSR snapshot; this preserves shortcuts across page navigation without adding persistence or server behavior.
-- Keep custom studies added from the Studies page in the same browser-only, visit-scoped store pattern; this isolates them from the built-in discipline cards.
-- Keep added AI model entries as visit-only interface settings, without implying a live provider connection; this separates model management from future AI execution.
-- Keep each chess colour's chosen AI model in the browser-only chess-models store (one selection per side, persisted separately) rather than a single shared choice; this lets White and Black run different models without adding a live provider connection.
+- Keep the film catalog in a browser-safe data module with Movies and Film detail leaves for direct links without a live API.
+- Keep trailer photo frames in project asset pointers indexed by the film-photos module; this avoids external hotlinks.
+- Render cast portraits through ActorPortrait with normalized apostrophes and an image-error fallback to prevent broken images.
+- Keep the actor-entry interface in its own component with tokenized name highlights and visit-only state; this isolates custom cast entries without backend behavior.
+- Render every film an actor appears in through the shared FilmChip tile (token bevel, poster, optional role note) so filmography links stay identical and readable on both themes.
+- Test components that render a Link with the awaitable renderWithRouter helper in src/test/router.tsx so tests get a real router.
+- Group discipline links on the Studies leaf while keeping their direct routes.
+- Keep custom navigation shortcuts in a browser-only, visit-scoped store with a fixed empty SSR snapshot; no persistence or server behavior.
+- Keep custom studies added from the Studies page in that same visit-scoped store pattern.
+- Keep added AI model entries as visit-only interface settings that imply no live provider connection.
+- Keep each chess colour's AI model in the browser-only chess-models store (one per side) so White and Black can differ without a live provider.
 - Use licensed Cburnett chess piece assets with semantic board tokens; this keeps pieces readable on both square colors.
-- Keep the chess game (board, clocks, mode, AI move loop) in the module-level store src/lib/chess-store.ts, not in the route component; this lets the game and AI-vs-AI moves keep running while the user browses other tabs.
-- Keep per-side chess Elo targets in the visit-scoped chess store and validate them with a shared schema; this preserves difficulty across navigation and resets without claiming calibrated engine ratings.
-- Keep the player's built-up chess rating in the browser-only chess-rating store, updated by the chess store when a Vs AI game ends; this keeps rating logic separate from AI difficulty targets.
-- Keep iPhone installability manifest-only (public/manifest.webmanifest plus icon PNGs in public/, no service worker); this gives a home-screen app icon without stale-cache blank screens in preview.
-- Render compact list detail toggles through the shared beveled .chip-icon key and reveal the extra text inline in the same tile; this keeps detail controls consistent with film chips and avoids modal layers over plain lists.
-- Keep vocabulary topic data in the browser-safe module src/lib/topics.ts (grouped topics, each with its own word list); parts-of-speech tiles filter the main library instead of carrying words.
-- Keep favorites, custom words, history and collections in the localStorage-backed store src/lib/word-lists.ts with a fixed empty SSR snapshot; this persists word lists on the device without a backend.
+- Keep the chess game (board, clocks, mode, AI move loop) in the module-level store src/lib/chess-store.ts, not the route, so games keep running while browsing other tabs.
+- Keep per-side chess Elo targets in the visit-scoped chess store, validated by a shared schema, without claiming calibrated engine ratings.
+- Keep the player's chess rating in the browser-only chess-rating store, updated when a Vs AI game ends, separate from AI difficulty targets.
+- Keep chess board orientation in the visit-scoped chess store, rendered by mirroring display coordinates only, so the view turns without touching game state, clocks or the AI.
+- Keep iPhone installability manifest-only (public/manifest.webmanifest + icon PNGs, no service worker) to avoid stale-cache blank screens.
+- Render compact list detail toggles through the shared beveled .chip-icon key, revealing extra text inline in the same tile instead of a modal.
+- Keep vocabulary topic data in src/lib/topics.ts (grouped topics, each with its word list); parts-of-speech tiles filter the main library.
+- Keep favorites, custom words, history and collections in the localStorage-backed src/lib/word-lists.ts with a fixed empty SSR snapshot; no backend.
 - Render compact word rows through the shared WordRows component (detail key plus favorite star) so the library, topic panels and quick tiles behave identically.
-- Keep original dictionary-style editorial content in the browser-safe word-details module, keyed by normalized word, and render it through shared WordDetails in rows and flashcards; this prevents topic copies from showing inconsistent facts and preserves user-added words without invented editorial content.
-- Sort every alphabetical list through the shared comparator in src/lib/alphabetical.ts (sortByAlphabetical / compareAlphabetical) instead of ad-hoc localeCompare calls; this keeps A–Z and Z–A ordering, numeric-aware and accent-insensitive behavior identical across the word library, films, actors, videos and search tie-breaks.
-- Keep chess board orientation in the visit-scoped chess store and render it by mirroring the board's display coordinates only; this lets the view turn without touching game state, clocks or the AI.
+- Keep original dictionary-style editorial content in the browser-safe word-details module, keyed by normalized word, rendered through shared WordDetails; this keeps user-added words free of invented facts.
+- Sort every alphabetical list through src/lib/alphabetical.ts (sortByAlphabetical / compareAlphabetical), not ad-hoc localeCompare, so A–Z/Z–A, numeric-aware and accent-insensitive ordering stays identical everywhere.
