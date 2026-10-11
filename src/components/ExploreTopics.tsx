@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WordRows } from "@/components/WordRows";
 import { words as coreWords, type PartOfSpeech } from "@/lib/data";
+import { sortByAlphabetical } from "@/lib/alphabetical";
 import { allTopics, findTopic, quickTiles, topicGroups, type QuickTileId, type Topic, type TopicWord } from "@/lib/topics";
 import {
   addCollection, addCustomWord, removeCollection, removeCustomWord,

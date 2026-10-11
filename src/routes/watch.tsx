@@ -6,6 +6,7 @@ import { Section } from "@/components/Section";
 import { Star, Play, Search } from "lucide-react";
 import { Shell } from "@/components/Shell";
 import { videos, type Video } from "@/lib/data";
+import { sortByAlphabetical } from "@/lib/alphabetical";
 import { useProgress } from "@/lib/progress";
 
 export const Route = createFileRoute("/watch")({

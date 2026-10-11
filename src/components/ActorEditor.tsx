@@ -6,6 +6,7 @@ import { Section } from '@/components/Section';
 import { FilmChip } from '@/components/FilmChip';
 import { filmographyForActor } from '@/lib/film-search';
 import { movies } from '@/lib/movies';
+import { sortByAlphabetical } from '@/lib/alphabetical';
 
 const highlights = [
  { id: 'none', label: 'None', className: '', swatch: 'bg-card' },
