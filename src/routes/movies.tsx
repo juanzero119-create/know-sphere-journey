@@ -17,7 +17,8 @@ export const Route = createFileRoute('/movies')({
 function Movies() {
  const [search,setSearch]=useState(''); const [genre,setGenre]=useState('All'); const [sort,setSort]=useState('title');
  const featured=movies[0];
- const list=movies.filter(m=>(genre==='All'||m.genres.includes(genre))&&`${m.title} ${m.director} ${m.cast.flat().join(' ')}`.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>sort==='year'?b.year-a.year:sort==='title'?a.title.localeCompare(b.title):sort==='title-desc'?b.title.localeCompare(a.title):b.score-a.score);
+ const filtered=movies.filter(m=>(genre==='All'||m.genres.includes(genre))&&`${m.title} ${m.director} ${m.cast.flat().join(' ')}`.toLowerCase().includes(search.toLowerCase()));
+ const list=sort==='year'?[...filtered].sort((a,b)=>b.year-a.year):sort==='score'?[...filtered].sort((a,b)=>b.score-a.score):sortByAlphabetical(filtered,m=>m.title,sort==='title-desc'?'za':'az');
  if(!featured)return null;
  return <Shell title="Movies" theme="movies">
  <div className="grid gap-6 border-t border-border pt-7 sm:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr]">

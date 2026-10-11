@@ -89,7 +89,7 @@ function CollectionsPanel({ index }: { index: Map<string, TopicWord> }) {
   const { collections } = useWordLists();
   const [name, setName] = useState("");
   const [editing, setEditing] = useState<string | null>(null);
-  const all = useMemo(() => [...index.keys()].sort((a, b) => a.localeCompare(b)), [index]);
+  const all = useMemo(() => sortByAlphabetical([...index.keys()], key => key), [index]);
   return (
     <div>
       <div className="flex gap-2">
