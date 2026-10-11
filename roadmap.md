@@ -137,6 +137,11 @@
 - [x] Add a shared alphabetical sorting algorithm (collator-based, numeric-aware, accent-insensitive, stable) and use it for the word library, films, actors, videos and search tie-breaks.
 - [x] Add an A–Z / Z–A toggle to the word library and verify ordering live on mobile and desktop.
 
+# Adjustable chess time
+- [x] Add a Time control section with presets (1+0 to 30+0), a minutes slider and a per-move bonus picker.
+- [x] Apply the chosen time to the clocks on the next game and show it in the section title.
+- [x] Verify presets, validation, tests and the phone layout.
+
 # Added words: Kleptocracy and Hegemony
 - [x] Add Kleptocracy and Hegemony to the word library with meaning, example, synonym and part of speech.
 - [x] Place both in the Society, Advanced, GRE and Greek root topic panels.
