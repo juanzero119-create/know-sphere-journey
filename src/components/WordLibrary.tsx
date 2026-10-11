@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Info, Search, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { WordRows } from "@/components/WordRows";
 import { words, type PartOfSpeech } from "@/lib/data";
 
 /**
@@ -10,7 +10,6 @@ import { words, type PartOfSpeech } from "@/lib/data";
  */
 export function WordLibrary({ posFilter }: { posFilter: PartOfSpeech | null }) {
   const [search, setSearch] = useState("");
-  const [open, setOpen] = useState<string | null>(null);
   const list = words.filter(
     w =>
       (!posFilter || w.pos === posFilter) &&
@@ -29,43 +28,8 @@ export function WordLibrary({ posFilter }: { posFilter: PartOfSpeech | null }) {
           className="h-9 bg-card pl-9 text-sm"
         />
       </div>
-      <div className="mt-3 gap-2 sm:columns-2 lg:columns-3">
-        {list.map(w => {
-          const shown = open === w.word;
-          return (
-            <article
-              key={w.word}
-              className={`mb-2 break-inside-avoid rounded-md border bg-card px-3 py-2 ${shown ? "border-primary ring-2 ring-ring" : "border-border"}`}
-            >
-              <div className="flex items-center gap-2">
-                <h3 className="min-w-0 flex-1 truncate text-sm font-semibold">{w.word}</h3>
-                <span className="shrink-0 rounded-full border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-wide capitalize text-muted-foreground">
-                  {w.pos}
-                </span>
-                <Button
-                  variant="ghost"
-                  type="button"
-                  aria-expanded={shown}
-                  aria-label={`${shown ? "Hide" : "Show"} full definition of ${w.word}`}
-                  title="Full definition"
-                  onClick={() => setOpen(shown ? null : w.word)}
-                  className="chip-icon ml-auto h-7 w-7 p-0"
-                >
-                  {shown ? <X className="size-3.5" /> : <Info className="size-3.5" />}
-                </Button>
-              </div>
-              {shown && (
-                <div className="mt-2 border-t border-border pt-2">
-                  <p className="text-sm leading-snug">{w.meaning}</p>
-                  <p className="mt-1.5 text-xs italic text-muted-foreground">“{w.example}”</p>
-                  <p className="mt-1.5 text-xs text-muted-foreground">
-                    Synonym: <span className="font-medium text-foreground">{w.synonym}</span>
-                  </p>
-                </div>
-              )}
-            </article>
-          );
-        })}
+      <div className="mt-3">
+        <WordRows list={list} />
       </div>
       {list.length === 0 && (
         <p className="py-6 text-center text-muted-foreground">No words match your search.</p>
