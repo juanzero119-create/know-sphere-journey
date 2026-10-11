@@ -175,7 +175,7 @@ async function maybeAiMove() {
   }
 }
 
-export function resetChess(mode?: ChessMode, autoStart = false) {
+export function resetChess(mode?: ChessMode) {
   stopClock();
   endSoundPlayed = false;
   game = new Chess();
@@ -189,13 +189,6 @@ export function resetChess(mode?: ChessMode, autoStart = false) {
     time: { ...state.time },
   };
   listeners.forEach((l) => l());
-  if (autoStart) {
-    // "New game" puts the game live immediately: the clock runs from the
-    // start (and increments apply from move one) without pressing Play.
-    state.started = true;
-    startClock();
-    emit();
-  }
   void maybeAiMove();
 }
 
