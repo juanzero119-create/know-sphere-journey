@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, RotateCcw, Search } from "lucide-react";
+import { ArrowRight, BookOpen, Briefcase, ChevronLeft, ChevronRight, Gauge, Heart, HelpCircle, PenLine, Repeat, RotateCcw, Search, Shuffle, Smile, Timer, Users, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Section } from "@/components/Section";
 import { useState } from "react";
 import { Shell } from "@/components/Shell";
-import { Quiz } from "@/components/Quiz";
+import { Quiz, type Mode } from "@/components/Quiz";
 import { partsOfSpeech, words, type PartOfSpeech } from "@/lib/data";
+import { categories, categoryQuiz, fillInTheGap, gameShuffle, guessTheWord, matchSynonyms, meaningMatch } from "@/lib/word-games";
 
 export const Route = createFileRoute("/words")({
   head: () => ({
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/words")({
 });
 
 function Words() {
- const [i,setI]=useState(0); const [flip,setFlip]=useState(false); const [quiz,setQuiz]=useState(false); const [search,setSearch]=useState(''); const [posFilter,setPosFilter]=useState<PartOfSpeech|null>(null);
+ const [i,setI]=useState(0); const [flip,setFlip]=useState(false); const [quiz,setQuiz]=useState(false); const [search,setSearch]=useState(''); const [posFilter,setPosFilter]=useState<PartOfSpeech|null>(null); const [game,setGame]=useState<Mode|null>(null);
  const w=words[i]; if(!w) return null;
  const list=words.filter(w=>(!posFilter||w.pos===posFilter)&&`${w.word} ${w.meaning}`.toLowerCase().includes(search.toLowerCase()));
  return <Shell title="Vocabulary">
