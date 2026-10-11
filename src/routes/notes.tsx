@@ -110,26 +110,6 @@ function Notes() {
     element?.setSelectionRange(end, end);
     setSelection({ start: end, end });
   };
-  const savedRange = (element: HTMLParagraphElement) => {
-    const selected = window.getSelection();
-    if (!selected || selected.isCollapsed || selected.rangeCount === 0) return null;
-    const range = selected.getRangeAt(0);
-    if (!element.contains(range.startContainer) || !element.contains(range.endContainer)) return null;
-    const prefix = range.cloneRange();
-    prefix.selectNodeContents(element);
-    prefix.setEnd(range.startContainer, range.startOffset);
-    const start = prefix.toString().length;
-    return { start, end: start + range.toString().length };
-  };
-  const highlightSavedText = (element: HTMLParagraphElement, note: Note, chosen: NoteColor | null) => {
-    const offsets = savedRange(element);
-    if (!offsets) return;
-    const nextHighlights = applyHighlight(note.highlights ?? [], offsets.start, offsets.end, chosen);
-    update(notesRef.current.map(item => item.id === note.id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
-    if (editingId === note.id && draftBody === note.body) setHighlights(nextHighlights);
-    window.getSelection()?.removeAllRanges();
-    setSelMenu(null);
-  };
 
   useEffect(() => { setNotes(loadNotes()); }, []);
 
