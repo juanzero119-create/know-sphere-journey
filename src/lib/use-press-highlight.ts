@@ -115,7 +115,7 @@ export function usePressHighlight(onCommit: (id: string, start: number, end: num
       lastFocus = null;
       lockNative(false);
       const current = dragRef.current;
-      if (current && current.end > current.start) commitRef.current(current.id, current.start, current.end);
+      if (current) commitRef.current(current.id, current.start, current.end);
       if (current) clearNative();
       target.current = null;
       set(null);
