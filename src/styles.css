@@ -97,7 +97,7 @@
   --chip-active-foreground: oklch(0.2 0 0);
   --play: oklch(0.72 0.17 155);
   --play-foreground: oklch(0 0 0);
-  --pause-live-foreground: oklch(1 0 0);
+  --pause-paused-foreground: oklch(1 0 0);
   --chess-light: #ffffff;
   --chess-dark: #121212;
   --chess-last-light: #f5fa53;
@@ -270,18 +270,18 @@ nav [data-status='active'] .nav-tile {
   .chip-icon:hover, .chip-icon:active { transform: none; }
 }
 
-/* The Play button turns green while the game is running; the Pause button
-   stays gray and only its icon lightens while the game is running. */
+/* The Play button turns green while the game is running. The Pause button
+   always stays the same gray; its icon turns a lighter gray once you press it. */
 .btn-play-live {
   background: var(--play);
   color: var(--play-foreground);
   border-color: var(--play);
 }
 .btn-play-live:hover { background: color-mix(in oklab, var(--play) 88%, black); }
-.btn-pause-live { color: var(--pause-live-foreground); }
+.btn-pause-paused { color: var(--pause-paused-foreground); }
 @media (prefers-reduced-motion: reduce) {
   .btn-play-live { transition: none; }
-  .btn-pause-live { transition: none; }
+  .btn-pause-paused { transition: none; }
 }
 
 /* Reference countdown ring: the cream arc recedes clockwise from twelve. */
