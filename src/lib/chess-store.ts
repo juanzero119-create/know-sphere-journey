@@ -189,15 +189,17 @@ async function maybeAiMove() {
   }
 }
 
-// Play a few random legal opening plies so every new game starts from a
-// different position. Kept modest (6 plies) so the game is still fresh.
+// Play a few random pawn moves so every new game starts from a different
+// pawn structure. Falls back to any legal move if no pawn can move.
 function randomizeOpening(g: Chess) {
   for (let i = 0; i < 6; i++) {
-    const moves = g.moves();
+    const moves = g.moves({ verbose: true });
     if (!moves.length) break;
-    const pick = moves[Math.floor(Math.random() * moves.length)];
+    const pawns = moves.filter((m) => m.piece === 'p');
+    const pool = pawns.length ? pawns : moves;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
     if (!pick) break;
-    g.move(pick);
+    g.move(pick.san);
   }
 }
 
