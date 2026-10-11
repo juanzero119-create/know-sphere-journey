@@ -124,3 +124,7 @@
 - [x] Add original expanded meanings, pronunciation, examples and usage facts for every built-in vocabulary word.
 - [x] Show the same rich details in the library, topics and flashcards while keeping closed rows compact.
 - [x] Verify coverage, detail controls and mobile readability.
+
+# Bug audit
+- [x] Validate saved word-list entries so damaged data cannot crash Vocabulary.
+- [x] Verify recovery, page navigation and existing tests.

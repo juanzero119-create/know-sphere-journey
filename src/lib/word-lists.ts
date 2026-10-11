@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import type { TopicWord } from "@/lib/topics";
+import { z } from "zod";
 
 /**
  * Browser-only word lists: favorites, custom words, history and named
@@ -7,7 +8,7 @@ import type { TopicWord } from "@/lib/topics";
  * hook in sync within the visit.
  */
 
-export type CustomWord = TopicWord & { custom?: boolean };
+export type CustomWord = TopicWord & { custom?: boolean | undefined };
 export type Collection = { id: string; name: string; words: string[] };
 
 type Lists = {
@@ -19,6 +20,27 @@ type Lists = {
 
 const KEY = "lexi-word-lists";
 const empty: Lists = { favorites: [], customWords: [], history: [], collections: [] };
+const customWordSchema = z.object({
+  word: z.string().trim().min(1),
+  meaning: z.string().trim().min(1),
+  example: z.string().default("—"),
+  pos: z.enum(["noun", "pronoun", "verb", "adjective", "adverb"]),
+  synonym: z.string().optional(),
+  custom: z.boolean().optional(),
+});
+const collectionSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().trim().min(1),
+  words: z.array(z.string()).catch([]),
+});
+
+function validEntries<S extends z.ZodTypeAny>(value: unknown, schema: S): z.output<S>[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap(entry => {
+    const result = schema.safeParse(entry);
+    return result.success ? [result.data] : [];
+  });
+}
 
 let state: Lists = empty;
 const listeners = new Set<() => void>();
@@ -28,12 +50,14 @@ function load(): Lists {
   try {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return empty;
-    const parsed = JSON.parse(raw) as Partial<Lists>;
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return empty;
+    const stored = parsed as Record<string, unknown>;
     return {
-      favorites: Array.isArray(parsed.favorites) ? parsed.favorites.filter(x => typeof x === "string") : [],
-      customWords: Array.isArray(parsed.customWords) ? parsed.customWords : [],
-      history: Array.isArray(parsed.history) ? parsed.history.filter(x => typeof x === "string") : [],
-      collections: Array.isArray(parsed.collections) ? parsed.collections : [],
+      favorites: validEntries(stored['favorites'], z.string()),
+      customWords: validEntries(stored['customWords'], customWordSchema),
+      history: validEntries(stored['history'], z.string()),
+      collections: validEntries(stored['collections'], collectionSchema),
     };
   } catch {
     return empty;
@@ -82,8 +106,11 @@ export function toggleFavorite(word: string) {
 
 export function addCustomWord(word: CustomWord) {
   ensureLoaded();
-  if (state.customWords.some(w => w.word.toLowerCase() === word.word.toLowerCase())) return;
-  setState({ ...state, customWords: [{ ...word, custom: true }, ...state.customWords] });
+  const result = customWordSchema.safeParse(word);
+  if (!result.success) return;
+  const validWord = result.data;
+  if (state.customWords.some(w => w.word.toLowerCase() === validWord.word.toLowerCase())) return;
+  setState({ ...state, customWords: [{ ...validWord, custom: true }, ...state.customWords] });
 }
 
 export function removeCustomWord(word: string) {
