@@ -86,75 +86,63 @@ function Notes() {
   const [highlights, setHighlights] = useState<NoteHighlight[]>([]);
   const [color, setColor] = useState<NoteColor>('gold');
   const [selection, setSelection] = useState({ start: 0, end: 0 });
+  // Floating color bar shown next to the current text selection (draft box or saved note).
+  const [selMenu, setSelMenu] = useState<{ target: 'draft' | string; x: number; y: number; start: number; end: number } | null>(null);
   const editor = useRef<HTMLTextAreaElement>(null);
   const backdrop = useRef<HTMLDivElement>(null);
-  const settleTimer = useRef<number | undefined>(undefined);
+  const draftBox = useRef<HTMLDivElement>(null);
   const colorRef = useRef(color);
   colorRef.current = color;
-  useEffect(() => () => window.clearTimeout(settleTimer.current), []);
-  const applyEditorSelection = () => {
-    const element = editor.current;
-    if (!element || element.selectionStart === element.selectionEnd) return;
-    const { selectionStart: start, selectionEnd: end } = element;
-    setHighlights(old => applyHighlight(old, start, end, colorRef.current));
-    setSelection({ start, end });
-    // Collapse the selection so the system's blue selection gives way to the app's highlight.
-    element.setSelectionRange(end, end);
-  };
   const captureSelection = () => {
     const element = editor.current;
     if (!element) return;
     setSelection({ start: element.selectionStart, end: element.selectionEnd });
-    // Phones adjust selections with drag handles that never send a pointer-up to the box,
-    // so apply the highlight once the selection stops changing.
-    window.clearTimeout(settleTimer.current);
-    if (element.selectionStart !== element.selectionEnd) settleTimer.current = window.setTimeout(applyEditorSelection, 700);
   };
   const highlightSelection = (chosen: NoteColor | null) => {
-    setHighlights(old => applyHighlight(old, selection.start, selection.end, chosen));
-    editor.current?.focus();
-    editor.current?.setSelectionRange(selection.end, selection.end);
-  };
-  const highlightDraggedText = () => {
-    requestAnimationFrame(() => { window.clearTimeout(settleTimer.current); applyEditorSelection(); });
-  };
-  const highlightSavedText = (element: HTMLParagraphElement, note: Note) => {
-    const selected = window.getSelection();
-    if (!selected || selected.isCollapsed || selected.rangeCount === 0) return;
-    const range = selected.getRangeAt(0);
-    if (!element.contains(range.startContainer) || !element.contains(range.endContainer)) return;
-    const prefix = range.cloneRange();
-    prefix.selectNodeContents(element);
-    prefix.setEnd(range.startContainer, range.startOffset);
-    const start = prefix.toString().length;
-    const end = start + range.toString().length;
-    const nextHighlights = applyHighlight(note.highlights ?? [], start, end, color);
-    update(notes.map(item => item.id === note.id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
-    if (editingId === note.id && draftBody === note.body) setHighlights(nextHighlights);
-    selected.removeAllRanges();
+    // Read the live selection straight from the box — the stored state can lag on phones.
+    const element = editor.current;
+    const start = element && element.selectionStart !== element.selectionEnd ? element.selectionStart : selection.start;
+    const end = element && element.selectionStart !== element.selectionEnd ? element.selectionEnd : selection.end;
+    if (start === end) return;
+    setHighlights(old => applyHighlight(old, start, end, chosen));
+    setSelMenu(null);
+    element?.focus();
+    element?.setSelectionRange(end, end);
+    setSelection({ start: end, end });
   };
 
   useEffect(() => { setNotes(loadNotes()); }, []);
 
   const captureRef = useRef(captureSelection);
   captureRef.current = captureSelection;
-  const savedHighlighter = useRef(highlightSavedText);
-  savedHighlighter.current = highlightSavedText;
   const notesRef = useRef(notes);
   notesRef.current = notes;
   useEffect(() => {
-    // Touch selections on saved notes finish with drag handles, so apply once the selection settles.
+    // Show the floating color bar once a text selection exists (draft box or saved note).
     let timer: number | undefined;
     const onChange = () => {
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
+        // Draft box selection: anchor the bar above the writing box.
+        const box = editor.current;
+        if (box && document.activeElement === box && box.selectionStart !== box.selectionEnd) {
+          const rect = draftBox.current?.getBoundingClientRect();
+          if (rect) setSelMenu({ target: 'draft', x: rect.left + rect.width / 2, y: rect.top, start: box.selectionStart, end: box.selectionEnd });
+          return;
+        }
         const selected = window.getSelection();
-        if (!selected || selected.isCollapsed || !selected.anchorNode) return;
+        if (!selected || selected.isCollapsed || !selected.anchorNode) { setSelMenu(null); return; }
         const start = selected.anchorNode instanceof Element ? selected.anchorNode : selected.anchorNode.parentElement;
         const element = start?.closest<HTMLParagraphElement>('[data-note-id]');
-        const note = element && notesRef.current.find(item => item.id === element.dataset['noteId']);
-        if (element && note) savedHighlighter.current(element, note);
-      }, 700);
+        if (!element) { setSelMenu(null); return; }
+        const range = selected.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        const prefix = range.cloneRange();
+        prefix.selectNodeContents(element);
+        prefix.setEnd(range.startContainer, range.startOffset);
+        const from = prefix.toString().length;
+        setSelMenu({ target: element.dataset['noteId'] ?? '', x: rect.left + rect.width / 2, y: rect.top, start: from, end: from + range.toString().length });
+      }, 250);
     };
     const onEditorSelect = () => { if (document.activeElement === editor.current) captureRef.current(); };
     document.addEventListener('selectionchange', onChange);
@@ -284,12 +272,22 @@ function Notes() {
   const pillColor = noteColors.find(option => option.id === color)?.className ?? '';
   return <Shell title="Notes">
     {drag && <div aria-hidden="true" className={`pointer-events-none fixed z-50 grid h-7 w-12 -translate-x-1/2 -translate-y-full place-items-center rounded-full shadow-lg ring-2 ring-background ${pillColor}`} style={{ left: drag.x, top: drag.y - 14 }}><Highlighter className="size-4"/></div>}
+    {selMenu && !drag && <div role="toolbar" aria-label="Highlight selection" className="fixed z-50 flex -translate-x-1/2 -translate-y-full items-center gap-1 rounded-full border border-border bg-card p-1 shadow-xl" style={{ left: Math.min(Math.max(selMenu.x, 110), window.innerWidth - 110), top: Math.max(selMenu.y - 10, 60) }}>
+      {noteColors.map(option => <Button key={option.id} type="button" size="icon" variant="ghost" aria-label={`${option.label} highlight`} title={`${option.label} highlight`} onPointerDown={event => event.preventDefault()} onClick={() => {
+        if (selMenu.target === 'draft') { setHighlights(old => applyHighlight(old, selMenu.start, selMenu.end, option.id)); editor.current?.setSelectionRange(selMenu.end, selMenu.end); setSelection({ start: selMenu.end, end: selMenu.end }); setSelMenu(null); }
+        else { const element = document.querySelector<HTMLParagraphElement>(`[data-note-id="${selMenu.target}"]`); const note = notesRef.current.find(item => item.id === selMenu.target); if (element && note) { const nextHighlights = applyHighlight(note.highlights ?? [], selMenu.start, selMenu.end, option.id); update(notesRef.current.map(item => item.id === note.id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item)); window.getSelection()?.removeAllRanges(); setSelMenu(null); } }
+      }}><span className={`size-5 rounded-sm ${option.className}`}/></Button>)}
+      <Button type="button" size="icon" variant="ghost" aria-label="Remove highlight" title="Remove highlight" onPointerDown={event => event.preventDefault()} onClick={() => {
+        if (selMenu.target === 'draft') { setHighlights(old => applyHighlight(old, selMenu.start, selMenu.end, null)); setSelMenu(null); }
+        else { const note = notesRef.current.find(item => item.id === selMenu.target); if (note) { update(notesRef.current.map(item => item.id === note.id ? { ...item, highlights: applyHighlight(note.highlights ?? [], selMenu.start, selMenu.end, null), updatedAt: Date.now() } : item)); window.getSelection()?.removeAllRanges(); setSelMenu(null); } }
+      }}><X className="size-4"/></Button>
+    </div>}
     <Section number="01" title="Write a note" subtitle="Saved on this device">
       <div className="rounded-lg border border-border bg-card p-6">
         <Input value={draftTitle} onChange={event => setDraftTitle(event.target.value)} placeholder="Note title" aria-label="Note title" maxLength={80} disabled={!ready}/>
-        <div className="note-select relative mt-3" data-color={color} onPointerDown={event => begin(event, 'draft', backdrop.current, editor.current)}>
+        <div ref={draftBox} className="note-select note-press relative mt-3" data-color={color} onPointerDown={event => begin(event, 'draft', backdrop.current, editor.current)}>
           <div ref={backdrop} aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words rounded-md border border-transparent px-3 py-2 text-base text-foreground md:text-sm"><HighlightedNote body={draftBody} highlights={withDrag('draft', highlights)}/>{'\n'}</div>
-          <Textarea ref={editor} value={draftBody} onSelect={captureSelection} onPointerUp={highlightDraggedText} onTouchEnd={highlightDraggedText} onScroll={event => { if (backdrop.current) backdrop.current.scrollTop = event.currentTarget.scrollTop; }} onChange={event => { const next = event.target.value; setHighlights(old => adjustHighlights(old, draftBody, next)); setDraftBody(next); }} placeholder="Write your note…" aria-label="Note text" className="note-editor-input relative min-h-28 break-words" maxLength={4000} disabled={!ready}/>
+          <Textarea ref={editor} value={draftBody} onSelect={captureSelection} onPointerUp={captureSelection} onTouchEnd={captureSelection} onKeyUp={captureSelection} onScroll={event => { if (backdrop.current) backdrop.current.scrollTop = event.currentTarget.scrollTop; }} onChange={event => { const next = event.target.value; setHighlights(old => adjustHighlights(old, draftBody, next)); setDraftBody(next); }} placeholder="Write your note…" aria-label="Note text" className="note-editor-input relative min-h-28 break-words" maxLength={4000} disabled={!ready}/>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Note highlighting">
           {noteColors.map(option => <Button key={option.id} type="button" size="icon" variant="outline" aria-label={`${option.label} highlight color`} title={`${option.label} highlight color`} aria-pressed={color === option.id} onMouseDown={event => event.preventDefault()} onClick={() => setColor(option.id)} className={color === option.id ? 'border-primary' : ''}><span className={`grid size-6 place-items-center rounded-sm ${option.className}`}>{color === option.id && <Check className="size-4"/>}</span></Button>)}
@@ -370,7 +368,7 @@ function Notes() {
                   </div>
                 </div>
                 {open && <div className="mt-3 pl-6">
-                  {note.body && <p data-note-id={note.id} data-color={color} onPointerDown={event => begin(event, note.id, event.currentTarget)} onPointerUp={event => highlightSavedText(event.currentTarget, note)} className="note-select note-press select-text whitespace-pre-wrap break-words text-sm text-muted-foreground"><HighlightedNote body={note.body} highlights={withDrag(note.id, note.highlights ?? [])}/></p>}
+                  {note.body && <p data-note-id={note.id} data-color={color} onPointerDown={event => begin(event, note.id, event.currentTarget)} className="note-select note-press select-text whitespace-pre-wrap break-words text-sm text-muted-foreground"><HighlightedNote body={note.body} highlights={withDrag(note.id, note.highlights ?? [])}/></p>}
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <select value={folderOf(note)} onChange={event => patch(note.id, { folder: event.target.value })} aria-label={`Folder for ${note.title}`} className="h-9 rounded-md border border-input bg-background px-2 text-sm">
                       {folders.map(name => <option key={name} value={name}>{name}</option>)}
