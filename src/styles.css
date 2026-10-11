@@ -97,7 +97,7 @@
   --chip-active-foreground: oklch(0.2 0 0);
   --play: oklch(0.72 0.17 155);
   --play-foreground: oklch(0 0 0);
-  --pause-paused-foreground: oklch(0.78 0 0);
+  --pause-paused-foreground: oklch(0.6 0 0);
   --chess-light: #ffffff;
   --chess-dark: #121212;
   --chess-last-light: #f5fa53;
@@ -278,7 +278,7 @@ nav [data-status='active'] .nav-tile {
   border-color: var(--play);
 }
 .btn-play-live:hover { background: color-mix(in oklab, var(--play) 88%, black); }
-.btn-pause-paused { color: var(--pause-paused-foreground); }
+.btn-pause-paused, .btn-pause-paused:hover { color: var(--pause-paused-foreground) !important; }
 @media (prefers-reduced-motion: reduce) {
   .btn-play-live { transition: none; }
   .btn-pause-paused { transition: none; }
