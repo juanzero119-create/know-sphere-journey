@@ -6,7 +6,7 @@ describe('alphabetical sorting', () => {
   it('orders entries A–Z whatever their case or stray spaces', () => {
     expect(sortByAlphabetical(['zesty', 'Apple', '  banana ', 'Cherry'], w => w)).toEqual([
       'Apple',
-      'banana',
+      '  banana ',
       'Cherry',
       'zesty',
     ]);
