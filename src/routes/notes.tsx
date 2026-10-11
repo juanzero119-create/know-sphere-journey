@@ -10,7 +10,7 @@ import { HighlightedNote } from '@/components/HighlightedNote';
 import { NoteLockDialog } from '@/components/NoteLockDialog';
 import { offsetAt, usePressHighlight } from '@/lib/use-press-highlight';
 import { disableFaceId, enableFaceId, faceIdAvailable, hasFaceId } from '@/lib/note-lock';
-import { adjustHighlights, applyHighlight, noteColors, type NoteColor, type NoteHighlight } from '@/lib/note-highlights';
+import { adjustHighlights, applyHighlight, isNoteColor, noteColors, type NoteColor, type NoteHighlight } from '@/lib/note-highlights';
 
 export const Route = createFileRoute('/notes')({
   head: () => ({ meta: [
