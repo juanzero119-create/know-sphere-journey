@@ -6,6 +6,7 @@ import { Section } from '@/components/Section';
 import { FilmChip } from '@/components/FilmChip';
 import { filmographyForActor } from '@/lib/film-search';
 import { movies } from '@/lib/movies';
+import { sortByAlphabetical } from '@/lib/alphabetical';
 
 const highlights = [
  { id: 'none', label: 'None', className: '', swatch: 'bg-card' },
@@ -50,7 +51,7 @@ export function ActorEditor() {
  const [openId, setOpenId] = useState<number | null>(null);
  const [message, setMessage] = useState('');
  const [sortDir, setSortDir] = useState<'az' | 'za'>('az');
- const sortedActors = [...actors].sort((a, b) => { const an = `${a.firstName} ${a.lastName}`.toLowerCase(); const bn = `${b.firstName} ${b.lastName}`.toLowerCase(); return sortDir === 'az' ? an.localeCompare(bn) : bn.localeCompare(an); });
+ const sortedActors = sortByAlphabetical(actors, a => `${a.firstName} ${a.lastName}`, sortDir);
  const update = <K extends keyof ActorDraft>(key: K, value: ActorDraft[K]) => setDraft(old => ({ ...old, [key]: value }));
  function reset() { setDraft({ ...emptyDraft }); setEditingId(null); }
  function submit(event: FormEvent<HTMLFormElement>) {

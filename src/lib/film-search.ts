@@ -1,4 +1,5 @@
 import { movies, type Movie } from './movies';
+import { compareAlphabetical } from './alphabetical';
 
 export type ActorHit = { name: string; films: { movie: Movie; role: string }[]; score: number };
 export type MovieHit = { movie: Movie; score: number; reason: string };
@@ -70,7 +71,7 @@ export function searchActors(query: string, limit = 8): ActorHit[] {
     const s = matchScore(query, name);
     if (s > 0) hits.push({ name, films: [...films].sort((a, b) => b.movie.score - a.movie.score), score: s + Math.min(films.length, 5) });
   }
-  return hits.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name)).slice(0, limit);
+  return hits.sort((a, b) => b.score - a.score || compareAlphabetical(a.name, b.name)).slice(0, limit);
 }
 
 export function searchMovies(query: string, limit = 12): MovieHit[] {

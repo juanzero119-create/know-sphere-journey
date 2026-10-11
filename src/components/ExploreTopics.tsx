@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WordRows } from "@/components/WordRows";
 import { words as coreWords, type PartOfSpeech } from "@/lib/data";
+import { sortByAlphabetical } from "@/lib/alphabetical";
 import { allTopics, findTopic, quickTiles, topicGroups, type QuickTileId, type Topic, type TopicWord } from "@/lib/topics";
 import {
   addCollection, addCustomWord, removeCollection, removeCustomWord,
@@ -89,7 +90,7 @@ function CollectionsPanel({ index }: { index: Map<string, TopicWord> }) {
   const { collections } = useWordLists();
   const [name, setName] = useState("");
   const [editing, setEditing] = useState<string | null>(null);
-  const all = useMemo(() => [...index.keys()].sort((a, b) => a.localeCompare(b)), [index]);
+  const all = useMemo(() => sortByAlphabetical([...index.keys()], key => key), [index]);
   return (
     <div>
       <div className="flex gap-2">
