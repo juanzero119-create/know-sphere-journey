@@ -10,6 +10,14 @@ export type BlendNoteColor = 'orange' | 'purple' | 'teal' | 'lime' | 'olive';
 export type NoteColor = BaseNoteColor | BlendNoteColor;
 export type NoteHighlight = { start: number; end: number; color: NoteColor };
 
+const blendIds: BlendNoteColor[] = ['orange', 'purple', 'teal', 'lime', 'olive'];
+export function isNoteColor(id: string): id is NoteColor {
+  return noteColors.some(color => color.id === id) || (blendIds as string[]).includes(id);
+}
+export function colorClass(color: NoteColor): string {
+  return `bg-name-${color}`;
+}
+
 const blends: Record<string, BlendNoteColor> = {
   'blue+gold': 'green',
   'gold+rose': 'orange',
