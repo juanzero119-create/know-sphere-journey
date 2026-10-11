@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getChessSnapshot, resetChess, setChessPaused, startChess } from '@/lib/chess-store';
+import { getChessSnapshot, resetChess, setChessHumanSide, setChessPaused, startChess } from '@/lib/chess-store';
 
 describe('chess pause', () => {
   it('starts unpaused and toggles', () => {
@@ -45,5 +45,17 @@ describe('chess pause', () => {
     startChess();
     expect(getChessSnapshot().paused).toBe(false);
     expect(getChessSnapshot().playPressed).toBe(true);
+  });
+
+  it('a new game is ready, not paused, even when the AI moves first', () => {
+    setChessHumanSide('b'); // the AI plays White here
+    expect(getChessSnapshot().paused).toBe(false);
+    expect(getChessSnapshot().playPressed).toBe(false);
+    expect(getChessSnapshot().thinking).toBe(false); // it waits instead of opening
+    resetChess('aivai');
+    expect(getChessSnapshot().paused).toBe(false);
+    expect(getChessSnapshot().playPressed).toBe(false);
+    expect(getChessSnapshot().thinking).toBe(false);
+    setChessHumanSide('w');
   });
 });

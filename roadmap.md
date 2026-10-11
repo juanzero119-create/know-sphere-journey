@@ -146,3 +146,7 @@
 - [x] Add Kleptocracy and Hegemony to the word library with meaning, example, synonym and part of speech.
 - [x] Place both in the Society, Advanced, GRE and Greek root topic panels.
 - [x] Write full definitions with pronunciation, second example and word fact, and verify the detail panels open live.
+
+# New game is ready, not paused
+- [x] Make a new game start unpaused and ready, with the AI holding its first move until Play is pressed.
+- [x] Show "Ready" in the game status and verify New game, Play and Pause live on the Chess page.

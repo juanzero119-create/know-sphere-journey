@@ -135,9 +135,10 @@ function ChessPage() {
 
   const interactive = !over && !thinking && !paused && mode !== 'aivai' && !(mode === 'ai' && turn !== humanSide);
 
+  const ready = !paused && !playPressed && !over && mode !== '2p';
   const status = flagged ? `${flagged === 'w' ? 'White' : 'Black'} ran out of time — ${flagged === 'w' ? 'Black' : 'White'} wins`
     : game.isCheckmate() ? `Checkmate — ${turn === 'w' ? 'Black' : 'White'} wins`
-    : game.isDraw() ? 'Draw' : `${paused ? 'Paused · ' : ''}${turn === 'w' ? 'White' : 'Black'} to move${game.inCheck() ? ' · Check!' : ''}`;
+    : game.isDraw() ? 'Draw' : `${paused ? 'Paused · ' : ready ? 'Ready · ' : ''}${turn === 'w' ? 'White' : 'Black'} to move${game.inCheck() ? ' · Check!' : ''}`;
   const history = game.history();
   const renderClock = (side: 'w' | 'b') => <div className={'flex items-center justify-between rounded-md px-3 py-2 text-sm ' + (turn === side && !over ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground')}><span className="flex items-center gap-2 font-semibold">{side === 'w' ? 'White' : 'Black'}<span className="inline-flex items-center">{thinking && !over && !paused && turn === side && <Thinking since={state.thinkingSince} />}</span></span><span className="font-mono text-lg tabular-nums">{fmt(clock[side])}</span></div>;
 
