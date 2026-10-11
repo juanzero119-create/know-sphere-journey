@@ -47,7 +47,6 @@ const initialState: ChessState = {
 // Module-level game + state: survives route unmounts, so the game (and AI
 // moves) keep running while the user browses other tabs. Visit-scoped only.
 let game = new Chess();
-randomizeOpening(game);
 let state: ChessState = initialState;
 const listeners = new Set<() => void>();
 
@@ -149,6 +148,21 @@ async function maybeAiMove() {
   const aiTurn = state.mode === 'aivai' || (state.mode === 'ai' && turn !== state.humanSide);
   if (!aiTurn || isOver() || state.paused || aiRunning) return;
   aiRunning = true;
+  // Opening variety: each side's first move is a random pawn move played
+  // locally, so games don't all start with the same position. From the
+  // second move on the chosen AI model decides everything itself.
+  if (game.history().length < 2) {
+    const pawns = game.moves({ verbose: true }).filter((m) => m.piece === 'p');
+    const pick = pawns[Math.floor(Math.random() * pawns.length)];
+    if (pick) {
+      const m = game.move(pick.san);
+      if (m) applyMove(m.from, m.to, turn);
+    }
+    aiRunning = false;
+    emit();
+    void maybeAiMove();
+    return;
+  }
   state.thinking = true;
   state.thinkingSince = Date.now();
   state.aiNote = '';
@@ -189,25 +203,10 @@ async function maybeAiMove() {
   }
 }
 
-// Play a few random pawn moves so every new game starts from a different
-// pawn structure. Falls back to any legal move if no pawn can move.
-function randomizeOpening(g: Chess) {
-  for (let i = 0; i < 6; i++) {
-    const moves = g.moves({ verbose: true });
-    if (!moves.length) break;
-    const pawns = moves.filter((m) => m.piece === 'p');
-    const pool = pawns.length ? pawns : moves;
-    const pick = pool[Math.floor(Math.random() * pool.length)];
-    if (!pick) break;
-    g.move(pick.san);
-  }
-}
-
 export function resetChess(mode?: ChessMode) {
   stopClock();
   endSoundPlayed = false;
   game = new Chess();
-  randomizeOpening(game);
   const nextMode = mode ?? state.mode;
   // When the AI moves first (AI vs AI, or the human chose Black), hold the
   // new game paused until the player presses Play — nothing moves on its own.
