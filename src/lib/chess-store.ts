@@ -47,6 +47,7 @@ const initialState: ChessState = {
 // Module-level game + state: survives route unmounts, so the game (and AI
 // moves) keep running while the user browses other tabs. Visit-scoped only.
 let game = new Chess();
+randomizeOpening(game);
 let state: ChessState = initialState;
 const listeners = new Set<() => void>();
 
@@ -188,10 +189,23 @@ async function maybeAiMove() {
   }
 }
 
+// Play a few random legal opening plies so every new game starts from a
+// different position. Kept modest (6 plies) so the game is still fresh.
+function randomizeOpening(g: Chess) {
+  for (let i = 0; i < 6; i++) {
+    const moves = g.moves();
+    if (!moves.length) break;
+    const pick = moves[Math.floor(Math.random() * moves.length)];
+    if (!pick) break;
+    g.move(pick);
+  }
+}
+
 export function resetChess(mode?: ChessMode) {
   stopClock();
   endSoundPlayed = false;
   game = new Chess();
+  randomizeOpening(game);
   const nextMode = mode ?? state.mode;
   // When the AI moves first (AI vs AI, or the human chose Black), hold the
   // new game paused until the player presses Play — nothing moves on its own.
