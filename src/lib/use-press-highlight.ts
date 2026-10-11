@@ -9,7 +9,7 @@ const MOVE_TOLERANCE = 10;
  * Character offset inside `container` under a screen point, measured from the rendered
  * character boxes (works the same in every direction and ignores user-select locks).
  */
-function offsetAt(container: HTMLElement, rawX: number, rawY: number, _cover?: HTMLElement | null): number | null {
+export function offsetAt(container: HTMLElement, rawX: number, rawY: number, _cover?: HTMLElement | null): number | null {
   const box = container.getBoundingClientRect();
   const x = Math.min(Math.max(rawX, box.left + 1), box.right - 1);
   const y = Math.min(Math.max(rawY, box.top + 1), box.bottom - 1);

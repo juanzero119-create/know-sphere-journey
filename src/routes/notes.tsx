@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { HighlightedNote } from '@/components/HighlightedNote';
 import { NoteLockDialog } from '@/components/NoteLockDialog';
-import { usePressHighlight } from '@/lib/use-press-highlight';
+import { offsetAt, usePressHighlight } from '@/lib/use-press-highlight';
 import { disableFaceId, enableFaceId, faceIdAvailable, hasFaceId } from '@/lib/note-lock';
 import { adjustHighlights, applyHighlight, noteColors, type NoteColor, type NoteHighlight } from '@/lib/note-highlights';
 
@@ -172,6 +172,48 @@ function Notes() {
     if (editingId === id && draftBody === note.body) setHighlights(nextHighlights);
   });
   const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, overlapsHighlight(base, drag.start, drag.end) ? null : color) : base;
+
+  useEffect(() => {
+    // iPhone: stop Safari's own long-press loupe in the writing box so press-and-hold
+    // drives the highlight pill. Taps still place the caret; swipes still scroll.
+    const box = draftBox.current;
+    if (!box) return;
+    let start: { x: number; y: number; t: number; lastY: number; moved: boolean } | null = null;
+    const onStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (!touch || event.touches.length > 1) return;
+      event.preventDefault();
+      start = { x: touch.clientX, y: touch.clientY, t: Date.now(), lastY: touch.clientY, moved: false };
+    };
+    const onMove = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (!start || !touch || document.documentElement.classList.contains('press-highlighting')) return;
+      if (Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > 10) start.moved = true;
+      if (start.moved) {
+        const dy = start.lastY - touch.clientY;
+        const area = editor.current;
+        if (area && area.scrollHeight > area.clientHeight && ((dy > 0 && area.scrollTop + area.clientHeight < area.scrollHeight) || (dy < 0 && area.scrollTop > 0))) area.scrollTop += dy;
+        else window.scrollBy(0, dy);
+      }
+      start.lastY = touch.clientY;
+    };
+    const onEnd = (event: TouchEvent) => {
+      const s = start; start = null;
+      if (!s || s.moved || Date.now() - s.t >= 350) return;
+      const area = editor.current;
+      if (!area || area.disabled) return;
+      const touch = event.changedTouches[0];
+      const offset = touch && backdrop.current ? offsetAt(backdrop.current, touch.clientX, touch.clientY) : null;
+      area.focus();
+      const at = offset ?? area.value.length;
+      area.setSelectionRange(at, at);
+      setSelection({ start: at, end: at });
+    };
+    box.addEventListener('touchstart', onStart, { passive: false });
+    box.addEventListener('touchmove', onMove, { passive: true });
+    box.addEventListener('touchend', onEnd);
+    return () => { box.removeEventListener('touchstart', onStart); box.removeEventListener('touchmove', onMove); box.removeEventListener('touchend', onEnd); };
+  }, []);
 
   const update = (next: Note[]) => {
     setNotes(next);
