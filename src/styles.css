@@ -97,7 +97,7 @@
   --chip-active-foreground: oklch(0.2 0 0);
   --play: oklch(0.72 0.17 155);
   --play-foreground: oklch(0 0 0);
-  --pause-paused-foreground: oklch(1 0 0);
+  --pause-paused-foreground: oklch(0.78 0 0);
   --chess-light: #ffffff;
   --chess-dark: #121212;
   --chess-last-light: #f5fa53;
