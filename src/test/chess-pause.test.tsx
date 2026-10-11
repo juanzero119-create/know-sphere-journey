@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getChessSnapshot, resetChess, setChessPaused } from '@/lib/chess-store';
+import { getChessSnapshot, resetChess, setChessPaused, startChess } from '@/lib/chess-store';
 
 describe('chess pause', () => {
   it('starts unpaused and toggles', () => {
