@@ -84,8 +84,11 @@ export const getAiMove = createServerFn({ method: 'POST' })
       'General technique: develop pieces early, castle to safety, control the center, connect rooks, keep the king safe, and never hang pieces — before moving, check what your opponent threatens.',
     ].map((t, i) => `${i + 1}. ${t}`).join('\n');
     const prompt = `You are a strong chess engine playing ${game.turn() === 'w' ? 'White' : 'Black'}. Position (FEN): ${data.fen}\nLegal moves (SAN): ${legal.join(' ')}\n\nUse these tactics and techniques when choosing your move:\n${tactics}\n\nLook for winning tactics first (checks, captures, threats), then improve your position. Pick the best move. Reply with ONLY one move from the list, nothing else.`;
+    const clock = data.clockSec
+      ? `Clock situation: you have ${data.clockSec.own} seconds left, your opponent has ${data.clockSec.opponent} seconds, and each move adds a ${data.clockSec.increment}-second bonus. Manage your time: if your clock is low (under ~30 seconds), pick a safe, simple move immediately — do not hunt for the perfect move or you will lose on time. If you have a big time lead, you may play quickly and safely to pressure the opponent's clock. If the opponent is very low on time, prefer moves that keep the game going and avoid instant simplification into a dead draw.`
+      : '';
     const difficulty = `Play at an approximate ${data.elo} Elo difficulty target, not maximum strength. This is a simulated difficulty, not a certified rating. At 400–700 use basic one-move plans and miss complex tactics; at 800–1100 notice obvious captures and checks but miss combinations; at 1200–1500 develop sensibly and consider short tactics; at 1600–1900 consider tactical replies and positional plans; at 2000–2400 calculate forcing variations carefully and apply advanced technique. Use the techniques above only as appropriate to this target. Always choose a legal move. Reply with ONLY one SAN move.`;
-    const out = await ask(data.model, `${prompt}\n\n${difficulty}`, key);
+    const out = await ask(data.model, `${prompt}\n\n${clock ? `${clock}\n\n` : ''}${difficulty}`, key);
     if ('error' in out) return { error: out.error };
     const tokens = (out.text ?? '').replace(/[.,!*`"]/g, ' ').split(/\s+/).filter(Boolean);
     const move = [...tokens].reverse().find(t => legal.includes(t)) ?? legal.find(m => out.text?.includes(m));
