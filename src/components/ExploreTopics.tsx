@@ -151,15 +151,13 @@ export function ExploreTopics({ onPickPos }: { onPickPos: (pos: PartOfSpeech) =>
     .filter(g => g.topics.length > 0);
 
   const open = (t: Topic) => {
-    if (t.pos) {
-      onPickPos(t.pos);
-      return;
-    }
+    if (t.pos) onPickPos(t.pos);
     setOpenQuick(null);
     setOpenTopic(openTopic === t.id ? null : t.id);
   };
 
   const topic = openTopic ? findTopic(openTopic) : undefined;
+  const topicWords = topic?.pos ? coreWords.filter(w => w.pos === topic.pos) : topic?.words ?? [];
   const resolve = (names: string[]) => names.map(n => index.get(n)).filter((w): w is TopicWord => !!w);
 
   return (
@@ -246,9 +244,9 @@ export function ExploreTopics({ onPickPos }: { onPickPos: (pos: PartOfSpeech) =>
                   <ChevronLeft className="size-4" />
                 </Button>
                 <h3 className="text-lg font-semibold">{topic.label}</h3>
-                <span className="text-xs text-muted-foreground">{topic.words.length} words</span>
+                <span className="text-xs text-muted-foreground">{topicWords.length} words</span>
               </div>
-              <div className="mt-3"><WordRows list={topic.words} /></div>
+              <div className="mt-3"><WordRows list={topicWords} /></div>
             </div>
           )}
         </div>

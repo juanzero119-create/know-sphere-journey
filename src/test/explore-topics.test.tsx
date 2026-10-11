@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { renderWithRouter } from "@/test/router";
 import { ExploreTopics } from "@/components/ExploreTopics";
 import { allTopics, topicGroups } from "@/lib/topics";
+import { words } from "@/lib/data";
 
 describe("topic data", () => {
   it("has unique topic ids and words for every non-pos topic", () => {
@@ -42,6 +43,19 @@ describe("ExploreTopics", () => {
     await renderWithRouter(<ExploreTopics onPickPos={pos => { picked = pos; }} />);
     fireEvent.click(screen.getByRole("button", { name: /^Verbs/ }));
     expect(picked).toBe("verb");
+  });
+
+  it.each([['Nouns', 'noun'], ['Verbs', 'verb'], ['Adjectives', 'adjective']] as const)("opens %s with matching words inline", async (label, pos) => {
+    await renderWithRouter(<ExploreTopics onPickPos={() => {}} />);
+    const tile = screen.getByRole("button", { name: new RegExp(`^${label}`) });
+    fireEvent.click(tile);
+    expect(screen.getByRole("heading", { name: label })).toBeInTheDocument();
+    const matching = words.filter(w => w.pos === pos);
+    for (const word of matching) expect(screen.getByRole("button", { name: `Show full definition of ${word.word}` })).toBeInTheDocument();
+    const other = words.find(w => w.pos !== pos);
+    if (other) expect(screen.queryByRole("button", { name: `Show full definition of ${other.word}` })).not.toBeInTheDocument();
+    fireEvent.click(tile);
+    expect(screen.queryByRole("heading", { name: label })).not.toBeInTheDocument();
   });
 
   it("shows favorites, history, own words and collections tiles", async () => {
