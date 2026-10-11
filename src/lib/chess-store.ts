@@ -195,7 +195,9 @@ function randomizeOpening(g: Chess) {
   for (let i = 0; i < 6; i++) {
     const moves = g.moves();
     if (!moves.length) break;
-    g.move(moves[Math.floor(Math.random() * moves.length)]);
+    const pick = moves[Math.floor(Math.random() * moves.length)];
+    if (!pick) break;
+    g.move(pick);
   }
 }
 
