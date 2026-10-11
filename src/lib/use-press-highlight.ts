@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type PressDrag = { id: string; start: number; end: number; x: number; y: number };
+export type PressDrag = { id: string; start: number; end: number; x: number; y: number; anchor: number };
 
 const HOLD_MS = 350;
 const MOVE_TOLERANCE = 10;
@@ -43,7 +43,7 @@ const lockNative = (on: boolean) => {
  * Press and hold on text to spawn a drag pill; dragging extends a highlight range.
  * Releasing calls onCommit with the covered range.
  */
-export function usePressHighlight(onCommit: (id: string, start: number, end: number) => void) {
+export function usePressHighlight(onCommit: (id: string, start: number, end: number, anchor: number) => void) {
   const [drag, setDrag] = useState<PressDrag | null>(null);
   const dragRef = useRef<PressDrag | null>(null);
   const commitRef = useRef(onCommit);
