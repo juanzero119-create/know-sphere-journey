@@ -155,7 +155,18 @@ async function maybeAiMove() {
   const fen = game.fen();
   const model = getChessModelFor(turn);
   try {
-    const r = await getAiMove({ data: { fen, model, elo: state.elo[turn] } });
+    const r = await getAiMove({
+      data: {
+        fen,
+        model,
+        elo: state.elo[turn],
+        clockSec: {
+          own: Math.max(0, Math.round(state.clock[turn] / 1000)),
+          opponent: Math.max(0, Math.round(state.clock[turn === 'w' ? 'b' : 'w'] / 1000)),
+          increment: Math.round(incMs(state.time) / 1000),
+        },
+      },
+    });
     if (game.fen() !== fen) return; // game was reset while waiting
     if (isOver() || state.paused) return; // clock ran out, game ended, or the user paused while the AI was thinking
     if ('error' in r && r.error) {
