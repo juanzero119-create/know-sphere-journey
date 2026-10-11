@@ -48,7 +48,15 @@ export function applyHighlight(ranges: NoteHighlight[], start: number, end: numb
       ...(range.end > overlapEnd ? [{ ...range, start: overlapEnd }] : []),
     ];
   });
-  if (color) next.push({ start, end, color });
+  if (color) {
+    // Fill only the parts of the selection not already covered (and blended) above.
+    let cursor = start;
+    for (const part of covered.sort((a, b) => a.start - b.start)) {
+      if (part.start > cursor) next.push({ start: cursor, end: part.start, color });
+      cursor = Math.max(cursor, part.end);
+    }
+    if (cursor < end) next.push({ start: cursor, end, color });
+  }
   next.sort((a, b) => a.start - b.start);
   // Merge adjacent ranges that ended up with the same color.
   const merged: NoteHighlight[] = [];
