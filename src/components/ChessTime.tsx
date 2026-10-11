@@ -18,7 +18,7 @@ export function ChessTime() {
     <div className="flex flex-wrap gap-2">
       {timePresets.map(p => {
         const label = `${p.minutes}+${p.incrementSec}`;
-        return <Button key={label} variant={current === label ? 'secondary' : 'outline'} aria-pressed={current === label} onClickCapture={() => { (window as unknown as { __rcap?: number }).__rcap = ((window as unknown as { __rcap?: number }).__rcap ?? 0) + 1; }} onClick={() => apply(p.minutes, p.incrementSec)}>
+        return <Button key={label} variant={current === label ? 'secondary' : 'outline'} aria-pressed={current === label} onClick={() => apply(p.minutes, p.incrementSec)}>
           {label} · {p.label}
         </Button>;
       })}
