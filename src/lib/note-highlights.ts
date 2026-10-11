@@ -35,6 +35,7 @@ export function blendColors(a: NoteColor, b: NoteColor): NoteColor {
 
 export function applyHighlight(ranges: NoteHighlight[], start: number, end: number, color: NoteColor | null): NoteHighlight[] {
   if (start >= end) return ranges;
+  const covered: Array<{ start: number; end: number }> = [];
   const next = ranges.flatMap(range => {
     if (range.end <= start || range.start >= end) return [range];
     const overlapStart = Math.max(range.start, start);
