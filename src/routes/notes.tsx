@@ -162,16 +162,23 @@ function Notes() {
   // Press-and-hold on plain text adds the chosen color; press-and-hold on text that is
   // already highlighted removes the highlight it touches (undo).
   const overlapsHighlight = (ranges: NoteHighlight[], start: number, end: number) => ranges.some(range => range.start < end && start < range.end);
+  // Dragging always paints the chosen color (so re-dragging never erases); holding still on a
+  // highlight without dragging removes that highlight (undo).
+  const paint = (ranges: NoteHighlight[], start: number, end: number) => {
+    if (end > start) return applyHighlight(ranges, start, end, colorRef.current);
+    const hit = ranges.find(range => range.start <= start && start < range.end) ?? ranges.find(range => range.start < start && start <= range.end);
+    return hit ? applyHighlight(ranges, hit.start, hit.end, null) : ranges;
+  };
   const { drag, begin } = usePressHighlight((id, start, end) => {
-    const chosen = colorRef.current;
-    if (id === 'draft') { setHighlights(old => applyHighlight(old, start, end, overlapsHighlight(old, start, end) ? null : chosen)); return; }
+    if (id === 'draft') { setHighlights(old => paint(old, start, end)); return; }
     const note = notesRef.current.find(item => item.id === id);
     if (!note) return;
-    const nextHighlights = applyHighlight(note.highlights ?? [], start, end, overlapsHighlight(note.highlights ?? [], start, end) ? null : chosen);
+    const nextHighlights = paint(note.highlights ?? [], start, end);
+    if (nextHighlights === (note.highlights ?? [])) return;
     update(notesRef.current.map(item => item.id === id ? { ...item, highlights: nextHighlights, updatedAt: Date.now() } : item));
     if (editingId === id && draftBody === note.body) setHighlights(nextHighlights);
   });
-  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, overlapsHighlight(base, drag.start, drag.end) ? null : color) : base;
+  const withDrag = (id: string, base: NoteHighlight[]) => drag && drag.id === id && drag.end > drag.start ? applyHighlight(base, drag.start, drag.end, color) : base;
 
   useEffect(() => {
     // iPhone: stop Safari's own long-press loupe in the writing box so press-and-hold
