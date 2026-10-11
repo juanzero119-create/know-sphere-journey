@@ -142,7 +142,7 @@ function ChessPage() {
   const renderClock = (side: 'w' | 'b') => <div className={'flex items-center justify-between rounded-md px-3 py-2 text-sm ' + (turn === side && !over ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground')}><span className="flex items-center gap-2 font-semibold">{side === 'w' ? 'White' : 'Black'}<span className="inline-flex items-center">{thinking && !over && !paused && turn === side && <Thinking since={state.thinkingSince} />}</span></span><span className="font-mono text-lg tabular-nums">{fmt(clock[side])}</span></div>;
 
   return <Shell title="Chess">
-    <Section number="01" title="Blitz game · 3+2">
+    <Section number="01" title={`Game · ${timeLabel(state.time)}`}>
       <div className="mx-auto max-w-2xl space-y-2">
         {renderClock('w')}
         <Board game={game} picked={picked} lastMove={lastMove} interactive={interactive} onTap={tap} />
@@ -155,6 +155,7 @@ function ChessPage() {
         <p className="text-xs text-muted-foreground">Full rules: legal moves only, check, checkmate, castling, en passant, promotion. Clock starts after White's first move. The game keeps running if you switch tabs.</p>
         <p className="text-xs text-muted-foreground">Pieces: Cburnett / Wikimedia Commons · CC BY-SA 3.0</p>
         {mode === 'ai' && <ChessRating />}
+        <ChessTime />
         {mode !== '2p' && <ChessElo />}
       </div>
     </Section>
