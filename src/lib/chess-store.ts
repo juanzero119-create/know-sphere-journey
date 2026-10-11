@@ -46,6 +46,8 @@ const initialState: ChessState = {
 
 // Module-level game + state: survives route unmounts, so the game (and AI
 // moves) keep running while the user browses other tabs. Visit-scoped only.
+const INSTANCE = Math.random().toString(36).slice(2, 7);
+console.log('[chess] module instance', INSTANCE);
 let game = new Chess();
 let state: ChessState = initialState;
 const listeners = new Set<() => void>();
@@ -66,6 +68,14 @@ export function getChessSnapshot(): ChessState {
   return state;
 }
 const getChessServerSnapshot = (): ChessState => initialState;
+
+(globalThis as unknown as Record<string, unknown>).__chess = {
+  INSTANCE,
+  get state() { return state; },
+  get hist() { return game.history().length; },
+  startChess,
+  resetChess,
+};
 
 export function useChessStore() {
   const snapshot = useSyncExternalStore(subscribeChess, getChessSnapshot, getChessServerSnapshot);
