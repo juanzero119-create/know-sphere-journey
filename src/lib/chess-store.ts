@@ -51,6 +51,7 @@ let state: ChessState = initialState;
 const listeners = new Set<() => void>();
 
 function emit() {
+  console.log('[chess] emit', { playPressed: state.playPressed, paused: state.paused, mode: state.mode, hist: game.history().length });
   state = { ...state, version: state.version + 1 };
   listeners.forEach((l) => l());
 }
@@ -150,7 +151,7 @@ async function maybeAiMove() {
   // A fresh game waits for Play: the AI never plays the very first move by
   // itself, so "New game" leaves the board ready instead of paused. Once any
   // move has landed (the human's, or Play was pressed) the loop runs normally.
-  if (!state.playPressed && game.history().length === 0) return;
+  if (!state.playPressed && game.history().length === 0) { console.log('[chess] AI held: waiting for Play'); return; }
   aiRunning = true;
   // Opening variety: each side's first move is a random pawn move played
   // locally, so games don't all start with the same position. From the
@@ -277,6 +278,7 @@ export function setChessPaused(paused: boolean) {
 // green). A new game starts unplayed but ready — not paused — so the green only
 // appears once Play is pressed, whatever colour the human chose.
 export function startChess() {
+  console.log('[chess] startChess called', { playPressed: state.playPressed, paused: state.paused, mode: state.mode });
   if (state.playPressed && !state.paused) return;
   state = { ...state, playPressed: true, paused: false, version: state.version + 1 };
   emit();
