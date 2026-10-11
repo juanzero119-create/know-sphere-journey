@@ -159,8 +159,6 @@ function Notes() {
     };
   }, []);
 
-  // Press-and-hold on plain text adds the chosen color; press-and-hold on text that is
-  // already highlighted removes the highlight it touches (undo).
   // Dragging always paints the chosen color (so re-dragging never erases); holding still on a
   // highlight without dragging removes that highlight (undo).
   const paint = (ranges: NoteHighlight[], start: number, end: number) => {
