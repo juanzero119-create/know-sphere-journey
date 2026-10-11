@@ -24,6 +24,7 @@ export interface ChessState {
   aiNote: string;
   elo: { w: number; b: number };
   paused: boolean;
+  playPressed: boolean;
   time: ChessTime;
 }
 
@@ -39,6 +40,7 @@ const initialState: ChessState = {
   aiNote: '',
   elo: { w: DEFAULT_ELO, b: DEFAULT_ELO },
   paused: false,
+  playPressed: false,
   time: DEFAULT_TIME,
 };
 
@@ -192,6 +194,7 @@ export function resetChess(mode?: ChessMode) {
     elo: { ...state.elo },
     time: { ...state.time },
     paused: aiOpens,
+    playPressed: false,
   };
   listeners.forEach((l) => l());
   void maybeAiMove(); // a no-op while paused; Play resumes it
