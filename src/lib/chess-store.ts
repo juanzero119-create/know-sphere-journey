@@ -148,6 +148,21 @@ async function maybeAiMove() {
   const aiTurn = state.mode === 'aivai' || (state.mode === 'ai' && turn !== state.humanSide);
   if (!aiTurn || isOver() || state.paused || aiRunning) return;
   aiRunning = true;
+  // Opening variety: each side's first move is a random pawn move played
+  // locally, so games don't all start with the same position. From the
+  // second move on the chosen AI model decides everything itself.
+  if (game.history().length < 2) {
+    const pawns = game.moves({ verbose: true }).filter((m) => m.piece === 'p');
+    const pick = pawns[Math.floor(Math.random() * pawns.length)];
+    if (pick) {
+      const m = game.move(pick.san);
+      if (m) applyMove(m.from, m.to, turn);
+    }
+    aiRunning = false;
+    emit();
+    void maybeAiMove();
+    return;
+  }
   state.thinking = true;
   state.thinkingSince = Date.now();
   state.aiNote = '';
