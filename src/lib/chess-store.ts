@@ -122,7 +122,7 @@ function maybePlayEndSound() {
 }
 
 function applyMove(from: Square, to: Square, turn: 'w' | 'b') {
-  state.clock = { ...state.clock, [turn]: state.clock[turn] + (state.started ? INC : 0) };
+  state.clock = { ...state.clock, [turn]: state.clock[turn] + (state.started ? incMs(state.time) : 0) };
   state.started = true;
   state.lastMove = [from, to];
   playMoveSound();
@@ -184,8 +184,9 @@ export function resetChess(mode?: ChessMode) {
     version: state.version + 1,
     mode: mode ?? state.mode,
     humanSide: state.humanSide,
-    clock: { w: BLITZ, b: BLITZ },
+    clock: { w: startMs(state.time), b: startMs(state.time) },
     elo: { ...state.elo },
+    time: { ...state.time },
   };
   listeners.forEach((l) => l());
   void maybeAiMove();
@@ -206,6 +207,14 @@ export function setChessElo(side: 'w' | 'b', elo: number) {
   if (!parsed.success) return;
   state = { ...state, elo: { ...state.elo, [side]: parsed.data } };
   emit();
+}
+
+export function setChessTime(time: ChessTime) {
+  const parsed = timeSchema.safeParse(time);
+  if (!parsed.success) return;
+  if (parsed.data.minutes === state.time.minutes && parsed.data.incrementSec === state.time.incrementSec) return;
+  state = { ...state, time: parsed.data };
+  resetChess(); // new clocks apply from the next game
 }
 
 export function setChessPaused(paused: boolean) {
