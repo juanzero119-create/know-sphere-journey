@@ -95,9 +95,7 @@ Blend this with the overall situation: if you have a big time lead over your opp
       : '';
     const difficulty = `Play at an approximate ${data.elo} Elo difficulty target, not maximum strength. This is a simulated difficulty, not a certified rating. At 400–700 use basic one-move plans and miss complex tactics; at 800–1100 notice obvious captures and checks but miss combinations; at 1200–1500 develop sensibly and consider short tactics; at 1600–1900 consider tactical replies and positional plans; at 2000–2400 calculate forcing variations carefully and apply advanced technique. Use the techniques above only as appropriate to this target. Always choose a legal move. Reply with ONLY one SAN move.`;
     const out = await ask(data.model, `${prompt}\n\n${clock ? `${clock}\n\n` : ''}${difficulty}`, key);
-    // On any AI failure (out of credits, busy, unavailable model) play a random
-    // legal move instead of stalling the game, and tell the player why.
-    if ('error' in out) return { move: legal[Math.floor(Math.random() * legal.length)], fallback: true, error: out.error };
+    if ('error' in out) return { error: out.error };
     const tokens = (out.text ?? '').replace(/[.,!*`"]/g, ' ').split(/\s+/).filter(Boolean);
     const move = [...tokens].reverse().find(t => legal.includes(t)) ?? legal.find(m => out.text?.includes(m));
     if (move) return { move, fallback: false };
