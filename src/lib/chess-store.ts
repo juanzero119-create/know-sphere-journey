@@ -130,6 +130,7 @@ function applyMove(from: Square, to: Square, turn: 'w' | 'b') {
   state.clock = { ...state.clock, [turn]: state.clock[turn] + (state.started ? incMs(state.time) : 0) };
   state.started = true;
   state.lastMove = [from, to];
+  state.aiNote = ''; // a landed move clears any stale AI error note
   playMoveSound();
   maybePlayEndSound();
   startClock();
