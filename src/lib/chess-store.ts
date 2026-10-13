@@ -212,12 +212,14 @@ async function maybeAiMove() {
     if (r.fallback) state.aiNote = 'The AI gave an unclear answer, so a random legal move was played.';
     applyMove(m.from, m.to, turn);
   } catch {
-    state.aiNote = 'The AI could not move. Try again.';
+    state.aiNote = 'The AI could not move. Press Play to try again.';
   } finally {
     aiRunning = false;
     state.thinking = false;
     emit();
-    void maybeAiMove();
+    // No re-trigger here: a successful move already re-fires the loop through
+    // applyMove, and re-firing after an error would retry in a tight loop,
+    // spam the AI service, and wipe the error note before it can be read.
   }
 }
 
@@ -294,8 +296,10 @@ export function setChessPaused(paused: boolean) {
 // green). A new game starts unplayed but ready — not paused — so the green only
 // appears once Play is pressed, whatever colour the human chose.
 export function startChess() {
-  if (state.playPressed && !state.paused) return;
-  state = { ...state, playPressed: true, paused: false, version: state.version + 1 };
+  // After an AI error the game sits waiting on the AI's turn; pressing Play
+  // then acts as a retry, so don't bail out while an error note is showing.
+  if (state.playPressed && !state.paused && !state.aiNote) return;
+  state = { ...state, playPressed: true, paused: false, aiNote: '', version: state.version + 1 };
   emit();
   void maybeAiMove();
 }
